@@ -45,6 +45,7 @@ onUnmounted(() => {
             <div
                 class="bg-white dark:bg-gray-800 py-8 px-6 shadow rounded-3xl sm:px-10"
             >
+            {{ authStore.user }}
                 <form
                     class="space-y-6"
                     @submit.prevent="authStore.handleLogin(form)"

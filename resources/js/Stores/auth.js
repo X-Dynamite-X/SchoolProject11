@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import axios from "axios"
 import router from "@/router/router";
 
+const csrf =()=> axios.get('/sanctum/csrf-cookie');
+
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         authUser: null,
@@ -19,6 +21,8 @@ export const useAuthStore = defineStore('auth', {
         },
         async getUser() {
             try {
+                await csrf();
+                await this.getToken();
                 const response = await axios.get('/api/user'); // تأكد من صحة التوجيه
                 this.authUser = response.data;
             } catch (error) {
@@ -26,30 +30,24 @@ export const useAuthStore = defineStore('auth', {
                 this.authUser = null;
             }
         },
-        async handleLogin(data) {
-            this.authErrors = [];
-            await this.getToken(); // الحصول على CSRF Cookie
-
-            try {
-                const response = await axios.post('/login', {
+        async handleLogin(data){
+            // this.authErrors=[];
+            console.log(data);
+            await this.getToken()
+            try{
+                const r = await axios.post('/login', {
                     email: data.email,
                     password: data.password,
-                });
-
-                console.log("Login successful:", response.data);
-
-                // تحديث بيانات المستخدم بعد تسجيل الدخول
-                await this.getUser();
-
-                router.push("/"); // التوجيه إلى الصفحة الرئيسية
-            } catch (error) {
-                console.error("Login Error:", error);
-                if (error.response?.status === 422) {
+                    });
+                    console.log(r.data);
+                    await this.getUser();
+                // router.push("/");
+            }
+            catch(error){
+                if(error.response.status === 422){
                     this.authErrors = error.response.data.errors;
                 }
-            
-        }
-
+            }
         },
         async handleRegister(data) {
             this.authErrors = [];
