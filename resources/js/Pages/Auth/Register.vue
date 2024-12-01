@@ -6,10 +6,10 @@ import { useAuthStore } from "@/Stores/auth";
 import BigLogo from "@/components/AllApp/BigLogo.vue";
 import InputForm from "@/components/Auth/InputForm.vue";
 
-watch()({
+// watch()({
 
 
-})
+// })
 
 const authStore = useAuthStore();
 
