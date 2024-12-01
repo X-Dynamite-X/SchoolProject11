@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async handleLogin(data){
-            // this.authErrors=[];
+            this.authErrors=[];
             console.log(data);
             await this.getToken()
             try{
@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', {
         },
         async handleRegister  (data)  {
             this.authErrors=[];
-            
+
             await this.getToken()
             try{
                 await axios.post('/register', {
@@ -119,6 +119,10 @@ export const useAuthStore = defineStore('auth', {
                     this.authErrors = error.response.data.errors;
                 }
             }
-        }
-    }
+        },
+        clearErrors() {
+            this.authErrors = []; // تفريغ الأخطاء
+            console.log("clearErrors");
+        },
+    },
 });

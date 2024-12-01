@@ -1,28 +1,46 @@
 <script setup>
-import {ref} from "vue"
+import { ref,watch} from "vue";
+import { useRouter } from "vue-router";
+
 import BigLogo from "@/components/AllApp/BigLogo.vue";
 import InputForm from "@/components/Auth/InputForm.vue";
 import { useAuthStore } from "@/Stores/auth";
-const authStore = useAuthStore() ;
+const authStore = useAuthStore();
 const form = ref({
     email: "",
     password: "",
-})
- 
+});
+const router = useRouter();
+
+// watch(
+//     () => router.currentRoute.value, // مراقبة المسار الحالي
+//     () => {
+//         authStore.clearErrors(); // تفريغ الأخطاء عند تغيير المسار
+//     }
+// );
 </script>
 <template>
-    <div class="flex flex-col justify-center px-4 py-8 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900  ">
+    <div
+        class="flex flex-col justify-center px-4 py-8 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900"
+    >
         <!-- شعار أو عنوان -->
         <BigLogo>
             <h2
-                class="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
+                class="mt-6 text-center text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl"
+            >
                 Sign in to your account
             </h2>
         </BigLogo>
         <!-- الفورم -->
         <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md lg:max-w-lg">
-            <div class="bg-white dark:bg-gray-800   py-8 px-6 shadow rounded-3xl sm:px-10">
-                <form class="space-y-6" @submit.prevent="authStore.handleLogin(form)" method="POST">
+            <div
+                class="bg-white dark:bg-gray-800 py-8 px-6 shadow rounded-3xl sm:px-10"
+            >
+                <form
+                    class="space-y-6"
+                    @submit.prevent="authStore.handleLogin(form)"
+                    method="POST"
+                >
                     <!-- البريد الإلكتروني -->
 
                     <InputForm
@@ -35,7 +53,6 @@ const form = ref({
                         label="Email Address"
                         v-model="form.email"
                         :errorMessage="authStore.erroes.email"
-
                     />
                     <!-- كلمة المرور -->
                     <InputForm
@@ -65,8 +82,10 @@ const form = ref({
                 <p class="mt-6 text-center text-sm text-gray-600">
                     dont have acount ?
                     <router-link
-                    :to="{name:'register'}"
-                    class="font-medium text-indigo-600 hover:text-indigo-500"
+                    @click="authStore.clearErrors()"
+
+                        :to="{ name: 'register' }"
+                        class="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                         Register
                     </router-link>
