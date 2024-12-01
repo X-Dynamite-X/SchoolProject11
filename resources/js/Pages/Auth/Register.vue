@@ -64,7 +64,7 @@ onUnmounted(() => {
                         v-model="form.name"
                         placeholder="Enter User Name"
                         label="Enter User Name"
-                        :errorMessage="authStore.erroes.name"
+                        :errorMessage="authStore.errors.name"
                     />
                     <!-- البريد الإلكتروني -->
                     <InputForm
@@ -76,7 +76,7 @@ onUnmounted(() => {
                         v-model="form.email"
                         placeholder="Email Address"
                         label="Email Address"
-                        :errorMessage="authStore.erroes.email"
+                        :errorMessage="authStore.errors.email"
                     />
                     <!-- كلمة المرور -->
                     <InputForm
@@ -88,7 +88,7 @@ onUnmounted(() => {
                         v-model="form.password"
                         placeholder="Password"
                         label="Password"
-                        :errorMessage="authStore.erroes.password"
+                        :errorMessage="authStore.errors.password"
                     />
                     <!-- تأكيد كلمة المرور -->
                     <InputForm

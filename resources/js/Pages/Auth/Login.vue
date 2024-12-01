@@ -61,7 +61,7 @@ onUnmounted(() => {
                         placeholder="Email Address"
                         label="Email Address"
                         v-model="form.email"
-                        :errorMessage="authStore.erroes.email"
+                        :errorMessage="authStore.errors.email"
                     />
                     <!-- كلمة المرور -->
                     <InputForm
@@ -73,7 +73,7 @@ onUnmounted(() => {
                         placeholder="Password"
                         label="Password"
                         v-model="form.password"
-                        :errorMessage="authStore.erroes.password"
+                        :errorMessage="authStore.errors.password"
                     />
 
                     <!-- زر تسجيل الدخول -->
@@ -104,7 +104,7 @@ onUnmounted(() => {
                     <router-link
 
                         :to="{ name: 'register' }"
-                        class="font-medium text-indigo-600 hover:text-indigo-500  dark:text-cyan-600 dark:hover:text-cyan-500"
+                        class="font-medium text-indigo-600 hover:text-indigo-500 "
                     >
                         Register
                     </router-link>
