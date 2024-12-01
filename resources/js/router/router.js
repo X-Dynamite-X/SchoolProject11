@@ -49,38 +49,38 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(async (to, from, next) => {
-  const authStore = useAuthStore();
+// router.beforeEach(async (to, from, next) => {
+//   const authStore = useAuthStore();
 
-  // التحقق من وجود بيانات المستخدم
-  if (!authStore.user) {
-    try {
-      await authStore.getUser();
-    } catch (error) {
-      return next({ name: 'login' });
-    }
-  }
+//   // التحقق من وجود بيانات المستخدم
+//   if (!authStore.user) {
+//     try {
+//       await authStore.getUser();
+//     } catch (error) {
+//       return next({ name: 'login' });
+//     }
+//   }
 
-  const isAuthenticated = authStore.user;
+//   const isAuthenticated = authStore.user;
 
-  // التحقق من الصلاحيات
-  if (
-    isAuthenticated &&
-    isAuthenticated.roles[0].name !== 'admin' &&
-    (to.name === 'adminHome' || to.name === 'login' || to.name === 'register' || to.name === 'ForgotPsasword' || to.name === 'ResetPassword')
-  ) {
-    next({ name: 'home' });
-  } else if (
-    isAuthenticated &&
-    isAuthenticated.roles[0].name === 'admin' &&
-    (to.name === 'login' || to.name === 'register' || to.name === 'ForgotPsasword' || to.name === 'ResetPassword')
-  ) {
-    next({ name: 'adminHome' });
-  } else if (!isAuthenticated && to.name !== 'login' && to.name !== 'register' && to.name !== 'ForgotPsasword' && to.name !== 'ResetPassword') {
-    next({ name: 'login' });
-  } else {
-    next();
-  }
-});
+//   // التحقق من الصلاحيات
+//   if (
+//     isAuthenticated &&
+//     isAuthenticated.roles[0].name !== 'admin' &&
+//     (to.name === 'adminHome' || to.name === 'login' || to.name === 'register' || to.name === 'ForgotPsasword' || to.name === 'ResetPassword')
+//   ) {
+//     next({ name: 'home' });
+//   } else if (
+//     isAuthenticated &&
+//     isAuthenticated.roles[0].name === 'admin' &&
+//     (to.name === 'login' || to.name === 'register' || to.name === 'ForgotPsasword' || to.name === 'ResetPassword')
+//   ) {
+//     next({ name: 'adminHome' });
+//   } else if (!isAuthenticated && to.name !== 'login' && to.name !== 'register' && to.name !== 'ForgotPsasword' && to.name !== 'ResetPassword') {
+//     next({ name: 'login' });
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;

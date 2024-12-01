@@ -1,5 +1,5 @@
 <script setup>
-import { ref,watch} from "vue";
+import { ref,onMounted , onUnmounted} from "vue";
 import { useRouter } from "vue-router";
 
 import BigLogo from "@/components/AllApp/BigLogo.vue";
@@ -11,13 +11,22 @@ const form = ref({
     password: "",
 });
 const router = useRouter();
+console.log( router.currentRoute.value.name);
 
-// watch(
-//     () => router.currentRoute.value, // مراقبة المسار الحالي
-//     () => {
-//         authStore.clearErrors(); // تفريغ الأخطاء عند تغيير المسار
-//     }
-// );
+let unregisterRouterHook;
+
+onMounted(() => {
+  unregisterRouterHook = router.afterEach(() => {
+    authStore.clearErrors(); // تفريغ الأخطاء عند تغيير المسار
+  });
+});
+
+onUnmounted(() => {
+  // إزالة المراقبة عند تدمير المكون
+  if (unregisterRouterHook) {
+    unregisterRouterHook();
+  }
+});
 </script>
 <template>
     <div
@@ -79,16 +88,27 @@ const router = useRouter();
                 </form>
 
                 <!-- رابط التسجيل -->
-                <p class="mt-6 text-center text-sm text-gray-600">
+                <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-200">
+                    <router-link
+
+                        :to="{ name: 'ForgotPsasword' }"
+                        class="font-medium text-indigo-600 hover:text-indigo-500  dark:text-cyan-600 dark:hover:text-cyan-500  "
+                    >
+                    Forgot password?
+
+                    </router-link>
+
+                </p>
+                <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-200">
                     dont have acount ?
                     <router-link
-                    @click="authStore.clearErrors()"
 
                         :to="{ name: 'register' }"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
+                        class="font-medium text-indigo-600 hover:text-indigo-500  dark:text-cyan-600 dark:hover:text-cyan-500"
                     >
                         Register
                     </router-link>
+
                 </p>
             </div>
         </div>

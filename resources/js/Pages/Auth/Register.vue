@@ -1,11 +1,11 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 
 import { useAuthStore } from "@/Stores/auth";
 import BigLogo from "@/components/AllApp/BigLogo.vue";
 import InputForm from "@/components/Auth/InputForm.vue";
-watch({});
+
 const authStore = useAuthStore();
 const router = useRouter();
 
@@ -16,12 +16,19 @@ const form = ref({
     password_confirmation: "",
 });
 
-watch(
-    () => router.currentRoute.value, // مراقبة المسار الحالي
-    () => {
-        authStore.clearErrors(); // تفريغ الأخطاء عند تغيير المسار
+let unregisterRouterHook;
+
+onMounted(() => {
+    unregisterRouterHook = router.afterEach(() => {
+        authStore.clearErrors();
+    });
+});
+
+onUnmounted(() => {
+    if (unregisterRouterHook) {
+        unregisterRouterHook();
     }
-);
+});
 </script>
 
 <template>
@@ -109,10 +116,8 @@ watch(
                 <p class="mt-6 text-center text-sm text-gray-600">
                     Already have an account?
                     <router-link
-                    @click="authStore.clearErrors()"
-
                         :to="{ name: 'login' }"
-                        class="font-medium text-indigo-600 hover:text-indigo-500"
+                        class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-cyan-600 dark:hover:text-cyan-500"
                     >
                         Sign in
                     </router-link>
