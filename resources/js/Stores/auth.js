@@ -18,32 +18,38 @@ export const useAuthStore = defineStore('auth', {
             await axios.get('/sanctum/csrf-cookie');
         },
         async getUser() {
-            await this.getToken();
             try {
-                const data = await axios.get("/api/user");
-                this.authUser = data.data;
+                const response = await axios.get('/api/user'); // تأكد من صحة التوجيه
+                this.authUser = response.data;
             } catch (error) {
-                console.error("Failed to fetch user:", error);
+                console.error("User Fetch Error:", error);
                 this.authUser = null;
             }
         },
         async handleLogin(data) {
             this.authErrors = [];
-            let x = await this.getToken();
+            await this.getToken(); // الحصول على CSRF Cookie
 
-            console.log(x);
             try {
-                await axios.post('/login', {
+                const response = await axios.post('/login', {
                     email: data.email,
                     password: data.password,
                 });
-                router.push("/");
+
+                console.log("Login successful:", response.data);
+
+                // تحديث بيانات المستخدم بعد تسجيل الدخول
+                await this.getUser();
+
+                router.push("/"); // التوجيه إلى الصفحة الرئيسية
             } catch (error) {
-                console.log(error);
+                console.error("Login Error:", error);
                 if (error.response?.status === 422) {
                     this.authErrors = error.response.data.errors;
                 }
-            }
+            
+        }
+
         },
         async handleRegister(data) {
             this.authErrors = [];
@@ -55,6 +61,7 @@ export const useAuthStore = defineStore('auth', {
                     password: data.password,
                     password_confirmation: data.password_confirmation,
                 });
+
                 await axios.post('/logout');
                 router.push("/login");
             } catch (error) {

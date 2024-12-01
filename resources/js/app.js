@@ -1,4 +1,4 @@
-import "@/bootstrap";
+// import "@/bootstrap";
 import "@/axios";
 import { createApp } from "vue";
 import { createPinia } from 'pinia';
