@@ -4,6 +4,7 @@ module.exports = {
 		'./resources/**/*.ts',
 		'./resources/**/*.vue',
 	],
+    darkMode: 'class',
 	theme: {
 		extend: {},
 	},
