@@ -1,31 +1,36 @@
 <script setup>
-import { defineProps ,onMounted ,ref } from "vue";
+import { defineProps, ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
-import {useAuthStore } from "@/Stores/auth"
+import { useAuthStore } from "@/Stores/auth";
 
 const authStore = useAuthStore();
-
 const route = useRoute();
-
-const prpos = defineProps({
+defineProps({
     menuItems: {
         type: Array,
         required: true,
     },
-
 });
 const isAuth = ref(false);
 onMounted(() => {
     console.log(localStorage.getItem("authUser"));
 
-    if(authStore.user){
+    if (authStore.user) {
         isAuth.value = true;
-    }else{
+    } else {
         isAuth.value = false;
     }
 });
-
-console.log(prpos.isUser);
+watch(
+    () => authStore.user,
+    (newVal, oldVal) => {
+        if (newVal) {
+            isAuth.value = true;
+        } else {
+            isAuth.value = false;
+        }
+    }
+);
 </script>
 
 <template>
@@ -41,7 +46,11 @@ console.log(prpos.isUser);
                             : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     ]"
                     aria-current="page"
-                    v-if="isAuth === item.auth "
+                    v-if="
+                        (isAuth === item.auth && item.allUser) ||
+                        (isAuth === item.auth &&
+                            item.role === authStore.roles[0].name)
+                    "
                 >
                     {{ item.name }}
                 </router-link>

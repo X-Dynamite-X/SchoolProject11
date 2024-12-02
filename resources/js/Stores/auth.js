@@ -7,24 +7,32 @@ const csrf =()=> axios.get('/sanctum/csrf-cookie');
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         // authUser: null,
-        authUser: JSON.parse(localStorage.getItem('authUser')) || null,
+        // authRole: null,
 
+        authUser: JSON.parse(localStorage.getItem('authUser')) || null,
+        authRole:  JSON.parse(localStorage.getItem('authRole')) || null,
         authErrors: [],
         authStatus: null,
     }),
     getters: {
         user: (state) => state.authUser,
         errors: (state) => state.authErrors,
+        roles: (state) => state.authRole,
         status: (state) => state.authStatus,
     },
     actions: {
         saveUserToStorage(user) {
             this.authUser = user;
+            this.authRole = user.roles;
             localStorage.setItem('authUser', JSON.stringify(user));
+            localStorage.setItem('authRole', JSON.stringify(user.roles));
+
         },
         clearUserFromStorage() {
             this.authUser = null;
             localStorage.removeItem('authUser');
+            localStorage.removeItem('authRole');
+
         },
         async getToken() {
             await axios.get('/sanctum/csrf-cookie');
@@ -38,6 +46,7 @@ export const useAuthStore = defineStore('auth', {
                 this.saveUserToStorage(response.data);
 
 
+
                 // this.authUser = response.data;
             } catch (error) {
                 console.error("User Fetch Error:", error);
@@ -47,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async handleLogin(data){
-            // this.authErrors=[];
+            this.authErrors=[];
             console.log(data);
             await this.getToken()
             try{
@@ -85,9 +94,9 @@ export const useAuthStore = defineStore('auth', {
         },
         async handleLogout() {
             await axios.post('/logout');
-            router.push("/login");
             this.clearUserFromStorage();
             this.authUser = null;
+            router.push("/login");
         },
         async handleForgotPassword(data) {
             this.authErrors = [];

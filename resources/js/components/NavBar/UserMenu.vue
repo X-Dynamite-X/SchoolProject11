@@ -53,11 +53,14 @@ onBeforeUnmount(() => {
     <div
       v-if="showMenu"
       id="user-menu"
-      class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5"
+      class="absolute items-center right-0 z-10 mt-2 w-48 origin-top-right rounded-md text-gray-700 bg-white dark:bg-gray-600  dark:text-white py-1 shadow-lg ring-1 ring-black/5"
     >
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700">Your Profile</a>
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700">Settings</a>
-      <span @click="authStore.handleLogout()" href="#" class="block px-4 py-2 text-sm text-gray-700">Sign out</span>
+      <a href="#" class="block px-4 py-2 text-sm ">Your Profile</a>
+      <a href="#" class="block px-4 py-2 text-sm ">Settings</a>
+      <button  @click="authStore.handleLogout()"  class="block px-4 py-2 text-sm   ">
+
+        Logout
+      </button>
     </div>
   </div>
 </template>

@@ -47,4 +47,8 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'subject_users')->withPivot('mark');
+    }
 }

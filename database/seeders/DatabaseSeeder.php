@@ -14,11 +14,27 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // User::factory(10)->create();
+        $this->call(
+            [
+                RoleSeeder::class,
 
-        User::factory()->create([
+            ]
+        );
+        $user = User::factory()->create([
             'name' => 'dynamite',
             'email' => 'dynamite@gmail.com',
-            "password"=>"123"
+            "password" => "123"
         ]);
+        $user->assignRole("admin");
+        $user->save();
+        $this->call(
+            [
+                 UserSeeder::class,
+                PermissionSeeder::class,
+                SubjectSeeder::class,
+                SubjectUserSeeder::class
+            ]
+        );
+
     }
 }

@@ -1,9 +1,11 @@
 <script setup>
     import Navigation from "@/Layouts/Navigation.vue"
     const menuItems = [
-  { name: 'Home' , to:"home" , auth:true},
-  { name: 'Login' ,to:"login", auth:false },
-  { name: 'Register' ,to:"register" , auth:false },
+  { name: 'admin' , to:"adminHome" , auth:true ,allUser:false, role:"admin"},
+  { name: 'Home' , to:"home" , auth:true ,allUser:true},
+
+  { name: 'Login' ,to:"login", auth:false ,allUser:true},
+  { name: 'Register' ,to:"register" , auth:false ,allUser:true},
 ];
 
 
