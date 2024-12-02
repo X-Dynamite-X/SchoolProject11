@@ -4,6 +4,7 @@ use App\Models\Subject;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\v1\UserController;
 use App\Http\Controllers\api\v1\SubjectController;
 
 
@@ -13,4 +14,5 @@ Route::get('/user', function (Request $request) {
         "roles" => $request->user()->roles()->get() // Fetch the actual roles from the database
     ]);
 })->middleware('auth:sanctum')->name("api.user");
-Route::resource('subject', SubjectController::class)->middleware('auth:sanctum');
+Route::resource('admin/subject', SubjectController::class) ;
+Route::resource('admin/user', UserController::class) ;
