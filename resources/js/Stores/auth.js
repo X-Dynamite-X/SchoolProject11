@@ -6,7 +6,9 @@ const csrf =()=> axios.get('/sanctum/csrf-cookie');
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        authUser: null,
+        // authUser: null,
+        authUser: JSON.parse(localStorage.getItem('authUser')) || null,
+
         authErrors: [],
         authStatus: null,
     }),
@@ -16,18 +18,32 @@ export const useAuthStore = defineStore('auth', {
         status: (state) => state.authStatus,
     },
     actions: {
+        saveUserToStorage(user) {
+            this.authUser = user;
+            localStorage.setItem('authUser', JSON.stringify(user));
+        },
+        clearUserFromStorage() {
+            this.authUser = null;
+            localStorage.removeItem('authUser');
+        },
         async getToken() {
             await axios.get('/sanctum/csrf-cookie');
         },
         async getUser() {
             try {
-                await csrf();
+                // await csrf();
                 await this.getToken();
                 const response = await axios.get('/api/user'); // تأكد من صحة التوجيه
-                this.authUser = response.data;
+                console.log(response.data);
+                this.saveUserToStorage(response.data);
+
+
+                // this.authUser = response.data;
             } catch (error) {
                 console.error("User Fetch Error:", error);
                 this.authUser = null;
+                this.clearUserFromStorage();
+
             }
         },
         async handleLogin(data){

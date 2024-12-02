@@ -16,19 +16,19 @@ const form = ref({
     password_confirmation: "",
 });
 
-let unregisterRouterHook;
+// let unregisterRouterHook;
 
-onMounted(() => {
-    unregisterRouterHook = router.afterEach(() => {
-        authStore.clearErrors();
-    });
-});
+// onMounted(() => {
+//     unregisterRouterHook = router.afterEach(() => {
+//         authStore.clearErrors();
+//     });
+// });
 
-onUnmounted(() => {
-    if (unregisterRouterHook) {
-        unregisterRouterHook();
-    }
-});
+// onUnmounted(() => {
+//     if (unregisterRouterHook) {
+//         unregisterRouterHook();
+//     }
+// });
 </script>
 
 <template>
@@ -116,6 +116,7 @@ onUnmounted(() => {
                 <p class="mt-6 text-center text-sm text-gray-600">
                     Already have an account?
                     <router-link
+                    @click="authStore.clearErrors()"
                         :to="{ name: 'login' }"
                         class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-cyan-600 dark:hover:text-cyan-500"
                     >

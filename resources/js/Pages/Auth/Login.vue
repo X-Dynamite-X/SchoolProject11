@@ -13,20 +13,20 @@ const form = ref({
 const router = useRouter();
 console.log( router.currentRoute.value.name);
 
-let unregisterRouterHook;
+// let unregisterRouterHook;
 
-onMounted(() => {
-  unregisterRouterHook = router.afterEach(() => {
-    authStore.clearErrors(); // تفريغ الأخطاء عند تغيير المسار
-  });
-});
+// onMounted(() => {
+//   unregisterRouterHook = router.afterEach(() => {
+//     authStore.clearErrors(); // تفريغ الأخطاء عند تغيير المسار
+//   });
+// });
 
-onUnmounted(() => {
-  // إزالة المراقبة عند تدمير المكون
-  if (unregisterRouterHook) {
-    unregisterRouterHook();
-  }
-});
+// onUnmounted(() => {
+//   // إزالة المراقبة عند تدمير المكون
+//   if (unregisterRouterHook) {
+//     unregisterRouterHook();
+//   }
+// });
 </script>
 <template>
     <div
@@ -103,7 +103,7 @@ onUnmounted(() => {
                 <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-200">
                     dont have acount ?
                     <router-link
-
+                    @click="authStore.clearErrors()"
                         :to="{ name: 'register' }"
                         class="font-medium text-indigo-600 hover:text-indigo-500 "
                     >
