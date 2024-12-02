@@ -57,7 +57,7 @@ export const useAuthStore = defineStore('auth', {
                     });
                     console.log(r.data);
                     await this.getUser();
-                // router.push("/");
+                router.push("/");
             }
             catch(error){
                 if(error.response.status === 422){
@@ -75,9 +75,7 @@ export const useAuthStore = defineStore('auth', {
                     password: data.password,
                     password_confirmation: data.password_confirmation,
                 });
-
-                await axios.post('/logout');
-                router.push("/login");
+                await this.handleLogout();
             } catch (error) {
                 if (error.response?.status === 422) {
                     this.authErrors = error.response.data.errors;
@@ -89,7 +87,6 @@ export const useAuthStore = defineStore('auth', {
             await axios.post('/logout');
             router.push("/login");
             this.clearUserFromStorage();
-
             this.authUser = null;
         },
         async handleForgotPassword(data) {
