@@ -1,6 +1,10 @@
 <script setup>
-import { defineProps } from "vue";
+import { defineProps ,onMounted ,ref } from "vue";
 import { useRoute } from "vue-router";
+import {useAuthStore } from "@/Stores/auth"
+
+const authStore = useAuthStore();
+
 const route = useRoute();
 
 const prpos = defineProps({
@@ -8,11 +12,19 @@ const prpos = defineProps({
         type: Array,
         required: true,
     },
-    isUser: {
-        type: String,
-        required: true,
-    },
+
 });
+const isAuth = ref(false);
+onMounted(() => {
+    console.log(localStorage.getItem("authUser"));
+
+    if(authStore.user){
+        isAuth.value = true;
+    }else{
+        isAuth.value = false;
+    }
+});
+
 console.log(prpos.isUser);
 </script>
 
@@ -29,7 +41,7 @@ console.log(prpos.isUser);
                             : 'text-gray-300 hover:bg-gray-700 hover:text-white',
                     ]"
                     aria-current="page"
-                    v-if="isUser === item.auth"
+                    v-if="isAuth === item.auth "
                 >
                     {{ item.name }}
                 </router-link>

@@ -1,9 +1,9 @@
 <script setup>
     import Navigation from "@/Layouts/Navigation.vue"
     const menuItems = [
-  { name: 'Home' , to:"home" , auth:!null},
-  { name: 'Login' ,to:"login", auth:null },
-  { name: 'Register' ,to:"register" , auth:null },
+  { name: 'Home' , to:"home" , auth:true},
+  { name: 'Login' ,to:"login", auth:false },
+  { name: 'Register' ,to:"register" , auth:false },
 ];
 
 

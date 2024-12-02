@@ -1,17 +1,28 @@
 <script setup>
-import { defineProps } from "vue";
+import { defineProps ,ref, onMounted ,computed} from "vue";
 import { useRoute } from "vue-router";
+import {useAuthStore } from "@/Stores/auth"
+
+const authStore = useAuthStore();
 const route = useRoute();
 defineProps({
     menuItems: {
         type: Array,
         required: true,
     },
-    isUser: {
-        type: String,
-        required: true,
-    },
 });
+const isAuth = ref(false);
+onMounted(() => {
+    console.log(localStorage.getItem("authUser"));
+
+    if(authStore.user){
+        isAuth.value = true;
+    }else{
+        isAuth.value = false;
+    }
+});
+
+
 </script>
 
 <template>
@@ -20,7 +31,7 @@ defineProps({
             <div v-for="item in menuItems" :key="item.name">
                 <router-link
                     :to="{ name: item.to }"
-                    v-if="isUser === item.auth"
+                    v-if="isAuth === item.auth"
 
                     :class="[
                         'block rounded-md px-3 py-2 text-base font-medium',

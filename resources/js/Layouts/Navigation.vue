@@ -57,7 +57,7 @@ const toggleMobileMenu = () => {
                 <div class="flex flex-1 items-center justify-between">
                     <SmollLogo />
 
-                    <NavMenu :menuItems="prpos.menuItems" :isUser="authStore.user" />
+                    <NavMenu :menuItems="prpos.menuItems"   />
                     <UserMenu v-if="authStore.user"  />
                 </div>
         <ToggleDarkMode />

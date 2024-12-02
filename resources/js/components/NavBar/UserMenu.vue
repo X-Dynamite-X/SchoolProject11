@@ -1,5 +1,8 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
+import {useAuthStore } from "@/Stores/auth"
+
+const authStore = useAuthStore();
 
 // حالة إظهار القائمة
 const showMenu = ref(false);
@@ -54,7 +57,7 @@ onBeforeUnmount(() => {
     >
       <a href="#" class="block px-4 py-2 text-sm text-gray-700">Your Profile</a>
       <a href="#" class="block px-4 py-2 text-sm text-gray-700">Settings</a>
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700">Sign out</a>
+      <span @click="authStore.handleLogout()" href="#" class="block px-4 py-2 text-sm text-gray-700">Sign out</span>
     </div>
   </div>
 </template>
