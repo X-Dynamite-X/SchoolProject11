@@ -24,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
                  try {
                     const data = await axios.get("/api/user");
                     this.authUser = data.data;
+                    this.authRole = data.data.roles;
                 } catch (error) {
                     this.authUser = null;
                 }
