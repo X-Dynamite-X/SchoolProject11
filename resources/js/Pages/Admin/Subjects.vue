@@ -64,9 +64,9 @@ const columns = [
 </script>
 <template>
     <div
-        class="flex-grow p-4 container bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
+        class="bg-red-800 flex-grow p-4   bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
     >
-        <div class="container w-10/12 mx-auto">
+        <div class="container w-10/12 mx-auto ">
             <SearchInput v-model="searchKeyword" placeholder="Search subjects...">
                 <template #icon>
                     <SearchIcon />
@@ -117,5 +117,6 @@ const columns = [
                 </div>
             </div>
         </div>
+
     </div>
 </template>

@@ -38,9 +38,9 @@ const pagination = computed(() => ({
 // الحسابات
 const totalUsers = computed(() => users.value?.total || 0);
 const cumulativeDisplayedUsers = computed(() => {
-    const perPage = users.value?.per_page || 10; // عدد المستخدمين لكل صفحة
-    const currentPage = pagination.value.current_page || 1; // الصفحة الحالية
-    const displayedInCurrentPage = usersData.value.length; // عدد المستخدمين في الصفحة الحالية
+    const perPage = users.value?.per_page || 10;  
+    const currentPage = pagination.value.current_page || 1;
+    const displayedInCurrentPage = usersData.value.length;
     return (currentPage - 1) * perPage + displayedInCurrentPage;
 });
 
@@ -61,7 +61,7 @@ const columns = [
 </script>
 <template>
     <div
-        class="flex-grow p-4 container bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
+        class="flex-grow p-4   bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
     >
         <div class="container w-10/12 mx-auto">
             <SearchInput v-model="searchKeyword" placeholder="Search users...">
