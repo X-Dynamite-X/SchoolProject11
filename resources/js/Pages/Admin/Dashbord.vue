@@ -1,8 +1,6 @@
 <script setup>
 import { useAdminStore } from "@/Stores/admin";
 import { onMounted, ref, computed, watch } from "vue";
-import thRoo from "@/components/Table/Th.vue";
-
 const adminStore = useAdminStore();
 const loading = ref(true);
 const currentPageUrl = ref("/api/admin/user");
@@ -94,8 +92,11 @@ const changePage = (url) => {
                         class="bg-blue-100 text-blue-900 dark:bg-blue-900 dark:text-blue-100"
                     >
                         <tr>
-                            <thRoo name="ID" />
-
+                            <th
+                                class="px-4 py-2 text-left border-b border-blue-200 dark:border-blue-700"
+                            >
+                                ID
+                            </th>
                             <th
                                 class="px-4 py-2 text-left border-b border-blue-200 dark:border-blue-700"
                             >

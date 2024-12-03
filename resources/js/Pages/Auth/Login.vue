@@ -3,7 +3,7 @@ import { ref,onMounted , onUnmounted} from "vue";
 import { useRouter } from "vue-router";
 
 import BigLogo from "@/components/AllApp/BigLogo.vue";
-import InputForm from "@/components/Auth/InputForm.vue";
+import InputForm from "@/components/FieldRequst/InputForm.vue";
 import { useAuthStore } from "@/Stores/auth";
 const authStore = useAuthStore();
 const form = ref({

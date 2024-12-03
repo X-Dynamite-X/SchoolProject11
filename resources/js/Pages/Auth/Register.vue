@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 
 import { useAuthStore } from "@/Stores/auth";
 import BigLogo from "@/components/AllApp/BigLogo.vue";
-import InputForm from "@/components/Auth/InputForm.vue";
+import InputForm from "@/components/FieldRequst/InputForm.vue";
 
 const authStore = useAuthStore();
 const router = useRouter();

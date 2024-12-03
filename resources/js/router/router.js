@@ -54,21 +54,20 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
-    if (!authStore.user) {
-         const storedUser = JSON.parse(localStorage.getItem("authUser"));
 
-        if (!storedUser) {
-          try {
-            await authStore.getUser();
-          } catch (error) {
-            return next({ name: "login" });
-          }
-        }
+    // التحقق من وجود بيانات المستخدم
+    if (!authStore.user) {
+      try {
+        await authStore.getUser();
+      } catch (error) {
+        return next({ name: 'login' });
       }
-    authStore.user
+    }
 
 
     const isAuthenticated = authStore.user;
+
+
     const userRole = isAuthenticated?.roles?.[0]?.name || null;
 
     // قوائم الصفحات بناءً على الصلاحيات
