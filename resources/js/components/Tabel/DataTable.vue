@@ -1,15 +1,8 @@
 <template>
     <table class="table-auto w-full border-collapse">
         <thead>
-            <tr>
-                <th
-                    v-for="column in columns"
-                    :key="column.key"
-                    class="px-4 py-2 border-b bg-gray-100 dark:bg-gray-800 text-left text-gray-700 dark:text-gray-300"
-                >
-                    {{ column.label }}
-                </th>
-            </tr>
+            <slot name="header" />
+
         </thead>
         <tbody>
             <slot name="row" :item="item" v-for="item in data" :key="item.id">

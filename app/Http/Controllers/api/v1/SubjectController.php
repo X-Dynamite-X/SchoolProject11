@@ -2,18 +2,32 @@
 
 namespace App\Http\Controllers\api\v1;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Subject;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
+
 class SubjectController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        return Subject::all();
+        $subjects = Cache::remember('subjects_page_' . $request->input('page', 1) . '_keyword_' . $request->input('keyword', ''), now()->addMinutes(10), function () use ($request) {
+            $query = Subject::select('id', 'name', 'success_mark' , "full_mark") // اختر الأعمدة المهمة فقط
+                ->with('users'); // إذا كنت بحاجة للأدوار
+
+            if ($keyword = $request->input('keyword')) {
+                $query->where('name', 'like', "%$keyword%");
+            }
+
+            return $query->paginate(2);
+        });
+
+        return response()->json([
+            'subjects' => $subjects,
+        ]);
     }
 
     /**

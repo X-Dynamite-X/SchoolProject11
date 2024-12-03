@@ -7,7 +7,9 @@ import Register from "@/Pages/Auth/Register.vue";
 import ForgotPsasword from "@/Pages/Auth/ForgotPsasword.vue";
 import ResetPassword from "@/Pages/Auth/ResetPassword.vue";
 import NotFound from "@/Pages/Errors/NotFound.vue"; // استيراد صفحة 404
-import Dashbord from "@/Pages/Admin/Dashbord.vue";
+import UsersAdmin from "@/Pages/Admin/Users.vue";
+import SubjectsAdmin from "@/Pages/Admin/Subjects.vue";
+
 const routes = [
     // المسارات المسجلة
     {
@@ -36,9 +38,13 @@ const routes = [
         name: "ResetPassword",
     },
     {
-        path: "/admin",
-        component: Dashbord,
-        name: "adminHome",
+        path: "/admin/users",
+        component: UsersAdmin,
+        name: "adminUsers",
+    }, {
+        path: "/admin/Subject",
+        component: SubjectsAdmin,
+        name: "adminSubjects",
     },
     {
         path: "/:catchAll(.*)",
