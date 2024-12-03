@@ -15,13 +15,11 @@ class SubjectController extends Controller
     public function index(Request $request)
     {
         $subjects = Cache::remember('subjects_page_' . $request->input('page', 1) . '_keyword_' . $request->input('keyword', ''), now()->addMinutes(10), function () use ($request) {
-            $query = Subject::select('id', 'name', 'success_mark' , "full_mark") // اختر الأعمدة المهمة فقط
-                ->with('users'); // إذا كنت بحاجة للأدوار
-
+            $query = Subject::select('id', 'name', 'success_mark', "full_mark") // اختر الأعمدة المهمة فقط
+                ->with('users'); 
             if ($keyword = $request->input('keyword')) {
                 $query->where('name', 'like', "%$keyword%");
             }
-
             return $query->paginate(2);
         });
 
