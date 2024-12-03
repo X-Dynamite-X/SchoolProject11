@@ -20,21 +20,13 @@ export const useAuthStore = defineStore('auth', {
     actions: {
 
         async getUser() {
-            try {
-                // await csrf();
-                await csrf();
-                const response = await axios.get('/api/user'); // تأكد من صحة التوجيه
-                console.log(response.data);
-                this.authUser = response.data;
-                console.log(this.authUser);
-
-                this.authRole =this.authUser.roles
-            } catch (error) {
-                console.error("User Fetch Error:", error);
-                this.authUser = null;
-                this.clearUserFromStorage();
-
-            }
+            await csrf();
+                 try {
+                    const data = await axios.get("/api/user");
+                    this.authUser = data.data;
+                } catch (error) {
+                    this.authUser = null;
+                }
         },
         async handleLogin(data){
             this.authErrors=[];
@@ -73,6 +65,7 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async handleLogout(){
+            await csrf();
             await axios.post('/logout');
             this.router.push("/login");
             this.authUser = null;

@@ -52,6 +52,12 @@ const changePage = (url) => {
 };
 
 const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
+const columns = [
+    { key: "id", label: "ID" },
+    { key: "name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "roles", label: "Role" },
+];
 </script>
 <template>
     <div
@@ -63,7 +69,6 @@ const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
                     <SearchIcon />
                 </template>
             </SearchInput>
-
             <div>
                 <DataTable :data="usersData" :loading="loading">
                     <template #header>
@@ -74,31 +79,29 @@ const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
                         />
                     </template>
                     <template #row="{ item }">
-                        
-                        <td class="px-4 py-2 border-b">{{ item.id }}</td>
-                        <td class="px-4 py-2 border-b">{{ item.name }}</td>
-                        <td class="px-4 py-2 border-b">{{ item.email }}</td>
-                        <td class="px-4 py-2 border-b">
-                            <span
-                                v-for="role in item.roles"
-                                :key="role.id"
-                                class="inline-block px-2 py-1 mr-1 text-xs font-semibold bg-blue-500 text-white rounded dark:bg-blue-600"
-                            >
-                                {{ role.name }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-2 border-b">
-                            <button
-                                class="px-3 py-1 text-xs bg-green-500 text-white rounded"
-                            >
-                                Edit
-                            </button>
-                            <button
-                                class="px-3 py-1 text-xs bg-red-500 text-white rounded"
-                            >
-                                Delete
-                            </button>
-                        </td>
+                        <DynamicRow :item="item" :columns="columns">
+                            <template #column-roles="{ item }">
+                                <span
+                                    v-for="role in item.roles"
+                                    :key="role.id"
+                                    class="inline-block px-2 py-1 mr-1 text-xs font-semibold bg-blue-500 text-white rounded dark:bg-blue-600"
+                                >
+                                    {{ role.name }}
+                                </span>
+                            </template>
+                            <template #column-actions="{ item }">
+                                <button :id="item.id"
+                                    class="px-3 py-1 text-xs bg-green-500 text-white rounded"
+                                >
+                                    Edit
+                                </button>
+                                <button  :id="item.id"
+                                    class="px-3 py-1 text-xs bg-red-500 text-white rounded"
+                                >
+                                    Delete
+                                </button>
+                            </template>
+                        </DynamicRow>
                     </template>
                 </DataTable>
 

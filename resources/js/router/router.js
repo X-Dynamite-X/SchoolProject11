@@ -64,7 +64,6 @@ router.beforeEach(async (to, from, next) => {
       }
     }
 
-
     const isAuthenticated = authStore.user;
 
 

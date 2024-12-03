@@ -23,7 +23,7 @@ class UserController extends Controller
                     ->orWhere('email', 'like', value: "%$keyword%");
             }
 
-            return $query->paginate(10);
+            return $query->paginate(2);
         });
 
         return response()->json([
