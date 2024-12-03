@@ -6,48 +6,29 @@ const csrf =()=> axios.get('/sanctum/csrf-cookie');
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
-        // authUser: null,
-        // authRole: null,
-
-        authUser: JSON.parse(localStorage.getItem('authUser')) || null,
-        authRole:  JSON.parse(localStorage.getItem('authRole')) || null,
-        authErrors: [],
+        authUser:null,
+        authErrors:[],
+        authRole: null,
         authStatus: null,
     }),
     getters: {
-        user: (state) => state.authUser,
-        errors: (state) => state.authErrors,
+        user : (satae) => satae.authUser,
+        errors : (satae) => satae.authErrors,
+        status : (satae) => satae.authStatus,
         roles: (state) => state.authRole,
-        status: (state) => state.authStatus,
     },
     actions: {
-        saveUserToStorage(user) {
-            this.authUser = user;
-            this.authRole = user.roles;
-            localStorage.setItem('authUser', JSON.stringify(user));
-            localStorage.setItem('authRole', JSON.stringify(user.roles));
 
-        },
-        clearUserFromStorage() {
-            this.authUser = null;
-            localStorage.removeItem('authUser');
-            localStorage.removeItem('authRole');
-
-        },
-        async getToken() {
-            await axios.get('/sanctum/csrf-cookie');
-        },
         async getUser() {
             try {
                 // await csrf();
-                await this.getToken();
+                await csrf();
                 const response = await axios.get('/api/user'); // تأكد من صحة التوجيه
                 console.log(response.data);
-                this.saveUserToStorage(response.data);
+                this.authUser = response.data;
+                console.log(this.authUser);
 
-
-
-                // this.authUser = response.data;
+                this.authRole =this.authUser.roles
             } catch (error) {
                 console.error("User Fetch Error:", error);
                 this.authUser = null;
@@ -57,8 +38,7 @@ export const useAuthStore = defineStore('auth', {
         },
         async handleLogin(data){
             this.authErrors=[];
-            console.log(data);
-            await this.getToken()
+             await csrf();
             try{
                 const r = await axios.post('/login', {
                     email: data.email,
@@ -76,7 +56,7 @@ export const useAuthStore = defineStore('auth', {
         },
         async handleRegister(data) {
             this.authErrors = [];
-            await this.getToken();
+            await csrf();
             try {
                 await axios.post('/register', {
                     name: data.name,
@@ -92,15 +72,17 @@ export const useAuthStore = defineStore('auth', {
                 }
             }
         },
-        async handleLogout() {
+        async handleLogout(){
             await axios.post('/logout');
-            this.clearUserFromStorage();
+            this.router.push("/login");
             this.authUser = null;
-            router.push("/login");
+            this.authRole = null;
+
+
         },
         async handleForgotPassword(data) {
             this.authErrors = [];
-            await this.getToken();
+            await csrf();
             try {
                 const response = await axios.post('/forgot-password', {
                     email: data,
@@ -114,7 +96,7 @@ export const useAuthStore = defineStore('auth', {
         },
         async handleResetPassword(resetData) {
             this.authErrors = [];
-            await this.getToken();
+            await csrf();
             try {
                 await axios.post('/reset-password', resetData);
                 router.push("/login");
