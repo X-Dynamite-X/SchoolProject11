@@ -12,18 +12,25 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = Cache::remember('users_page_' . request('page', 1), now()->addMinutes(10), function () {
-            return User::select('id', 'name', 'email') // اختر الأعمدة المهمة فقط
-                ->with('roles') // إذا كنت بحاجة للأدوار
-                ->paginate(10);
+        $users = Cache::remember('users_page_' . $request->input('page', 1) . '_keyword_' . $request->input('keyword', ''), now()->addMinutes(10), function () use ($request) {
+            $query = User::select('id', 'name', 'email') // اختر الأعمدة المهمة فقط
+                ->with('roles'); // إذا كنت بحاجة للأدوار
+
+            if ($keyword = $request->input('keyword')) {
+                $query->where('name', 'like', "%$keyword%")
+                    ->orWhere('email', 'like', value: "%$keyword%");
+            }
+
+            return $query->paginate(10);
         });
 
         return response()->json([
             'users' => $users,
         ]);
     }
+
 
 
     /**

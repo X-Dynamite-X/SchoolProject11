@@ -21,5 +21,12 @@ class UserSeeder extends Seeder
             $user->assignRole("user");
             $user->save();
         }
+        for($count =0 ;$count <= 30 ;$count++){
+            User::create([
+                "name"=>"dynamite_".$count,
+                "email"=>"dynamite_".$count."@gmail.com",
+                "password"=>"123"
+            ])->assignRole("user");
+        };
     }
 }

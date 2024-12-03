@@ -14,5 +14,9 @@ Route::get('/user', function (Request $request) {
         "roles" => $request->user()->roles()->get() // Fetch the actual roles from the database
     ]);
 })->middleware('auth:sanctum')->name("api.user");
-Route::resource('admin/subject', SubjectController::class) ;
-Route::resource('admin/user', UserController::class) ;
+
+Route::middleware("role:admin")->name("admin.")->prefix("admin")->group(function(){
+
+    Route::resource('/subject', SubjectController::class);
+    Route::resource('/user', UserController::class) ;
+});
