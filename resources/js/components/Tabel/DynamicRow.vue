@@ -8,7 +8,7 @@ defineProps({
 </script>
 
 <template>
-    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 text-center">
         <td
             v-for="column in columns"
             :key="column.key"

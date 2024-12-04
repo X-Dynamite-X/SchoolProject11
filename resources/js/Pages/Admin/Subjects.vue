@@ -11,7 +11,6 @@ import EditIcon from "@/components/Icon/EditIcon.vue";
 import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
 import InfoIcon from "@/components/Icon/InfoIcon.vue";
 
-
 const adminStore = useAdminStore();
 const loading = ref(true);
 const currentPageUrl = ref("/api/admin/subject");
@@ -19,9 +18,11 @@ const searchKeyword = ref("");
 
 const fetchData = () => {
     loading.value = true;
-    adminStore.getSubjects(currentPageUrl.value, searchKeyword.value).then(() => {
-        loading.value = false;
-    });
+    adminStore
+        .getSubjects(currentPageUrl.value, searchKeyword.value)
+        .then(() => {
+            loading.value = false;
+        });
 };
 
 onMounted(fetchData);
@@ -29,7 +30,9 @@ onMounted(fetchData);
 watch(searchKeyword, fetchData);
 
 const subjects = computed(() =>
-    adminStore.subjects(`${currentPageUrl.value}?keyword=${searchKeyword.value}`)
+    adminStore.subjects(
+        `${currentPageUrl.value}?keyword=${searchKeyword.value}`
+    )
 );
 const subjectsData = computed(() => subjects.value?.data || []);
 const pagination = computed(() => ({
@@ -60,18 +63,17 @@ const columns = [
     { key: "name", label: "Name" },
     { key: "success_mark", label: "Success Mark" },
     { key: "full_mark", label: "Full Mark" },
-
-
 ];
-
-
 </script>
 <template>
     <div
-        class="bg-red-800 flex-grow p-4   bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
+        class="bg-red-800 flex-grow p-4 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
     >
-        <div class="container w-10/12 mx-auto ">
-            <SearchInput v-model="searchKeyword" placeholder="Search subjects...">
+        <div class="container w-10/12 mx-auto">
+            <SearchInput
+                v-model="searchKeyword"
+                placeholder="Search subjects..."
+            >
                 <template #icon>
                     <SearchIcon />
                 </template>
@@ -87,24 +89,28 @@ const columns = [
                     </template>
                     <template #row="{ item }">
                         <DynamicRow :item="item" :columns="columns">
+                            <template #column-actions="{ item }">
 
-                            <template #column-actions="{ item }" >
-                                <button :id="item.id"
-                                class="px-3 py-1 text-xs bg-stone-300 dark:bg-gray-800  text-blue-400 hover:text-blue-600 rounded"
-                                >
-                                    <InfoIcon />
-                                </button>
-                                <button :id="item.id"
-                                    class="px-3 py-1 text-xs  bg-stone-300 dark:bg-gray-800  text-yellow-400 hover:text-yellow-600 rounded"
-                                >
-                                    <EditIcon />
-                                </button>
-                                <button  :id="item.id"
-                                    class="px-2 py-2 bg-stone-300 dark:bg-gray-800  text-red-400 hover:text-red-600  rounded"
-                                >
-                                    <DeleteIcon />
-                                </button>
-                            </template>
+                                     <button
+                                        :id="item.id"
+                                        class="px-3 py-1 text-xs bg-stone-300 dark:bg-gray-800 text-blue-400 hover:text-blue-600 rounded mx-1"
+                                    >
+                                        <InfoIcon />
+                                    </button>
+                                    <button
+                                        :id="item.id"
+                                        class="px-3 py-1 text-xs bg-stone-300 dark:bg-gray-800 text-yellow-400 hover:text-yellow-600 rounded mx-1"
+                                    >
+                                        <EditIcon />
+                                    </button>
+                                    <button
+                                        :id="item.id"
+                                        class="px-2 py-1 bg-stone-300 dark:bg-gray-800 text-red-400 hover:text-red-600 rounded mx-1"
+                                    >
+                                        <DeleteIcon />
+                                    </button>
+ 
+                             </template>
                         </DynamicRow>
                     </template>
                 </DataTable>
@@ -126,6 +132,5 @@ const columns = [
                 </div>
             </div>
         </div>
-
     </div>
 </template>
