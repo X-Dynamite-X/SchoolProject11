@@ -93,7 +93,7 @@ const columns = [
 
                                      <button
                                         :id="item.id"
-                                        class="px-3 py-1 text-xs bg-stone-300 dark:bg-gray-800 text-blue-400 hover:text-blue-600 rounded mx-1"
+                                        class="px-3 py-1 text-xs  bg-stone-300 dark:bg-gray-800 text-blue-400 hover:text-blue-600 rounded mx-1"
                                     >
                                         <InfoIcon />
                                     </button>
@@ -105,11 +105,11 @@ const columns = [
                                     </button>
                                     <button
                                         :id="item.id"
-                                        class="px-2 py-1 bg-stone-300 dark:bg-gray-800 text-red-400 hover:text-red-600 rounded mx-1"
+                                        class="px-3 py-1 bg-stone-300 dark:bg-gray-800 text-red-400 hover:text-red-600 rounded mx-1"
                                     >
                                         <DeleteIcon />
                                     </button>
- 
+
                              </template>
                         </DynamicRow>
                     </template>

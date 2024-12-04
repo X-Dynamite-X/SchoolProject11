@@ -1,5 +1,5 @@
 <script setup>
-import { ref,onMounted , onUnmounted} from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 
 import BigLogo from "@/components/AllApp/BigLogo.vue";
@@ -11,22 +11,9 @@ const form = ref({
     password: "",
 });
 const router = useRouter();
-console.log( router.currentRoute.value.name);
+console.log(router.currentRoute.value.name);
 
-// let unregisterRouterHook;
-
-// onMounted(() => {
-//   unregisterRouterHook = router.afterEach(() => {
-//     authStore.clearErrors(); // تفريغ الأخطاء عند تغيير المسار
-//   });
-// });
-
-// onUnmounted(() => {
-//   // إزالة المراقبة عند تدمير المكون
-//   if (unregisterRouterHook) {
-//     unregisterRouterHook();
-//   }
-// });
+ 
 </script>
 <template>
     <div
@@ -45,7 +32,6 @@ console.log( router.currentRoute.value.name);
             <div
                 class="bg-white dark:bg-gray-800 py-8 px-6 shadow rounded-3xl sm:px-10"
             >
-            {{ authStore.user }}
                 <form
                     class="space-y-6"
                     @submit.prevent="authStore.handleLogin(form)"
@@ -89,27 +75,27 @@ console.log( router.currentRoute.value.name);
                 </form>
 
                 <!-- رابط التسجيل -->
-                <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-200">
+                <p
+                    class="mt-6 text-center text-sm text-gray-600 dark:text-gray-200"
+                >
                     <router-link
-
                         :to="{ name: 'ForgotPsasword' }"
-                        class="font-medium text-indigo-600 hover:text-indigo-500  dark:text-cyan-600 dark:hover:text-cyan-500  "
+                        class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-cyan-600 dark:hover:text-cyan-500"
                     >
-                    Forgot password?
-
+                        Forgot password?
                     </router-link>
-
                 </p>
-                <p class="mt-6 text-center text-sm text-gray-600 dark:text-gray-200">
+                <p
+                    class="mt-6 text-center text-sm text-gray-600 dark:text-gray-200"
+                >
                     dont have acount ?
                     <router-link
-                    @click="authStore.clearErrors()"
+                        @click="authStore.clearErrors()"
                         :to="{ name: 'register' }"
-                        class="font-medium text-indigo-600 hover:text-indigo-500 "
+                        class="font-medium text-indigo-600 hover:text-indigo-500"
                     >
                         Register
                     </router-link>
-
                 </p>
             </div>
         </div>

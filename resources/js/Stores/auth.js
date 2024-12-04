@@ -1,48 +1,44 @@
 import { defineStore } from "pinia";
-import axios from "axios"
+import axios from "axios";
 import router from "@/router/router";
 
-const csrf =()=> axios.get('/sanctum/csrf-cookie');
+const csrf = () => axios.get("/sanctum/csrf-cookie");
 
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore("auth", {
     state: () => ({
-        authUser:null,
-        authErrors:[],
+        authUser: null,
+        authErrors: [],
         authRole: null,
         authStatus: null,
     }),
     getters: {
-        user : (satae) => satae.authUser,
-        errors : (satae) => satae.authErrors,
-        status : (satae) => satae.authStatus,
+        user: (satae) => satae.authUser,
+        errors: (satae) => satae.authErrors,
+        status: (satae) => satae.authStatus,
         roles: (state) => state.authRole,
     },
     actions: {
-
         async getUser() {
             await csrf();
-                 try {
-                    const data = await axios.get("/api/user");
-                    this.authUser = data.data;
-                    this.authRole = data.data.roles;
-                } catch (error) {
-                    this.authUser = null;
-                }
+            try {
+                const data = await axios.get("/api/user");
+                this.authUser = data.data;
+                this.authRole = data.data.roles;
+            } catch (error) {
+                this.authUser = null;
+            }
         },
-        async handleLogin(data){
-            this.authErrors=[];
-             await csrf();
-            try{
-                const r = await axios.post('/login', {
+        async handleLogin(data) {
+            this.authErrors = [];
+            await csrf();
+            try {
+                await axios.post("/login", {
                     email: data.email,
                     password: data.password,
-                    });
-                    console.log(r.data);
-                    await this.getUser();
+                });
                 router.push("/");
-            }
-            catch(error){
-                if(error.response.status === 422){
+            } catch (error) {
+                if (error.response.status === 422) {
                     this.authErrors = error.response.data.errors;
                 }
             }
@@ -51,7 +47,7 @@ export const useAuthStore = defineStore('auth', {
             this.authErrors = [];
             await csrf();
             try {
-                await axios.post('/register', {
+                await axios.post("/register", {
                     name: data.name,
                     email: data.email,
                     password: data.password,
@@ -65,20 +61,18 @@ export const useAuthStore = defineStore('auth', {
                 }
             }
         },
-        async handleLogout(){
+        async handleLogout() {
             await csrf();
-            await axios.post('/logout');
+            await axios.post("/logout");
             this.router.push("/login");
             this.authUser = null;
             this.authRole = null;
-
-
         },
         async handleForgotPassword(data) {
             this.authErrors = [];
             await csrf();
             try {
-                const response = await axios.post('/forgot-password', {
+                const response = await axios.post("/forgot-password", {
                     email: data,
                 });
                 this.authStatus = response.data.status;
@@ -92,7 +86,7 @@ export const useAuthStore = defineStore('auth', {
             this.authErrors = [];
             await csrf();
             try {
-                await axios.post('/reset-password', resetData);
+                await axios.post("/reset-password", resetData);
                 router.push("/login");
             } catch (error) {
                 if (error.response?.status === 422) {
@@ -103,7 +97,7 @@ export const useAuthStore = defineStore('auth', {
         async updateProfile(data) {
             try {
                 const response = await axios.put(`/api/v1/user/update`, data);
-                router.push('/profile');
+                router.push("/profile");
                 this.authUser = response.data.profile;
             } catch (error) {
                 console.error("Error updating profile:", error);

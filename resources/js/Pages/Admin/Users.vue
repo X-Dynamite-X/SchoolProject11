@@ -10,6 +10,10 @@ import DynamicRow from "@/components/Tabel/DynamicRow.vue";
 import EditIcon from "@/components/Icon/EditIcon.vue";
 import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
 import InfoIcon from "@/components/Icon/InfoIcon.vue";
+import DynamicInfo from "@/components/Model/DynamicInfo.vue";
+import DynamicEdit from "@/components/Model/DynamicEdit.vue";
+import InputRadio from "@/components/FieldRequst/InputRadio.vue";
+// import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 
 const adminStore = useAdminStore();
 const loading = ref(true);
@@ -57,14 +61,65 @@ const changePage = (url) => {
 const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
 const columns = [
     { key: "id", label: "ID" },
-    { key: "name", label: "Name" },
-    { key: "email", label: "Email" },
-    { key: "roles", label: "Role" },
+    {
+        key: "name",
+        label: "Name",
+        name: "name",
+        type: "text",
+        required: true,
+        disabled: true,
+        placeholder: "Enter Name",
+        errorMessages: ["The name field is required."],
+    },
+    {
+        key: "email",
+        label: "Email",
+        name: "email",
+        type: "email",
+        required: true,
+        disabled: true,
+        placeholder: "Enter Email",
+        errorMessages: ["The email field is required."],
+    },
+    {
+        key: "roles",
+        label: "Role",
+        name: "roles",
+        type: "radio",
+        required: true,
+        options: [
+            { label: "Admin", value: "admin" },
+            { label: "User", value: "user" },
+        ],
+    },
 ];
+const showInfoModel = ref(false);
+const showEditModel = ref(false);
+const showDeleteModel = ref(false);
+const modelData = ref({});
+
+function openInfoModel(data) {
+    showInfoModel.value = true;
+
+    modelData.value = data;
+}
+function openEditModel(data) {
+    showEditModel.value = true;
+    modelData.value = data;
+}
+function openDeleteModel(data) {
+    showDeleteModel.value = true;
+    modelData.value = data;
+}
+const closeModal = () => {
+    showInfoModel.value = false;
+    showDeleteModel.value = false;
+    showEditModel.value = false;
+};
 </script>
 <template>
     <div
-        class="flex-grow p-4   bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
+        class="flex-grow p-4 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
     >
         <div class="container w-10/12 mx-auto">
             <SearchInput v-model="searchKeyword" placeholder="Search users...">
@@ -93,19 +148,25 @@ const columns = [
                                 </span>
                             </template>
 
-                            <template #column-actions="{ item }" >
-                                <button :id="item.id"
-                                class="px-3 py-1 text-xs bg-stone-300 dark:bg-gray-800  text-blue-400 hover:text-blue-600 rounded"
+                            <template #column-actions="{ item }">
+                                <button
+                                    :id="item.id"
+                                    @click="openInfoModel(item)"
+                                    class="px-3 py-1 mx-1 text-xs bg-stone-300 dark:bg-gray-800 text-blue-400 hover:text-blue-600 rounded"
                                 >
                                     <InfoIcon />
                                 </button>
-                                <button :id="item.id"
-                                    class="px-3 py-1 text-xs  bg-stone-300 dark:bg-gray-800  text-yellow-400 hover:text-yellow-600 rounded"
+                                <button
+                                    :id="item.id"
+                                    @click="openEditModel(item)"
+                                    class="px-3 py-1 mx-1 text-xs bg-stone-300 dark:bg-gray-800 text-yellow-400 hover:text-yellow-600 rounded"
                                 >
                                     <EditIcon />
                                 </button>
-                                <button  :id="item.id"
-                                    class="px-2 py-2 bg-stone-300 dark:bg-gray-800  text-red-400 hover:text-red-600  rounded"
+                                <button
+                                    @click="openDeleteModel(item)"
+                                    :id="item.id"
+                                    class="px-3 py-1 mx-1 bg-stone-300 dark:bg-gray-800 text-red-400 hover:text-red-600 rounded"
                                 >
                                     <DeleteIcon />
                                 </button>
@@ -130,6 +191,47 @@ const columns = [
                     </p>
                 </div>
             </div>
+
+            <DynamicInfo
+                :data="modelData"
+                :columns="columns"
+                :show="showInfoModel"
+                @close="closeModal"
+            >
+                <template #column-roles="{ data, column }">
+                    <strong>{{ column.label }}:</strong>
+                    <span
+                        v-for="role in data.roles"
+                        :key="role.id"
+                        class="inline-block px-2 py-1 mr-1 text-xs font-semibold rounded"
+                    >
+                        {{ role.name }}
+                    </span>
+                </template>
+            </DynamicInfo>
+
+            <DynamicEdit
+                :data="modelData"
+                :columns="columns"
+                :show="showEditModel"
+                @close="closeModal"
+                tytle="Edit User"
+            >
+                <template #column-roles="{ data, column }">
+                    <InputRadio
+                        :label="column.label"
+                        :name="column.name"
+                        :id="column.key"
+                        :type="column.type"
+                        :modelValue="data[column.key][0].name"
+                        :placeholder="column.placeholder"
+                        :required="column.required"
+                        :options="column.options"
+                        :errorMessage="column.errorMessage"
+                        :autocomplete="column.autocomplete"
+                    />
+                </template>
+            </DynamicEdit>
         </div>
     </div>
 </template>
