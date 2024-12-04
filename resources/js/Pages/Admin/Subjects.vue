@@ -7,6 +7,10 @@ import SearchIcon from "@/components/Icon/SearchIcon.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import DataTable from "@/components/Tabel/DataTable.vue";
 import DynamicRow from "@/components/Tabel/DynamicRow.vue";
+import EditIcon from "@/components/Icon/EditIcon.vue";
+import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
+import InfoIcon from "@/components/Icon/InfoIcon.vue";
+
 
 const adminStore = useAdminStore();
 const loading = ref(true);
@@ -84,16 +88,21 @@ const columns = [
                     <template #row="{ item }">
                         <DynamicRow :item="item" :columns="columns">
 
-                            <template #column-actions="{ item }">
+                            <template #column-actions="{ item }" >
                                 <button :id="item.id"
-                                    class="px-3 py-1 text-xs bg-green-500 text-white rounded"
+                                class="px-3 py-1 text-xs bg-stone-300 dark:bg-gray-800  text-blue-400 hover:text-blue-600 rounded"
                                 >
-                                    Edit
+                                    <InfoIcon />
+                                </button>
+                                <button :id="item.id"
+                                    class="px-3 py-1 text-xs  bg-stone-300 dark:bg-gray-800  text-yellow-400 hover:text-yellow-600 rounded"
+                                >
+                                    <EditIcon />
                                 </button>
                                 <button  :id="item.id"
-                                    class="px-3 py-1 text-xs bg-red-500 text-white rounded"
+                                    class="px-2 py-2 bg-stone-300 dark:bg-gray-800  text-red-400 hover:text-red-600  rounded"
                                 >
-                                    Delete
+                                    <DeleteIcon />
                                 </button>
                             </template>
                         </DynamicRow>
