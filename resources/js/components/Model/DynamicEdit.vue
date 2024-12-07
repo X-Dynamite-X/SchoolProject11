@@ -1,7 +1,6 @@
 <script setup>
-import { ref ,defineEmits} from "vue";
+import { ref, defineEmits } from "vue";
 import InputForm from "@/components/FieldRequst/InputForm.vue";
-
 
 // Props
 defineProps({
@@ -22,11 +21,14 @@ defineProps({
         required: true,
     },
 });
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close","update"]);
 
 // Functions
 const closeModal = () => {
-  emit("close"); // يجب تعريف emit هنا
+    emit("close"); // يجب تعريف emit هنا
+};
+const updateModal = () => {
+    emit("update"); // يجب تعريف emit هنا
 };
 </script>
 <template>
@@ -47,47 +49,49 @@ const closeModal = () => {
                 <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
                         <div
-                            class="mt-3  text-center sm:ml-4 sm:mt-0 sm:text-left w-full"
+                            class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full"
                         >
                             <h3
-                                class="text-base text-center  font-semibold leading-6 text-gray-900 dark:text-gray-100"
+                                class="text-base text-center font-semibold leading-6 text-gray-900 dark:text-gray-100"
                                 id="modal-title"
                             >
                                 {{ title }}
                             </h3>
                             <!-- Content -->
                             <div class="mt-4">
-
                                 <slot name="content">
                                     <!-- محتوى افتراضي إذا لم يتم تقديم محتوى داخل الـ slot -->
                                     <div
-                                    v-for="column in columns"
-                                    :key="column.key"
-                                >
-
-                                            <slot
-                                                :name="`column-${column.key}`"
-                                                :data="data"
-                                                :column="column"
-                                            >
-                                                <!-- العرض الافتراضي إذا لم يكن هناك slot -->
-                                                <InputForm
+                                        v-for="column in columns"
+                                        :key="column.key"
+                                    >
+                                        <slot
+                                            :name="`column-${column.key}`"
+                                            :data="data"
+                                            :column="column"
+                                        >
+                                            <!-- العرض الافتراضي إذا لم يكن هناك slot -->
+                                            <InputForm
                                                 v-if="column.key !== 'id'"
-                                                    :label="column.label"
-                                                    :name="column.name"
-                                                    :id="column.key"
-                                                    :type="column.type"
-                                                    :modelValue="data[column.key]"
-                                                    :placeholder="column.placeholder"
-                                                    :required="column.required"
-                                                    :errorMessage="column.errorMessage "
-                                                    :autocomplete="column.autocomplete"
-                                                    :disabled="column.disabled"
-                                                />
-
-                                            </slot>
-
-                                </div>
+                                                :label="column.label"
+                                                :name="column.name"
+                                                :id="column.key"
+                                                :type="column.type"
+                                                :modelValue="data[column.key]"
+                                                :placeholder="
+                                                    column.placeholder
+                                                "
+                                                :required="column.required"
+                                                :errorMessage="
+                                                    column.errorMessage
+                                                "
+                                                :autocomplete="
+                                                    column.autocomplete
+                                                "
+                                                :disabled="column.disabled"
+                                            />
+                                        </slot>
+                                    </div>
                                 </slot>
                             </div>
                         </div>
@@ -100,13 +104,21 @@ const closeModal = () => {
                 >
                     <button
                         type="button"
-                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 sm:mt-0 sm:w-auto"
+                        class="mt-3  mx-1 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 sm:mt-0 sm:w-auto"
                         @click="closeModal()"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-yellow-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-yellow-700  sm:mt-0 sm:w-auto"
+                        @click="updateModal()"
                     >
                         Cancel
                     </button>
                     <slot name="actions">
                         <!-- أزرار إضافية -->
+
                     </slot>
                 </div>
             </div>

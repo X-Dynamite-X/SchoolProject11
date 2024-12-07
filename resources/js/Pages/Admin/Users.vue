@@ -13,7 +13,7 @@ import InfoIcon from "@/components/Icon/InfoIcon.vue";
 import DynamicInfo from "@/components/Model/DynamicInfo.vue";
 import DynamicEdit from "@/components/Model/DynamicEdit.vue";
 import InputRadio from "@/components/FieldRequst/InputRadio.vue";
-// import DynamicDelete from "@/components/Model/DynamicDelete.vue";
+import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 
 const adminStore = useAdminStore();
 const loading = ref(true);
@@ -110,6 +110,12 @@ function openEditModel(data) {
 function openDeleteModel(data) {
     showDeleteModel.value = true;
     modelData.value = data;
+}
+function deleteData(data) {
+     adminStore.deleteUser(data)
+    console.log(usersData.value[0]);
+    closeModal();
+    usersData.value.filter(c => c.id !== data.id);
 }
 const closeModal = () => {
     showInfoModel.value = false;
@@ -215,7 +221,7 @@ const closeModal = () => {
                 :columns="columns"
                 :show="showEditModel"
                 @close="closeModal"
-                tytle="Edit User"
+                title="Edit User"
             >
                 <template #column-roles="{ data, column }">
                     <InputRadio
@@ -232,6 +238,19 @@ const closeModal = () => {
                     />
                 </template>
             </DynamicEdit>
+            <DynamicDelete
+                :data="modelData"
+                :columns="columns"
+                :show="showDeleteModel"
+                @close="closeModal"
+                @delete="deleteData"
+                title="Delete User"
+            >
+            <template #message="{data}">
+                Are you sure you want to delete this user?
+                <strong class="text-red-600">{{data.name}}</strong>
+            </template>
+            </DynamicDelete>
         </div>
     </div>
 </template>

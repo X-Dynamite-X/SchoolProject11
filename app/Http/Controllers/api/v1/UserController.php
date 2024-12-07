@@ -76,8 +76,11 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
         //
+        // dd($user);
+         $user->delete();
+        return response()->json(["user"=> $user,'message' => 'User deleted successfully'], 200);
     }
 }
