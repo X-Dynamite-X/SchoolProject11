@@ -40,3 +40,39 @@ const menuItems = [
         </div>
     </router-view>
 </template>
+
+<style>
+/* لإخفاء شريط التمرير فقط */
+.hidden-scrollbar {
+    scrollbar-width: none; /* لإخفاء الشريط في Firefox */
+    -ms-overflow-style: none; /* لإخفاء الشريط في Internet Explorer */
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+    display: none; /* لإخفاء الشريط في Chrome و Edge و Safari */
+}
+.scroll-container {
+    overflow: hidden; /* إخفاء الشريط */
+    position: relative; /* ضروري لتثبيت عنصر التمرير */
+}
+
+.scroll-container-inner {
+    overflow-y: scroll; /* السماح بالتمرير */
+    height: 100%;
+    padding-right: 15px; /* لتعويض المساحة المخفية لشريط التمرير */
+    box-sizing: content-box;
+}
+
+.scroll-container-inner::-webkit-scrollbar {
+    display: none; /* إخفاء الشريط في المتصفحات الحديثة */
+}
+.touch-scroll {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* لتجربة تمرير سلسة */
+}
+
+.touch-scroll::-webkit-scrollbar {
+    display: none; /* إخفاء الشريط */
+}
+
+</style>

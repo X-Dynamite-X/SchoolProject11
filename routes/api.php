@@ -21,4 +21,6 @@ Route::middleware(["role:admin","auth:sanctum","auth"])->name("admin.")->prefix(
 
     Route::resource('/subject', SubjectController::class);
     Route::resource('/user', UserController::class) ;
+
+
 });

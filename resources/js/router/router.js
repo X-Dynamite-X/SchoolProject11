@@ -8,6 +8,8 @@ import ForgotPsasword from "@/Pages/Auth/ForgotPsasword.vue";
 import ResetPassword from "@/Pages/Auth/ResetPassword.vue";
 import NotFound from "@/Pages/Errors/NotFound.vue"; // استيراد صفحة 404
 import UsersAdmin from "@/Pages/Admin/Users.vue";
+import UsersAdmin2 from "@/Pages/Admin/t.vue";
+
 import SubjectsAdmin from "@/Pages/Admin/Subjects.vue";
 
 const routes = [
@@ -39,7 +41,7 @@ const routes = [
     },
     {
         path: "/admin/users",
-        component: UsersAdmin,
+        component: UsersAdmin2,
         name: "adminUsers",
     },
     {

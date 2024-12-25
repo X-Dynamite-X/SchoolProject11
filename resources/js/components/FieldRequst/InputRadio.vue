@@ -1,10 +1,11 @@
 <script setup>
+import { ref } from "vue";
+
 defineProps({
     modelValue: {
         type: String,
         required: true,
     },
-
     name: {
         type: String,
         required: true,
@@ -41,9 +42,16 @@ defineProps({
         type: Array,
         default: "",
     },
+ 
 });
 
+
+
 const emit = defineEmits(["update:modelValue"]);
+function updateModelValue(value) {
+     emit("update:modelValue", value);
+}
+
 </script>
 
 <template>
@@ -60,7 +68,7 @@ const emit = defineEmits(["update:modelValue"]);
         <!-- القائمة -->
         <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <li
-                v-for="option in options"
+                 v-for="option in options"
                 :key="option.value"
                 class="flex items-center justify-between p-3 rounded-lg border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 shadow-sm hover:shadow-md transition-all"
             >
@@ -82,7 +90,7 @@ const emit = defineEmits(["update:modelValue"]);
                     :required="required"
                     :value="option.value"
                     :checked="modelValue === option.value"
-                    @input="$emit('update:modelValue', $event.target.value)"
+                    @input="updateModelValue($event.target.value)"
                     class="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-500 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-400 cursor-pointer"
                 />
             </li>

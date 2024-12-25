@@ -3,7 +3,7 @@ import { ref, defineEmits } from "vue";
 import InputForm from "@/components/FieldRequst/InputForm.vue";
 
 // Props
-defineProps({
+const prpos=defineProps({
     show: {
         type: Boolean,
         required: true,
@@ -21,14 +21,20 @@ defineProps({
         required: true,
     },
 });
-const emit = defineEmits(["close","update"]);
+const oldData = ref(prpos.data);
+const emit = defineEmits(["close", "update"]);
 
-// Functions
+// وظائف
 const closeModal = () => {
-    emit("close"); // يجب تعريف emit هنا
+
+
+    emit("close" );
 };
-const updateModal = () => {
-    emit("update"); // يجب تعريف emit هنا
+
+const updateModal = (x) => {
+    console.log(x);
+
+    emit("update", prpos.data); // إرسال البيانات إلى المكون الأعلى
 };
 </script>
 <template>
@@ -55,14 +61,14 @@ const updateModal = () => {
                                 class="text-base text-center font-semibold leading-6 text-gray-900 dark:text-gray-100"
                                 id="modal-title"
                             >
-                                {{ title }}
+                                {{ prpos.title }}
                             </h3>
                             <!-- Content -->
                             <div class="mt-4">
                                 <slot name="content">
                                     <!-- محتوى افتراضي إذا لم يتم تقديم محتوى داخل الـ slot -->
                                     <div
-                                        v-for="column in columns"
+                                        v-for="column in prpos.columns"
                                         :key="column.key"
                                     >
                                         <slot
@@ -77,7 +83,7 @@ const updateModal = () => {
                                                 :name="column.name"
                                                 :id="column.key"
                                                 :type="column.type"
-                                                :modelValue="data[column.key]"
+                                                :modelValue="prpos.data[column.key]"
                                                 :placeholder="
                                                     column.placeholder
                                                 "
@@ -114,7 +120,7 @@ const updateModal = () => {
                         class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-yellow-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-yellow-700  sm:mt-0 sm:w-auto"
                         @click="updateModal()"
                     >
-                        Cancel
+                        Save
                     </button>
                     <slot name="actions">
                         <!-- أزرار إضافية -->

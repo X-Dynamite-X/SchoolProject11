@@ -1,103 +1,178 @@
 import { defineStore } from "pinia";
 import $, { error, get } from "jquery";
-import axios from "axios";
 
-const csrf = () => axios.get("/sanctum/csrf-cookie");
+// const csrf = () => axios.get("/sanctum/csrf-cookie");
+const csrf = () => $.get("/sanctum/csrf-cookie");
 
 export const useAdminStore = defineStore("admin", {
     state: () => ({
         userCache: {}, // تخزين بيانات المستخدمين حسب رابط الصفحة أو رقم
         subjectCache: {},
+        AllUsers: [],
+        nextPageUrl: null,
+        prevPageUrl: null,
+        countUser: 0,
     }),
     getters: {
-        users: (state) => (pageUrl) => state.userCache[pageUrl] || null,
-        subjects: (state) => (pageUrl) => state.subjectCache[pageUrl] || null,
+        users: (state) => state.AllUsers,
+        // users(state) {
+        //     // تحويل الكاش إلى مصفوفة (للاستخدام في الجدول)
+        //     return Object.values(state.userCache);
+        // },
+        // subjects: (state) => (pageUrl) => state.subjectCache[pageUrl] || null,
+        subjects(state) {
+            // تحويل الكاش إلى مصفوفة (للاستخدام في الجدول)
+            return Object.values(state.subjectCache);
+        },
+        nextPage(state) {
+            return state.nextPageUrl;
+        },
+        prevPage(state) {
+            return state.prevPageUrl;
+        },
+        totalUsers: (state) => state.countUser,
     },
     actions: {
-        getCSRFToken() {
-            return $.ajax({
-                url: "/sanctum/csrf-cookie",
-                method: "GET",
-                success: () => {
-                    console.log("CSRF token retrieved successfully.");
-                },
-                error: (xhr, status, error) => {
-                    console.error("Failed to retrieve CSRF token:", error);
-                },
-            });
-        },
-
-        getUsers(url = "/api/admin/user", keyword = "") {
-            const cacheKey = `${url}?keyword=${keyword}`; // إنشاء المفتاح مع الأخذ بعين الاعتبار كلمة البحث
-            // التحقق من البيانات المخزنة في الذاكرة المؤقتة
+        async getUsers(url = "/api/admin/user", keyword = "", limit = 10) {
+            const cacheKey = `${url}?keyword=${keyword}&limit=${limit}`; // مفتاح فريد بناءً على معلمات الطلب
             if (this.userCache[cacheKey]) {
-                console.log("Fetching from cache:", cacheKey);
-                return Promise.resolve(this.userCache[cacheKey]); // إرجاع البيانات من الذاكرة المؤقتة
+                console.log("Fetching data from cache...");
+                const cachedData = this.userCache[cacheKey];
+
+                // تحديث البيانات من الكاش
+                this.AllUsers = cachedData.users;
+                this.countUser = cachedData.count;
+                this.nextPageUrl = cachedData.nextPageUrl;
+                this.prevPageUrl = cachedData.prevPageUrl;
+
+                return Promise.resolve(cachedData);
             }
-            // إذا لم تكن البيانات موجودة في الذاكرة المؤقتة، قم بجلبها باستخدام AJAX
-            return new Promise((resolve, reject) => {
-                $.ajax({
-                    url: cacheKey,
-                    method: "GET",
-                    dataType: "json",
-                    beforeSend: (xhr) => {
-                        xhr.setRequestHeader("X-CSRF-TOKEN", document.querySelector('meta[name="csrf-token"]').getAttribute("content"));
-                    },
-                    success: (data) => {
-                        console.log("Fetching from API:", cacheKey);
-                        this.userCache[cacheKey] = data.users; // تخزين البيانات في الذاكرة المؤقتة
-                        resolve(data.users); // إرجاع البيانات
-                    },
-                    error: (xhr, status, error) => {
-                        console.error("User Fetch Error:", error);
-                        reject(error); // إرجاع الخطأ إذا حدث
-                    },
+            console.log(this.userCache[cacheKey]);
+
+            await csrf(); // استدعاء وظيفة CSRF
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "get",
+                        url: url,
+                        data: { keyword, limit },
+                        dataType: "json",
+                        success: (data) => {
+                            console.log("Fetching data from server...");
+                            this.userCache[cacheKey] = {
+                                users: data.users,
+                                count: data.count,
+                                nextPageUrl: data.next_page_url,
+                                prevPageUrl: data.prev_page_url,
+                            };
+
+                            // تحديث الحالة
+                            this.AllUsers = data.users;
+                            this.countUser = data.count;
+                            this.nextPageUrl = data.next_page_url;
+                            this.prevPageUrl = data.prev_page_url;
+
+                            resolve(data);
+                        },
+                        error: (error) => {
+                            const errors =
+                                error.responseJSON?.message ||
+                                "An error occurred";
+                            $("#errurMessageInputUser").text(errors);
+                            reject(error);
+                        },
+                    });
                 });
-            });
+            } catch (error) {
+                console.error("User Fetch Error:", error);
+                throw error;
+            }
         },
-        deleteUser(data) {
-            console.log(data.id);
+        async deleteUser(data, limit) {
+            await csrf();
+        
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "DELETE",
+                        url: `/api/admin/user/${data.id}`,
+                        success: async (response) => {
+                            console.log("User deleted successfully:", response);
+        
+                            // حذف المستخدم من الكاش لجميع الصفحات
+                            Object.keys(this.userCache).forEach((key) => {
+                                const cachedData = this.userCache[key];
+                                cachedData.users = cachedData.users.filter(
+                                    (user) => user.id !== data.id
+                                );
+                                if (cachedData.users.length === 0) {
+                                    delete this.userCache[key]; 
+                                }
+                            }); 
+                            this.AllUsers = this.AllUsers.filter(
+                                (user) => user.id !== data.id
+                            );
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            console.error("User Delete Error:", error);
+                            reject(error);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("Unexpected Error During User Deletion:", error);
+                throw error;
+            }
+        },        
 
-            $.ajax({
-                url: `/api/admin/user/${data.id}`,
-                method: "DELETE",
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                },
-                dataType: "json",
-                success: (response) => {
-                    console.log("User deleted successfully", response);
-
-                    
-                },
-                error: (xhr, status, error) => {
-                    console.error("User Fetch Error:", error);
-                },
-            });
+        async updateUser(data) {
+            await csrf();
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "put",
+                        url: `/api/admin/user/${data.id}`,
+                        data: {
+                            roles: data.roles[0].name,
+                        },
+                        success: (response) => {
+                            console.log("User updated successfully:", response);
+                            // تحديث المستخدم في الكاش
+                            this.userCache[data.id] = response;
+                            console.log(response);
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            console.error("User Update Error:", error);
+                            reject(error);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("User Update Error:", error);
+                throw error;
+            }
         },
 
-        getSubjects(url = "/api/admin/subject", keyword = "") {
-            const cacheKey = `${url}?keyword=${keyword}`;
+        async getSubjects(url = "/api/admin/subject", keyword = "") {
+            const cacheKey = `${url}?keyword=${keyword}`; // المفتاح مع الأخذ بعين الاعتبار كلمة البحث
             if (this.subjectCache[cacheKey]) {
-                console.log(cacheKey);
-                return Promise.resolve(this.subjectCache[cacheKey]);
+                console.log("Fetching from cache:", cacheKey);
+                return this.subjectCache[cacheKey];
             }
-            return new Promise((resolve, reject) => {
-                $.ajax({
-                    url: cacheKey,
-                    method: "GET",
-                    dataType: "json",
-                    success: (data) => {
-                        console.log("Fetching from API:", cacheKey);
-                        this.subjectCache[cacheKey] = data.subjects;
-                        resolve(data.subjects);
-                    },
-                    error: (xhr, status, error) => {
-                        console.error("User Fetch Error:", error);
-                        reject(error); // إرجاع الخطأ إذا حدث
-                    },
-                });
-            });
+            await csrf();
+            try {
+                const response = await axios.get(url, { params: { keyword } }); // تمرير الكلمة كمعلومة
+                console.log("Fetching from API:", cacheKey);
+                this.subjectCache[cacheKey] = response.data.subjects;
+                console.log(response.data.subjects);
+
+                return response.data.subjects;
+            } catch (error) {
+                console.error("User Fetch Error:", error);
+                throw error;
+            }
         },
     },
 });

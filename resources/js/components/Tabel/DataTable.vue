@@ -1,5 +1,17 @@
+<script setup>
+defineProps({
+    data: Array, // البيانات المراد عرضها
+    loading: Boolean, // حالة التحميل
+    columns: Array, // تعريف الأعمدة
+    id:String,
+});
+ 
+</script>
+
+
 <template>
-    <table class="table-auto w-full border-collapse">
+    <table :id="id" class="table-auto w-full border-collapse overflow-scroll">
+
         <thead>
             <slot name="header" />
 
@@ -22,10 +34,3 @@
     </div>
 </template>
 
-<script setup>
-defineProps({
-    data: Array, // البيانات المراد عرضها
-    loading: Boolean, // حالة التحميل
-    columns: Array, // تعريف الأعمدة
-});
-</script>
