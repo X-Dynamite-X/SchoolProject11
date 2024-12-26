@@ -95,30 +95,13 @@ const filteredUsers = computed(() => {
     );
 });
 
-const sortedUsers = computed(() => {
-    if (!sortColumn.value) return filteredUsers.value;
-
-    return [...filteredUsers.value].sort((a, b) => {
-        const valA = a[sortColumn.value];
-        const valB = b[sortColumn.value];
-        if (valA < valB) return sortDirection.value === "asc" ? -1 : 1;
-        if (valA > valB) return sortDirection.value === "asc" ? 1 : -1;
-        return 0;
-    });
-});
-
-// تقسيم البيانات حسب الصفحة
 const paginatedUsers = computed(() => {
-    // التأكد من أن startIndex و limitUser.value أرقام صحيحة
     const startIndex = Number((currentPage.value - 1) * limitUser.value); // تحويل إلى عدد
-    console.log(startIndex);
 
     const endIndex = startIndex + Number(limitUser.value); // تحويل إلى عدد
-    console.log(endIndex);
 
     return sortedUsers.value.slice(startIndex, endIndex);
 });
-
 
 const totalPages = computed(() =>
     Math.ceil(filteredUsers.value.length / limitUser.value)
@@ -138,13 +121,30 @@ const updateItemsPerPage = (newLimit) => {
 
 // تغيير العمود المستخدم للفرز
 const sort = (column) => {
-    if (sortColumn.value === column) {
+    const columnKey = columns.find((col) => col.label === column)?.key;
+    if (!columnKey) return; // تجاهل إذا لم يتم العثور على العمود
+
+    if (sortColumn.value === columnKey) {
         sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
     } else {
-        sortColumn.value = column;
+        sortColumn.value = columnKey;
         sortDirection.value = "asc";
     }
 };
+
+const sortedUsers = computed(() => {
+    if (!sortColumn.value) return filteredUsers.value;
+
+    return [...filteredUsers.value].sort((a, b) => {
+        const valA = a[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
+        const valB = b[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
+
+        if (valA < valB) return sortDirection.value === "asc" ? -1 : 1;
+        if (valA > valB) return sortDirection.value === "asc" ? 1 : -1;
+        return 0;
+    });
+});
+
 
 onMounted(() => {
     loading.value = false;
@@ -230,12 +230,14 @@ const closeModal = (isEdit = false, saveChanges = false) => {
                     />
                 </div>
             </div>
-            <DataTable :data="paginatedUsers" :loading="loading">
+            <DataTable :data="paginatedUsers" @sort="sort" :loading="loading">
                 <template #header>
                     <TabelTh
                         v-for="thNameField in thNameFields"
                         :key="thNameField"
                         :nameFeild="thNameField"
+                        @click="sort(thNameField)"
+
                     />
                 </template>
                 <template #row="{ item }">

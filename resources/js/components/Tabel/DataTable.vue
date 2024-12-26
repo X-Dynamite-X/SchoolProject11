@@ -3,18 +3,16 @@ defineProps({
     data: Array, // البيانات المراد عرضها
     loading: Boolean, // حالة التحميل
     columns: Array, // تعريف الأعمدة
-    id:String,
+    id: String, // معرّف الجدول
 });
- 
-</script>
 
+const emit = defineEmits(["sort"]); // تعريف الحدث 'sort'
+</script>
 
 <template>
     <table :id="id" class="table-auto w-full border-collapse overflow-scroll">
-
         <thead>
             <slot name="header" />
-
         </thead>
         <tbody>
             <slot name="row" :item="item" v-for="item in data" :key="item.id">
@@ -33,4 +31,3 @@ defineProps({
         No data available.
     </div>
 </template>
-

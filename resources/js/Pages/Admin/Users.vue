@@ -4,7 +4,6 @@ import { onMounted, ref, computed, watch } from "vue";
 import TabelTh from "@/components/Tabel/TabelTh.vue";
 import SearchInput from "@/components/FieldRequst/SearchInput.vue";
 import SearchIcon from "@/components/Icon/SearchIcon.vue";
-import Pagination from "@/components/Tabel/Pagination.vue";
 import DataTable from "@/components/Tabel/DataTable.vue";
 import DynamicRow from "@/components/Tabel/DynamicRow.vue";
 import EditIcon from "@/components/Icon/EditIcon.vue";
@@ -15,78 +14,31 @@ import DynamicEdit from "@/components/Model/DynamicEdit.vue";
 import InputRadio from "@/components/FieldRequst/InputRadio.vue";
 import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
+import Pagination from "@/components/Tabel/Pagination.vue";
 
 const adminStore = useAdminStore();
 const loading = ref(true);
-const currentPageUrl = ref("/api/admin/user"); // URL الأساسي
 const searchKeyword = ref("");
 const limitUser = ref(5);
-const current_page = ref(1);
-const displayStart = ref(1);
-const displayEnd = ref(limitUser.value);
 const users = computed(() => adminStore.users);
-const totalUsers = computed(() => adminStore.totalUsers || 0);
-function displayAdd() {
-    // تحديث القيم عند التقدم
-    if (displayEnd.value < totalUsers.value) {
-        displayStart.value += limitUser.value;
-        displayEnd.value = Math.min(
-            displayEnd.value + limitUser.value,
-            totalUsers.value
-        );
-    }
-
-    console.log("displayStartAdd:", displayStart.value);
-    console.log("displayEndAdd:", displayEnd.value);
-}
-
-function displayDec() {
-    // تحديث القيم عند الرجوع
-    if (displayStart.value > 1) {
-        // التأكد من أن بداية العرض لا تقل عن 1
-        displayStart.value -= limitUser.value;
-        displayEnd.value = displayStart.value + limitUser.value - 1; // تحديث النهاية بناءً على البداية
-    }
-
-    console.log("displayStartDec:", displayStart.value);
-    console.log("displayEndDec:", displayEnd.value);
-}
-
-const fetchData = () => {
+const totalItems = ref(0);
+const fetchData = async () => {
     loading.value = true;
-    adminStore
-        .getUsers(currentPageUrl.value, searchKeyword.value, limitUser.value)
-        .then(() => {
-            loading.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
-};
+    try {
+        await adminStore.getUsers(); // استدعاء الدالة من المخزن
+        console.log(users.value.length);
 
-const pagination = computed(() => ({
-    current_page: current_page.value,
-    last_page: Math.ceil(Number(totalUsers.value / limitUser.value)) || 1,
-    limit_page: limitUser.value,
-    prev_page_url: adminStore.prevPage || null,
-    next_page_url: adminStore.nextPage || null,
-}));
-
-const changePage = (url, type) => {
-    console.log(url);
-    console.log(type);
-    if (type === "prev") {
-        displayDec();
-    } else if (type === "next") {
-        displayAdd();
-    }
-
-    if (url) {
-        currentPageUrl.value = url;
-        current_page.value = parseInt(url.split("start=")[1].split("&")[0]); // تحديث الصفحة الحالية استنادًا إلى رابط URL
-        fetchData();
+        totalItems.value = users.value.length; // إجمالي عدد المستخدمين
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    } finally {
+        loading.value = false;
     }
 };
+const currentPage = ref(1); // الصفحة الحالية
+const sortColumn = ref(null); // العمود المستخدم للفرز
+const sortDirection = ref("asc");
+
 const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
 const columns = [
     { key: "id", label: "ID" },
@@ -124,29 +76,98 @@ const columns = [
 ];
 
 onMounted(fetchData);
+
 watch(searchKeyword, (newKeyword) => {
     searchKeyword.value = newKeyword;
 });
+
+watch(limitUser, (newLimit) => {
+    currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
+    fetchData(); // تحديث البيانات
+});
+
+const filteredUsers = computed(() => {
+    const keyword = searchKeyword.value.toLowerCase();
+    return users.value.filter(
+        (user) =>
+            user.name.toLowerCase().includes(keyword) ||
+            user.email.toLowerCase().includes(keyword)
+    );
+});
+
+const paginatedUsers = computed(() => {
+    const startIndex = Number((currentPage.value - 1) * limitUser.value); // تحويل إلى عدد
+
+    const endIndex = startIndex + Number(limitUser.value); // تحويل إلى عدد
+
+    return sortedUsers.value.slice(startIndex, endIndex);
+});
+
+const totalPages = computed(() =>
+    Math.ceil(filteredUsers.value.length / limitUser.value)
+);
+// تغيير الصفحة
+const changePage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+    }
+};
+
+// تحديث عدد العناصر في الصفحة
+const updateItemsPerPage = (newLimit) => {
+    limitUser.value = newLimit;
+    currentPage.value = 1; // إعادة ضبط الصفحة إلى الأولى
+};
+
+// تغيير العمود المستخدم للفرز
+const sort = (column) => {
+    const columnKey = columns.find((col) => col.label === column)?.key;
+    if (!columnKey) return; // تجاهل إذا لم يتم العثور على العمود
+
+    if (sortColumn.value === columnKey) {
+        sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+    } else {
+        sortColumn.value = columnKey;
+        sortDirection.value = "asc";
+    }
+};
+
+const sortedUsers = computed(() => {
+    if (!sortColumn.value) return filteredUsers.value;
+
+    return [...filteredUsers.value].sort((a, b) => {
+        const valA = a[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
+        const valB = b[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
+
+        if (valA < valB) return sortDirection.value === "asc" ? -1 : 1;
+        if (valA > valB) return sortDirection.value === "asc" ? 1 : -1;
+        return 0;
+    });
+});
+
+
+onMounted(() => {
+    loading.value = false;
+});
+watch(limitUser, fetchData); // تحديث البيانات عند تغيير عدد العناصر
+
 const showInfoModel = ref(false);
 const showEditModel = ref(false);
 const showDeleteModel = ref(false);
 const modelData = ref({});
 const oldRolesData = ref(null);
 
-// فتح نموذج المعلومات
 const openInfoModel = (data) => {
     showInfoModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
 };
 
-// فتح نموذج التعديل
 const openEditModel = (data) => {
     showEditModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
     oldRolesData.value = data.roles?.[0]?.name || null; // معالجة أمان البيانات
 };
 
-// تحديث البيانات
 const updateData = async (updatedData) => {
     try {
         console.log("Updating Data:", updatedData);
@@ -158,27 +179,21 @@ const updateData = async (updatedData) => {
     }
 };
 
-// فتح نموذج الحذف
 const openDeleteModel = (data) => {
     showDeleteModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
 };
 
-// حذف البيانات
 const deleteData = async (data) => {
     console.log("Deleting User:", data);
-
     closeModal();
-    await adminStore.deleteUser(data,limitUser.value); // انتظار حذف
+    await adminStore.deleteUser(data, limitUser.value); // انتظار حذف
 };
 
-// إغلاق النماذج
 const closeModal = (isEdit = false, saveChanges = false) => {
     showInfoModel.value = false;
     showEditModel.value = false;
     showDeleteModel.value = false;
-
-    // التراجع عن التعديلات إذا لم يتم حفظ التغييرات
     if (!isEdit && !saveChanges) {
         if (oldRolesData.value !== null) {
             modelData.value.roles[0].name = oldRolesData.value;
@@ -186,6 +201,7 @@ const closeModal = (isEdit = false, saveChanges = false) => {
     }
 };
 </script>
+
 <template>
     <div
         class="flex-grow p-4 overflow-scroll touch-scroll bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
@@ -209,16 +225,19 @@ const closeModal = (isEdit = false, saveChanges = false) => {
                     <ItemsPerPage
                         :modelValue="limitUser"
                         v-model="limitUser"
-                        @update:modelValue="fetchData"
+                        class="ml-4"
+                        @update:modelValue="updateItemsPerPage"
                     />
                 </div>
             </div>
-            <DataTable :data="users" :loading="loading">
+            <DataTable :data="paginatedUsers" @sort="sort" :loading="loading">
                 <template #header>
                     <TabelTh
                         v-for="thNameField in thNameFields"
                         :key="thNameField"
                         :nameFeild="thNameField"
+                        @click="sort(thNameField)"
+
                     />
                 </template>
                 <template #row="{ item }">
@@ -258,22 +277,12 @@ const closeModal = (isEdit = false, saveChanges = false) => {
                     </DynamicRow>
                 </template>
             </DataTable>
-
-            <!-- التنقل بين الصفحات -->
-            <Pagination :pagination="pagination" @change-page="changePage" />
-
-            <!-- عدد المستخدمين -->
-            <div class="mt-4 text-gray-700 dark:text-gray-300 text-center">
-                <div class="mt-6 text-center text-gray-700 dark:text-gray-300">
-                    <p>
-                        Displaying
-                        <strong> {{ displayStart }} - {{ displayEnd }} </strong>
-                        of
-                        <strong>{{ totalUsers }}</strong>
-                        users.
-                    </p>
-                </div>
-            </div>
+            <!-- <Pagination :disabled="currentPage === 1" @change-page="changePage" /> -->
+            <Pagination
+                :currentPage="currentPage"
+                :totalPages="totalPages"
+                @change-page="changePage"
+            />
 
             <DynamicInfo
                 :data="modelData"
