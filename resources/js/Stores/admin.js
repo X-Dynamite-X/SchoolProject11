@@ -36,10 +36,7 @@ export const useAdminStore = defineStore("admin", {
         async getUsers(url = "/api/admin/user", keyword = "", limit = 10) {
             const cacheKey = `${url}?keyword=${keyword}&limit=${limit}`; // مفتاح فريد بناءً على معلمات الطلب
             if (this.userCache[cacheKey]) {
-                console.log("Fetching data from cache...");
                 const cachedData = this.userCache[cacheKey];
-
-                // تحديث البيانات من الكاش
                 this.AllUsers = cachedData.users;
                 this.countUser = cachedData.count;
                 this.nextPageUrl = cachedData.nextPageUrl;
@@ -90,7 +87,7 @@ export const useAdminStore = defineStore("admin", {
         },
         async deleteUser(data, limit) {
             await csrf();
-        
+
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -98,17 +95,17 @@ export const useAdminStore = defineStore("admin", {
                         url: `/api/admin/user/${data.id}`,
                         success: async (response) => {
                             console.log("User deleted successfully:", response);
-        
+                            console.log(response)
                             // حذف المستخدم من الكاش لجميع الصفحات
                             Object.keys(this.userCache).forEach((key) => {
                                 const cachedData = this.userCache[key];
                                 cachedData.users = cachedData.users.filter(
-                                    (user) => user.id !== data.id
+                                    (user) => user.id !== response.user.id
                                 );
                                 if (cachedData.users.length === 0) {
-                                    delete this.userCache[key]; 
+                                    delete this.userCache[key];
                                 }
-                            }); 
+                            });
                             this.AllUsers = this.AllUsers.filter(
                                 (user) => user.id !== data.id
                             );
@@ -124,7 +121,7 @@ export const useAdminStore = defineStore("admin", {
                 console.error("Unexpected Error During User Deletion:", error);
                 throw error;
             }
-        },        
+        },
 
         async updateUser(data) {
             await csrf();

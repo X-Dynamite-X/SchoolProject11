@@ -25,10 +25,8 @@ const totalItems = ref(0);
 const fetchData = async () => {
     loading.value = true;
     try {
-        await adminStore.getUsers(); // استدعاء الدالة من المخزن
-        console.log(users.value.length);
-
-        totalItems.value = users.value.length; // إجمالي عدد المستخدمين
+        await adminStore.getUsers();
+        totalItems.value = users.value.length;
     } catch (error) {
         console.error("Error fetching data:", error);
     } finally {
@@ -79,11 +77,12 @@ onMounted(fetchData);
 
 watch(searchKeyword, (newKeyword) => {
     searchKeyword.value = newKeyword;
+    currentPage.value = 1;
 });
 
 watch(limitUser, (newLimit) => {
     currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
-    fetchData(); // تحديث البيانات
+    // fetchData(); // تحديث البيانات
 });
 
 const filteredUsers = computed(() => {
