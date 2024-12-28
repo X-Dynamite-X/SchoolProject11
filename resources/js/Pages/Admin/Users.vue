@@ -14,7 +14,6 @@ import DynamicEdit from "@/components/Model/DynamicEdit.vue";
 import InputRadio from "@/components/FieldRequst/InputRadio.vue";
 import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 import DynamicCreate from "@/components/Model/DynamicCreate.vue";
-
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
@@ -39,7 +38,7 @@ const fetchData = async () => {
 const currentPage = ref(1); // الصفحة الحالية
 const sortColumn = ref(null); // العمود المستخدم للفرز
 const sortDirection = ref("asc");
-
+const errors = ref(null);
 const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
 const columns = [
     { key: "id", label: "ID",  showInTabel: true,
@@ -140,9 +139,7 @@ const filteredUsers = computed(() => {
 
 const paginatedUsers = computed(() => {
     const startIndex = Number((currentPage.value - 1) * limitUser.value); // تحويل إلى عدد
-
     const endIndex = startIndex + Number(limitUser.value); // تحويل إلى عدد
-
     return sortedUsers.value.slice(startIndex, endIndex);
 });
 
@@ -214,10 +211,12 @@ const createData = async (createData) => {
         await adminStore.createUser(createData);
         closeModal(true, true);
         viewAlert("success", "User Create successfully!");
-         
+
     } catch (error) {
-        console.error("Error updating data:", error);
-        viewAlert("error", "Failed to updating user.");
+        // console.error("Error updating data:", error);
+        console.log(adminStore.errors);
+
+         viewAlert("error", "Failed to updating user.");
     }
 };
 const openInfoModel = (data) => {
@@ -454,7 +453,7 @@ const viewAlert = (title, message) => {
                 </template>
             </DynamicDelete>
             <DynamicCreate
-                :columns="columns"
+                 :columns="columns"
                 :show="showCreateModel"
                 :data="modelData"
                 title="create User"

@@ -7,12 +7,12 @@ export const useAdminStore = defineStore("admin", {
     state: () => ({
         AllSubjects: [],
         AllUsers: [],
+        Errors: [],
+
     }),
     getters: {
         users: (state) => state.AllUsers,
-        subjects(state) {
-            return Object.values(state.subjectCache);
-        },
+        errors: (state) => state.Errors,
     },
     actions: {
         async getUsers() {
@@ -59,6 +59,9 @@ export const useAdminStore = defineStore("admin", {
                         },
                         error: (error) => {
                             console.error("User create Error:", error);
+                            console.log(error.responseJSON.errors);
+
+                            this.Errors = error.responseJSON.errors;
                             reject(error);
                         },
                     });
@@ -120,9 +123,11 @@ export const useAdminStore = defineStore("admin", {
                 throw error;
             }
         },
-
+        clearErrors() {
+            this.Errors = {}; // طريقة لإعادة تعيين الأخطاء
+        },
         async getSubjects(url = "/api/admin/subject", keyword = "") {
-            const cacheKey = `${url}?keyword=${keyword}`; 
+            const cacheKey = `${url}?keyword=${keyword}`;
             if (this.subjectCache[cacheKey]) {
                 console.log("Fetching from cache:", cacheKey);
                 return this.subjectCache[cacheKey];

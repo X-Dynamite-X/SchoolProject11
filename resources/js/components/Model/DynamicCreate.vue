@@ -1,6 +1,8 @@
 <script setup>
 import { ref, defineEmits } from "vue";
 import InputForm from "@/components/FieldRequst/InputForm.vue";
+import { useAdminStore } from "@/Stores/admin";
+const adminStore = useAdminStore();
 
 // Props
 
@@ -21,10 +23,14 @@ const prpos = defineProps({
         type: Object,
         required: true,
     },
+
 });
+
 const emit = defineEmits(["close", "create"]);
 
 const closeModal = () => {
+    console.log( adminStore.errors);
+    adminStore.clearErrors();
     emit("close");
 };
 const createModal = () => {
@@ -65,11 +71,12 @@ const createModal = () => {
                                         v-for="column in prpos.columns"
                                         :key="column.key"
                                     >
-                                        <slot
+                                         <slot
                                             :name="`column-${column.key}`"
                                             :data="data"
                                             :column="column"
                                         >
+
                                             <!-- العرض الافتراضي إذا لم يكن هناك slot -->
                                             <InputForm
                                                 v-if="column.key !== 'id' && column.showInCreate"
@@ -87,9 +94,7 @@ const createModal = () => {
                                                     column.placeholder
                                                 "
                                                 :required="column.required"
-                                                :errorMessage="
-                                                    column.errorMessage
-                                                "
+                                                :errorMessage="adminStore.errors[column.name]"
                                                 :autocomplete="
                                                     column.autocomplete
                                                 "

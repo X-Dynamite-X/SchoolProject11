@@ -5,7 +5,7 @@ namespace App\Http\Controllers\api\v1;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\Admin\StoreNewUserRequst;
 
 class UserController extends Controller
 {
@@ -21,7 +21,7 @@ class UserController extends Controller
             'users' => $users,
         ]);
     }
-    public function store(Request $request )
+    public function store(StoreNewUserRequst $request )
     {
         $user = User::create($request->input());
 
