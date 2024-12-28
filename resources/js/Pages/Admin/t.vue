@@ -14,7 +14,6 @@ import DynamicEdit from "@/components/Model/DynamicEdit.vue";
 import InputRadio from "@/components/FieldRequst/InputRadio.vue";
 import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 import DynamicCreate from "@/components/Model/DynamicCreate.vue";
-
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
@@ -39,10 +38,11 @@ const fetchData = async () => {
 const currentPage = ref(1); // الصفحة الحالية
 const sortColumn = ref(null); // العمود المستخدم للفرز
 const sortDirection = ref("asc");
-
+const errors = ref(null);
 const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
 const columns = [
-    { key: "id", label: "ID" },
+    { key: "id", label: "ID",  showInTabel: true,
+},
     {
         key: "name",
         label: "Name",
@@ -51,6 +51,8 @@ const columns = [
         required: true,
         disabled: true,
         showInCreate: true,
+        showInTabel: true,
+
         showInEdit: true,
         placeholder: "Enter Name",
         errorMessages: ["The name field is required."],
@@ -61,6 +63,8 @@ const columns = [
         name: "email",
         type: "email",
         showInCreate: true,
+        showInTabel: true,
+
         showInEdit: true,
         required: true,
         disabled: true,
@@ -75,6 +79,8 @@ const columns = [
         showInCreate: true,
         showInEdit: false,
         required: true,
+        showInTabel: false,
+
         disabled: true,
         placeholder: "Enter Password",
         errorMessages: ["The email field is required."],
@@ -83,6 +89,8 @@ const columns = [
         key: "password_confirmation",
         label: "Password Confirmation",
         name: "password_confirmation",
+        showInTabel: false,
+
         type: "password",
         showInCreate: true,
         showInEdit: false,
@@ -95,6 +103,8 @@ const columns = [
         key: "roles",
         label: "Role",
         name: "roles",
+        showInTabel: true,
+
         type: "radio",
         showInEdit: true,
         showInCreate: false,
@@ -129,9 +139,7 @@ const filteredUsers = computed(() => {
 
 const paginatedUsers = computed(() => {
     const startIndex = Number((currentPage.value - 1) * limitUser.value); // تحويل إلى عدد
-
     const endIndex = startIndex + Number(limitUser.value); // تحويل إلى عدد
-
     return sortedUsers.value.slice(startIndex, endIndex);
 });
 
@@ -186,7 +194,6 @@ const showInfoModel = ref(false);
 const showEditModel = ref(false);
 const showDeleteModel = ref(false);
 const showCreateModel = ref(false);
-
 const modelData = ref({});
 const oldRolesData = ref(null);
 const openCreateModel = () => {
@@ -201,26 +208,26 @@ const openCreateModel = () => {
 const createData = async (createData) => {
     try {
         console.log("Create Data:", createData);
-        await adminStore.updateUser(createData);
+        await adminStore.createUser(createData);
         closeModal(true, true);
         viewAlert("success", "User Create successfully!");
-        users.value.push(createData);
+
     } catch (error) {
-        console.error("Error updating data:", error);
-        viewAlert("error", "Failed to updating user.");
+        // console.error("Error updating data:", error);
+        console.log(adminStore.errors);
+
+         viewAlert("error", "Failed to updating user.");
     }
 };
 const openInfoModel = (data) => {
     showInfoModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
 };
-
 const openEditModel = (data) => {
     showEditModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
     oldRolesData.value = data.roles?.[0]?.name || null; // معالجة أمان البيانات
 };
-
 const updateData = async (updatedData) => {
     try {
         console.log("Updating Data:", updatedData);
@@ -233,12 +240,10 @@ const updateData = async (updatedData) => {
         viewAlert("error", "Failed to updating user.");
     }
 };
-
 const openDeleteModel = (data) => {
     showDeleteModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
 };
-
 const deleteData = async (data) => {
     console.log("Deleting User:", data);
     closeModal();
@@ -251,7 +256,6 @@ const deleteData = async (data) => {
         viewAlert("error", "Failed to delete user.");
     }
 };
-
 const closeModal = (isEdit = false, saveChanges = false) => {
     showInfoModel.value = false;
     showEditModel.value = false;
@@ -320,6 +324,7 @@ const viewAlert = (title, message) => {
 
             <DataTable :data="paginatedUsers" @sort="sort" :loading="loading">
                 <template #header>
+
                     <TabelTh
                         v-for="thNameField in thNameFields"
                         :key="thNameField"
@@ -448,7 +453,7 @@ const viewAlert = (title, message) => {
                 </template>
             </DynamicDelete>
             <DynamicCreate
-                :columns="columns"
+                 :columns="columns"
                 :show="showCreateModel"
                 :data="modelData"
                 title="create User"
