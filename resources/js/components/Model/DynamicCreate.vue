@@ -94,7 +94,7 @@ const createModal = () => {
                                                     column.placeholder
                                                 "
                                                 :required="column.required"
-                                                :errorMessage="adminStore.errors[column.name]"
+                                                :errorMessage="adminStore.errors[column.name]|| null"
                                                 :autocomplete="
                                                     column.autocomplete
                                                 "

@@ -108,8 +108,8 @@ export const useAdminStore = defineStore("admin", {
                             roles: data.roles[0].name,
                         },
                         success: (response) => {
-                            console.log(this.AllUsers[data.id]);
-                            this.AllUsers[data.id] = response.user;
+                            console.log("update is done");
+
                             resolve(response);
                         },
                         error: (error) => {

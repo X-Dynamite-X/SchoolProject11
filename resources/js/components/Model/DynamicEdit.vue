@@ -1,16 +1,17 @@
 <script setup>
-import { ref, defineEmits } from "vue";
+import { ref,watch, defineEmits } from "vue";
 import InputForm from "@/components/FieldRequst/InputForm.vue";
-
-// Props
-const prpos=defineProps({
+import { useAdminStore } from "@/Stores/admin";
+const adminStore = useAdminStore();
+// prpos
+const prpos =defineProps({
     show: {
         type: Boolean,
         required: true,
     },
     title: {
         type: String,
-        default: "Info",
+        default: "Edit",
     },
     columns: {
         type: Array,
@@ -21,7 +22,12 @@ const prpos=defineProps({
         required: true,
     },
 });
+
 const oldData = ref(prpos.data);
+watch(() => prpos.data, (newData) => {
+  oldData.value = newData;
+});
+
 const emit = defineEmits(["close", "update"]);
 
 // وظائف
@@ -31,11 +37,10 @@ const closeModal = () => {
     emit("close" );
 };
 
-const updateModal = (x) => {
-    console.log(x);
-
-    emit("update", prpos.data); // إرسال البيانات إلى المكون الأعلى
+const updateModal = () => {
+     emit("update", oldData.value);
 };
+;
 </script>
 <template>
     <div
@@ -84,18 +89,14 @@ const updateModal = (x) => {
                                                 :id="column.key"
                                                 :type="column.type"
                                                 :modelValue="prpos.data[column.key]"
-                                                :placeholder="
-                                                    column.placeholder
-                                                "
+                                                :placeholder="column.placeholder"
                                                 :required="column.required"
-                                                :errorMessage="
-                                                    column.errorMessage
-                                                "
-                                                :autocomplete="
-                                                    column.autocomplete
-                                                "
+                                                :errorMessage="adminStore.errors[column.name] || null"
+                                                :autocomplete="column.autocomplete"
                                                 :disabled="column.disabled"
+                                                @update:modelValue="value => prpos.data[column.key] = value"
                                             />
+
                                         </slot>
                                     </div>
                                 </slot>
