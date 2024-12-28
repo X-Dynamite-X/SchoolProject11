@@ -85,9 +85,8 @@ export const useAdminStore = defineStore("admin", {
                 throw error;
             }
         },
-        async deleteUser(data, limit) {
+        async deleteUser(data) {
             await csrf();
-
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({

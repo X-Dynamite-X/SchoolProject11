@@ -15,6 +15,7 @@ import InputRadio from "@/components/FieldRequst/InputRadio.vue";
 import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
+import Alerts from "@/components/AllApp/Alerts.vue";
 
 const adminStore = useAdminStore();
 const loading = ref(true);
@@ -26,7 +27,7 @@ const fetchData = async () => {
     loading.value = true;
     try {
         await adminStore.getUsers();
-        totalItems.value = users.value.length;
+        totalItems.value = users.value.length; // إجمالي عدد المستخدمين
     } catch (error) {
         console.error("Error fetching data:", error);
     } finally {
@@ -77,12 +78,11 @@ onMounted(fetchData);
 
 watch(searchKeyword, (newKeyword) => {
     searchKeyword.value = newKeyword;
-    currentPage.value = 1;
+    currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
 });
 
 watch(limitUser, (newLimit) => {
     currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
-    // fetchData(); // تحديث البيانات
 });
 
 const filteredUsers = computed(() => {
@@ -90,7 +90,8 @@ const filteredUsers = computed(() => {
     return users.value.filter(
         (user) =>
             user.name.toLowerCase().includes(keyword) ||
-            user.email.toLowerCase().includes(keyword)
+            user.email.toLowerCase().includes(keyword) ||
+            user.roles[0].name.includes(keyword)
     );
 });
 
@@ -144,7 +145,6 @@ const sortedUsers = computed(() => {
     });
 });
 
-
 onMounted(() => {
     loading.value = false;
 });
@@ -170,11 +170,15 @@ const openEditModel = (data) => {
 const updateData = async (updatedData) => {
     try {
         console.log("Updating Data:", updatedData);
-        closeModal(true, true);
         await adminStore.updateUser(updatedData); // انتظار تحديث المستخدم
-        modelData.value = { ...updatedData }; // تحديث البيانات في النموذج
+        closeModal(true, true);
+        viewAlert("success", "User updating successfully!");
+        modelData.value = { ...updatedData };
+
     } catch (error) {
         console.error("Error updating data:", error);
+        viewAlert("error", "Failed to updating user.");
+
     }
 };
 
@@ -186,7 +190,14 @@ const openDeleteModel = (data) => {
 const deleteData = async (data) => {
     console.log("Deleting User:", data);
     closeModal();
-    await adminStore.deleteUser(data, limitUser.value); // انتظار حذف
+    try {
+        await adminStore.deleteUser(data);
+        viewAlert("success", "User deleted successfully!");
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        // عرض إشعار الخطأ
+        viewAlert("error", "Failed to delete user.");
+    }
 };
 
 const closeModal = (isEdit = false, saveChanges = false) => {
@@ -199,35 +210,48 @@ const closeModal = (isEdit = false, saveChanges = false) => {
         }
     }
 };
+
+const showAlert = ref(false);
+const alertTitle = ref("");
+const alertMessage = ref("");
+
+const viewAlert = (title, message) => {
+    alertTitle.value = title;
+    alertMessage.value = message;
+    showAlert.value = true;
+
+    // إخفاء الإشعار تلقائيًا بعد 3 ثوانٍ
+    setTimeout(() => {
+        showAlert.value = false;
+    }, 3000);
+};
 </script>
 
 <template>
+    <div v-if="showAlert" class="fixed top-20 right-3 w-1/4 z-50">
+        <Alerts :title="alertTitle" :message="alertMessage" />
+    </div>
     <div
         class="flex-grow p-4 overflow-scroll touch-scroll bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
     >
         <div class="container w-10/12 mx-auto">
             <div class="flex items-center mb-6 space-x-4">
-                <div class="flex-1">
-                    <SearchInput
-                        v-model="searchKeyword"
-                        placeholder="Search users..."
-                        class="w-full"
-                    >
-                        <template #icon>
-                            <SearchIcon />
-                        </template>
-                    </SearchInput>
-                </div>
+                <SearchInput
+                    v-model="searchKeyword"
+                    placeholder="Search users..."
+                    class="w-full"
+                >
+                    <template #icon>
+                        <SearchIcon />
+                    </template>
+                </SearchInput>
 
-                <!-- اختيار عدد الصفوف -->
-                <div class="w-1/6">
-                    <ItemsPerPage
-                        :modelValue="limitUser"
-                        v-model="limitUser"
-                        class="ml-4"
-                        @update:modelValue="updateItemsPerPage"
-                    />
-                </div>
+                <ItemsPerPage
+                    :modelValue="limitUser"
+                    v-model="limitUser"
+                    class=" "
+                    @update:modelValue="updateItemsPerPage"
+                />
             </div>
             <DataTable :data="paginatedUsers" @sort="sort" :loading="loading">
                 <template #header>
@@ -236,7 +260,6 @@ const closeModal = (isEdit = false, saveChanges = false) => {
                         :key="thNameField"
                         :nameFeild="thNameField"
                         @click="sort(thNameField)"
-
                     />
                 </template>
                 <template #row="{ item }">

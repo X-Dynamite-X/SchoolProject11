@@ -24,8 +24,8 @@ watch(inputValue, (newValue) => {
 </script>
 
 <template>
-    <div class="mb-4 flex items-center space-x-2 pb-4">
-        <div class="relative mt-1">
+    <div class="items-center space-x-2  ">
+        <div class="relative  ">
             <input
                 id="searchInput"
                 type="text"
