@@ -178,8 +178,7 @@ const sortedUsers = computed(() => {
 onMounted(() => {
     loading.value = false;
 });
-watch(limitUser, fetchData); // تحديث البيانات عند تغيير عدد العناصر
-
+ 
 const showInfoModel = ref(false);
 const showEditModel = ref(false);
 const showDeleteModel = ref(false);
