@@ -1,8 +1,12 @@
 import { defineStore } from "pinia";
-import axios from "axios";
 import router from "@/router/router";
 
-const csrf = () => axios.get("/sanctum/csrf-cookie");
+const csrf = () => {
+    return $.ajax({
+        url: "/sanctum/csrf-cookie",
+        method: "GET",
+    });
+};
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -21,9 +25,12 @@ export const useAuthStore = defineStore("auth", {
         async getUser() {
             await csrf();
             try {
-                const data = await axios.get("/api/user");
-                this.authUser = data.data;
-                this.authRole = data.data.roles;
+                const response = await $.ajax({
+                    url: "/api/user",
+                    method: "GET",
+                });
+                this.authUser = response;
+                this.authRole = response.roles;
             } catch (error) {
                 this.authUser = null;
             }
@@ -32,14 +39,19 @@ export const useAuthStore = defineStore("auth", {
             this.authErrors = [];
             await csrf();
             try {
-                await axios.post("/login", {
-                    email: data.email,
-                    password: data.password,
+                await $.ajax({
+                    url: "/login",
+                    method: "POST",
+                    data: {
+                        email: data.email,
+                        password: data.password,
+                    },
                 });
+                this.getUser();
                 router.push("/");
             } catch (error) {
-                if (error.response.status === 422) {
-                    this.authErrors = error.response.data.errors;
+                if (error.status === 422) {
+                    this.authErrors = error.responseJSON.errors;
                 }
             }
         },
@@ -47,23 +59,29 @@ export const useAuthStore = defineStore("auth", {
             this.authErrors = [];
             await csrf();
             try {
-                await axios.post("/register", {
-                    name: data.name,
-                    email: data.email,
-                    password: data.password,
-                    password_confirmation: data.password_confirmation,
+                await $.ajax({
+                    url: "/register",
+                    method: "POST",
+                    data: {
+                        name: data.name,
+                        email: data.email,
+                        password: data.password,
+                        password_confirmation: data.password_confirmation,
+                    },
                 });
                 await this.handleLogout();
             } catch (error) {
-                if (error.response?.status === 422) {
-                    this.authErrors = error.response.data.errors;
-                    console.log(error.response);
+                if (error.status === 422) {
+                    this.authErrors = error.responseJSON.errors;
                 }
             }
         },
         async handleLogout() {
             await csrf();
-            await axios.post("/logout");
+            await $.ajax({
+                url: "/logout",
+                method: "POST",
+            });
             this.router.push("/login");
             this.authUser = null;
             this.authRole = null;
@@ -72,13 +90,15 @@ export const useAuthStore = defineStore("auth", {
             this.authErrors = [];
             await csrf();
             try {
-                const response = await axios.post("/forgot-password", {
-                    email: data,
+                const response = await $.ajax({
+                    url: "/forgot-password",
+                    method: "POST",
+                    data: { email: data },
                 });
-                this.authStatus = response.data.status;
+                this.authStatus = response.status;
             } catch (error) {
-                if (error.response?.status === 422) {
-                    this.authErrors = error.response.data.errors;
+                if (error.status === 422) {
+                    this.authErrors = error.responseJSON.errors;
                 }
             }
         },
@@ -86,23 +106,30 @@ export const useAuthStore = defineStore("auth", {
             this.authErrors = [];
             await csrf();
             try {
-                await axios.post("/reset-password", resetData);
+                await $.ajax({
+                    url: "/reset-password",
+                    method: "POST",
+                    data: resetData,
+                });
                 router.push("/login");
             } catch (error) {
-                if (error.response?.status === 422) {
-                    this.authErrors = error.response.data.errors;
+                if (error.status === 422) {
+                    this.authErrors = error.responseJSON.errors;
                 }
             }
         },
         async updateProfile(data) {
             try {
-                const response = await axios.put(`/api/v1/user/update`, data);
+                const response = await $.ajax({
+                    url: `/api/v1/user/update`,
+                    method: "PUT",
+                    data: data,
+                });
                 router.push("/profile");
-                this.authUser = response.data.profile;
+                this.authUser = response.profile;
             } catch (error) {
-                console.error("Error updating profile:", error);
-                if (error.response?.status === 422) {
-                    this.authErrors = error.response.data.errors;
+                if (error.status === 422) {
+                    this.authErrors = error.responseJSON.errors;
                 }
             }
         },
