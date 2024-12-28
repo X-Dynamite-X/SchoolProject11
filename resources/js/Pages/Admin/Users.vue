@@ -21,7 +21,7 @@ import Alerts from "@/components/AllApp/Alerts.vue";
 const adminStore = useAdminStore();
 const loading = ref(true);
 const searchKeyword = ref("");
-const limitUser = ref(5);
+const limitUser = ref(10);
 const users = computed(() => adminStore.users);
 const totalItems = ref(0);
 const fetchData = async () => {
@@ -178,7 +178,7 @@ const sortedUsers = computed(() => {
 onMounted(() => {
     loading.value = false;
 });
- 
+
 const showInfoModel = ref(false);
 const showEditModel = ref(false);
 const showDeleteModel = ref(false);
