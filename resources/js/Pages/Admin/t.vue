@@ -13,8 +13,11 @@ import DynamicInfo from "@/components/Model/DynamicInfo.vue";
 import DynamicEdit from "@/components/Model/DynamicEdit.vue";
 import InputRadio from "@/components/FieldRequst/InputRadio.vue";
 import DynamicDelete from "@/components/Model/DynamicDelete.vue";
+import DynamicCreate from "@/components/Model/DynamicCreate.vue";
+
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
+import Alerts from "@/components/AllApp/Alerts.vue";
 
 const adminStore = useAdminStore();
 const loading = ref(true);
@@ -25,9 +28,7 @@ const totalItems = ref(0);
 const fetchData = async () => {
     loading.value = true;
     try {
-        await adminStore.getUsers(); // استدعاء الدالة من المخزن
-        console.log(users.value.length);
-
+        await adminStore.getUsers();
         totalItems.value = users.value.length; // إجمالي عدد المستخدمين
     } catch (error) {
         console.error("Error fetching data:", error);
@@ -49,6 +50,8 @@ const columns = [
         type: "text",
         required: true,
         disabled: true,
+        showInCreate: true,
+        showInEdit: true,
         placeholder: "Enter Name",
         errorMessages: ["The name field is required."],
     },
@@ -57,9 +60,35 @@ const columns = [
         label: "Email",
         name: "email",
         type: "email",
+        showInCreate: true,
+        showInEdit: true,
         required: true,
         disabled: true,
         placeholder: "Enter Email",
+        errorMessages: ["The email field is required."],
+    },
+    {
+        key: "password",
+        label: "Password",
+        name: "password",
+        type: "password",
+        showInCreate: true,
+        showInEdit: false,
+        required: true,
+        disabled: true,
+        placeholder: "Enter Password",
+        errorMessages: ["The email field is required."],
+    },
+    {
+        key: "password_confirmation",
+        label: "Password Confirmation",
+        name: "password_confirmation",
+        type: "password",
+        showInCreate: true,
+        showInEdit: false,
+        required: true,
+        disabled: true,
+        placeholder: "Enter password Confirmation",
         errorMessages: ["The email field is required."],
     },
     {
@@ -67,6 +96,8 @@ const columns = [
         label: "Role",
         name: "roles",
         type: "radio",
+        showInEdit: true,
+        showInCreate: false,
         required: true,
         options: [
             { label: "Admin", value: "admin" },
@@ -79,11 +110,11 @@ onMounted(fetchData);
 
 watch(searchKeyword, (newKeyword) => {
     searchKeyword.value = newKeyword;
+    currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
 });
 
 watch(limitUser, (newLimit) => {
     currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
-    fetchData(); // تحديث البيانات
 });
 
 const filteredUsers = computed(() => {
@@ -91,7 +122,8 @@ const filteredUsers = computed(() => {
     return users.value.filter(
         (user) =>
             user.name.toLowerCase().includes(keyword) ||
-            user.email.toLowerCase().includes(keyword)
+            user.email.toLowerCase().includes(keyword) ||
+            user.roles[0].name.includes(keyword)
     );
 });
 
@@ -145,7 +177,6 @@ const sortedUsers = computed(() => {
     });
 });
 
-
 onMounted(() => {
     loading.value = false;
 });
@@ -154,9 +185,31 @@ watch(limitUser, fetchData); // تحديث البيانات عند تغيير ع
 const showInfoModel = ref(false);
 const showEditModel = ref(false);
 const showDeleteModel = ref(false);
+const showCreateModel = ref(false);
+
 const modelData = ref({});
 const oldRolesData = ref(null);
-
+const openCreateModel = () => {
+    showCreateModel.value = true;
+    modelData.value = {
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+    };
+};
+const createData = async (createData) => {
+    try {
+        console.log("Create Data:", createData);
+        await adminStore.updateUser(createData);
+        closeModal(true, true);
+        viewAlert("success", "User Create successfully!");
+        users.value.push(createData);
+    } catch (error) {
+        console.error("Error updating data:", error);
+        viewAlert("error", "Failed to updating user.");
+    }
+};
 const openInfoModel = (data) => {
     showInfoModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
@@ -171,11 +224,13 @@ const openEditModel = (data) => {
 const updateData = async (updatedData) => {
     try {
         console.log("Updating Data:", updatedData);
-        closeModal(true, true);
         await adminStore.updateUser(updatedData); // انتظار تحديث المستخدم
-        modelData.value = { ...updatedData }; // تحديث البيانات في النموذج
+        closeModal(true, true);
+        viewAlert("success", "User updating successfully!");
+        modelData.value = { ...updatedData };
     } catch (error) {
         console.error("Error updating data:", error);
+        viewAlert("error", "Failed to updating user.");
     }
 };
 
@@ -187,49 +242,82 @@ const openDeleteModel = (data) => {
 const deleteData = async (data) => {
     console.log("Deleting User:", data);
     closeModal();
-    await adminStore.deleteUser(data, limitUser.value); // انتظار حذف
+    try {
+        await adminStore.deleteUser(data);
+        viewAlert("success", "User deleted successfully!");
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        // عرض إشعار الخطأ
+        viewAlert("error", "Failed to delete user.");
+    }
 };
 
 const closeModal = (isEdit = false, saveChanges = false) => {
     showInfoModel.value = false;
     showEditModel.value = false;
     showDeleteModel.value = false;
+    showCreateModel.value = false;
+
     if (!isEdit && !saveChanges) {
         if (oldRolesData.value !== null) {
             modelData.value.roles[0].name = oldRolesData.value;
         }
     }
 };
+
+const showAlert = ref(false);
+const alertTitle = ref("");
+const alertMessage = ref("");
+
+const viewAlert = (title, message) => {
+    alertTitle.value = title;
+    alertMessage.value = message;
+    showAlert.value = true;
+
+    // إخفاء الإشعار تلقائيًا بعد 3 ثوانٍ
+    setTimeout(() => {
+        showAlert.value = false;
+    }, 3000);
+};
 </script>
 
 <template>
+    <div v-if="showAlert" class="fixed top-20 right-3 w-1/4 z-50">
+        <Alerts :title="alertTitle" :message="alertMessage" />
+    </div>
     <div
         class="flex-grow p-4 overflow-scroll touch-scroll bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
     >
+        <!--  -->
         <div class="container w-10/12 mx-auto">
-            <div class="flex items-center mb-6 space-x-4">
-                <div class="flex-1">
-                    <SearchInput
-                        v-model="searchKeyword"
-                        placeholder="Search users..."
-                        class="w-full"
-                    >
-                        <template #icon>
-                            <SearchIcon />
-                        </template>
-                    </SearchInput>
-                </div>
 
-                <!-- اختيار عدد الصفوف -->
-                <div class="w-1/6">
-                    <ItemsPerPage
-                        :modelValue="limitUser"
-                        v-model="limitUser"
-                        class="ml-4"
-                        @update:modelValue="updateItemsPerPage"
-                    />
-                </div>
+        <div
+            class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between  space-x-4 pb-4 "
+        >
+            <div class="relative">
+                <SearchInput
+                    v-model="searchKeyword"
+                    placeholder="Search users..."
+                    class="w-full"
+                >
+                    <template #icon>
+                        <SearchIcon />
+                    </template>
+                </SearchInput>
             </div>
+            <div>
+                <ItemsPerPage
+                    :modelValue="limitUser"
+                    v-model="limitUser"
+                    class=" "
+                    @update:modelValue="updateItemsPerPage"
+                />
+
+            </div>
+        </div>
+
+
+
             <DataTable :data="paginatedUsers" @sort="sort" :loading="loading">
                 <template #header>
                     <TabelTh
@@ -237,7 +325,6 @@ const closeModal = (isEdit = false, saveChanges = false) => {
                         :key="thNameField"
                         :nameFeild="thNameField"
                         @click="sort(thNameField)"
-
                     />
                 </template>
                 <template #row="{ item }">
@@ -277,12 +364,33 @@ const closeModal = (isEdit = false, saveChanges = false) => {
                     </DynamicRow>
                 </template>
             </DataTable>
-            <!-- <Pagination :disabled="currentPage === 1" @change-page="changePage" /> -->
+
+
             <Pagination
                 :currentPage="currentPage"
                 :totalPages="totalPages"
                 @change-page="changePage"
             />
+            <button
+                @click="openCreateModel()"
+                class="fixed bottom-4 right-4 flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                style="position: fixed; bottom: 16px; right: 16px"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    class="w-6 h-6"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 4v16m8-8H4"
+                    />
+                </svg>
+            </button>
 
             <DynamicInfo
                 :data="modelData"
@@ -339,6 +447,15 @@ const closeModal = (isEdit = false, saveChanges = false) => {
                     <strong class="text-red-600">{{ data.name }}</strong>
                 </template>
             </DynamicDelete>
+            <DynamicCreate
+                :columns="columns"
+                :show="showCreateModel"
+                :data="modelData"
+                title="create User"
+                @create="createData"
+                @close="closeModal"
+            >
+            </DynamicCreate>
         </div>
     </div>
 </template>

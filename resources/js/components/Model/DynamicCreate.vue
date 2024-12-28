@@ -3,7 +3,8 @@ import { ref, defineEmits } from "vue";
 import InputForm from "@/components/FieldRequst/InputForm.vue";
 
 // Props
-const prpos=defineProps({
+
+const prpos = defineProps({
     show: {
         type: Boolean,
         required: true,
@@ -21,25 +22,18 @@ const prpos=defineProps({
         required: true,
     },
 });
-const oldData = ref(prpos.data);
-const emit = defineEmits(["close", "update"]);
+const emit = defineEmits(["close", "create"]);
 
-// وظائف
 const closeModal = () => {
-
-
-    emit("close" );
+    emit("close");
 };
-
-const updateModal = (x) => {
-    console.log(x);
-
-    emit("update", prpos.data); // إرسال البيانات إلى المكون الأعلى
+const createModal = () => {
+    emit("create", prpos.data); // إرسال البيانات إلى المكون الأعلى
 };
 </script>
 <template>
     <div
-        v-if="show"
+        v-if="prpos.show"
         class="fixed inset-0 z-10 overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
@@ -78,12 +72,17 @@ const updateModal = (x) => {
                                         >
                                             <!-- العرض الافتراضي إذا لم يكن هناك slot -->
                                             <InputForm
-                                                v-if="column.key !== 'id' && column.showInEdit"
+                                                v-if="column.key !== 'id' && column.showInCreate"
                                                 :label="column.label"
                                                 :name="column.name"
                                                 :id="column.key"
                                                 :type="column.type"
-                                                :modelValue="prpos.data[column.key]"
+                                                :modelValue="
+                                                    prpos.data[column.key]
+                                                "
+                                                v-model="
+                                                    prpos.data[column.key]
+                                                "
                                                 :placeholder="
                                                     column.placeholder
                                                 "
@@ -94,7 +93,7 @@ const updateModal = (x) => {
                                                 :autocomplete="
                                                     column.autocomplete
                                                 "
-                                                :disabled="column.disabled"
+
                                             />
                                         </slot>
                                     </div>
@@ -103,29 +102,24 @@ const updateModal = (x) => {
                         </div>
                     </div>
                 </div>
-
-                <!-- Footer -->
                 <div
                     class="bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
                 >
                     <button
                         type="button"
-                        class="mt-3  mx-1 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 sm:mt-0 sm:w-auto"
+                        class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 sm:mt-0 sm:w-auto"
                         @click="closeModal()"
                     >
                         Cancel
                     </button>
                     <button
                         type="button"
-                        class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-yellow-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-yellow-700  sm:mt-0 sm:w-auto"
-                        @click="updateModal()"
+                        class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-green-700 sm:mt-0 sm:w-auto"
+                        @click="createModal()"
                     >
-                        Save
+                        Create
                     </button>
-                    <slot name="actions">
-                        <!-- أزرار إضافية -->
-
-                    </slot>
+                    <slot name="actions"> </slot>
                 </div>
             </div>
         </div>

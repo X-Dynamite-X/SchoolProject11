@@ -13,6 +13,8 @@ import DynamicInfo from "@/components/Model/DynamicInfo.vue";
 import DynamicEdit from "@/components/Model/DynamicEdit.vue";
 import InputRadio from "@/components/FieldRequst/InputRadio.vue";
 import DynamicDelete from "@/components/Model/DynamicDelete.vue";
+import DynamicCreate from "@/components/Model/DynamicCreate.vue";
+
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
@@ -40,7 +42,8 @@ const sortDirection = ref("asc");
 
 const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
 const columns = [
-    { key: "id", label: "ID" },
+    { key: "id", label: "ID",  showInTabel: true,
+},
     {
         key: "name",
         label: "Name",
@@ -48,6 +51,10 @@ const columns = [
         type: "text",
         required: true,
         disabled: true,
+        showInCreate: true,
+        showInTabel: true,
+
+        showInEdit: true,
         placeholder: "Enter Name",
         errorMessages: ["The name field is required."],
     },
@@ -56,16 +63,52 @@ const columns = [
         label: "Email",
         name: "email",
         type: "email",
+        showInCreate: true,
+        showInTabel: true,
+
+        showInEdit: true,
         required: true,
         disabled: true,
         placeholder: "Enter Email",
         errorMessages: ["The email field is required."],
     },
     {
+        key: "password",
+        label: "Password",
+        name: "password",
+        type: "password",
+        showInCreate: true,
+        showInEdit: false,
+        required: true,
+        showInTabel: false,
+
+        disabled: true,
+        placeholder: "Enter Password",
+        errorMessages: ["The email field is required."],
+    },
+    {
+        key: "password_confirmation",
+        label: "Password Confirmation",
+        name: "password_confirmation",
+        showInTabel: false,
+
+        type: "password",
+        showInCreate: true,
+        showInEdit: false,
+        required: true,
+        disabled: true,
+        placeholder: "Enter password Confirmation",
+        errorMessages: ["The email field is required."],
+    },
+    {
         key: "roles",
         label: "Role",
         name: "roles",
+        showInTabel: true,
+
         type: "radio",
+        showInEdit: true,
+        showInCreate: false,
         required: true,
         options: [
             { label: "Admin", value: "admin" },
@@ -153,20 +196,39 @@ watch(limitUser, fetchData); // تحديث البيانات عند تغيير ع
 const showInfoModel = ref(false);
 const showEditModel = ref(false);
 const showDeleteModel = ref(false);
+const showCreateModel = ref(false);
 const modelData = ref({});
 const oldRolesData = ref(null);
-
+const openCreateModel = () => {
+    showCreateModel.value = true;
+    modelData.value = {
+        name: "",
+        email: "",
+        password: "",
+        password_confirmation: "",
+    };
+};
+const createData = async (createData) => {
+    try {
+        console.log("Create Data:", createData);
+        await adminStore.createUser(createData);
+        closeModal(true, true);
+        viewAlert("success", "User Create successfully!");
+         
+    } catch (error) {
+        console.error("Error updating data:", error);
+        viewAlert("error", "Failed to updating user.");
+    }
+};
 const openInfoModel = (data) => {
     showInfoModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
 };
-
 const openEditModel = (data) => {
     showEditModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
     oldRolesData.value = data.roles?.[0]?.name || null; // معالجة أمان البيانات
 };
-
 const updateData = async (updatedData) => {
     try {
         console.log("Updating Data:", updatedData);
@@ -174,19 +236,15 @@ const updateData = async (updatedData) => {
         closeModal(true, true);
         viewAlert("success", "User updating successfully!");
         modelData.value = { ...updatedData };
-
     } catch (error) {
         console.error("Error updating data:", error);
         viewAlert("error", "Failed to updating user.");
-
     }
 };
-
 const openDeleteModel = (data) => {
     showDeleteModel.value = true;
     modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
 };
-
 const deleteData = async (data) => {
     console.log("Deleting User:", data);
     closeModal();
@@ -199,11 +257,12 @@ const deleteData = async (data) => {
         viewAlert("error", "Failed to delete user.");
     }
 };
-
 const closeModal = (isEdit = false, saveChanges = false) => {
     showInfoModel.value = false;
     showEditModel.value = false;
     showDeleteModel.value = false;
+    showCreateModel.value = false;
+
     if (!isEdit && !saveChanges) {
         if (oldRolesData.value !== null) {
             modelData.value.roles[0].name = oldRolesData.value;
@@ -234,8 +293,13 @@ const viewAlert = (title, message) => {
     <div
         class="flex-grow p-4 overflow-scroll touch-scroll bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 min-h-screen"
     >
+        <!--  -->
         <div class="container w-10/12 mx-auto">
-            <div class="flex items-center mb-6 space-x-4">
+
+        <div
+            class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between  space-x-4 pb-4 "
+        >
+            <div class="relative">
                 <SearchInput
                     v-model="searchKeyword"
                     placeholder="Search users..."
@@ -245,16 +309,23 @@ const viewAlert = (title, message) => {
                         <SearchIcon />
                     </template>
                 </SearchInput>
-
+            </div>
+            <div>
                 <ItemsPerPage
                     :modelValue="limitUser"
                     v-model="limitUser"
                     class=" "
                     @update:modelValue="updateItemsPerPage"
                 />
+
             </div>
+        </div>
+
+
+
             <DataTable :data="paginatedUsers" @sort="sort" :loading="loading">
                 <template #header>
+
                     <TabelTh
                         v-for="thNameField in thNameFields"
                         :key="thNameField"
@@ -299,12 +370,33 @@ const viewAlert = (title, message) => {
                     </DynamicRow>
                 </template>
             </DataTable>
-            <!-- <Pagination :disabled="currentPage === 1" @change-page="changePage" /> -->
+
+
             <Pagination
                 :currentPage="currentPage"
                 :totalPages="totalPages"
                 @change-page="changePage"
             />
+            <button
+                @click="openCreateModel()"
+                class="fixed bottom-4 right-4 flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                style="position: fixed; bottom: 16px; right: 16px"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    class="w-6 h-6"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 4v16m8-8H4"
+                    />
+                </svg>
+            </button>
 
             <DynamicInfo
                 :data="modelData"
@@ -361,6 +453,15 @@ const viewAlert = (title, message) => {
                     <strong class="text-red-600">{{ data.name }}</strong>
                 </template>
             </DynamicDelete>
+            <DynamicCreate
+                :columns="columns"
+                :show="showCreateModel"
+                :data="modelData"
+                title="create User"
+                @create="createData"
+                @close="closeModal"
+            >
+            </DynamicCreate>
         </div>
     </div>
 </template>
