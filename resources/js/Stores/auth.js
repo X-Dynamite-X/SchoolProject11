@@ -23,16 +23,21 @@ export const useAuthStore = defineStore("auth", {
     },
     actions: {
         async getUser() {
-            await csrf();
-            try {
-                const response = await $.ajax({
-                    url: "/api/user",
-                    method: "GET",
-                });
-                this.authUser = response;
-                this.authRole = response.roles;
-            } catch (error) {
-                this.authUser = null;
+            if (this.authUser) {
+                
+                return this.authUser;
+            } else {
+                await csrf();
+                try {
+                    const response = await $.ajax({
+                        url: "/api/user",
+                        method: "GET",
+                    });
+                    this.authUser = response;
+                    this.authRole = response.roles;
+                } catch (error) {
+                    this.authUser = null;
+                }
             }
         },
         async handleLogin(data) {

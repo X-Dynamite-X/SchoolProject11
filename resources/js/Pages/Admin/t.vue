@@ -21,7 +21,7 @@ import Alerts from "@/components/AllApp/Alerts.vue";
 const adminStore = useAdminStore();
 const loading = ref(true);
 const searchKeyword = ref("");
-const limitUser = ref(5);
+const limitUser = ref(10);
 const users = computed(() => adminStore.users);
 const totalItems = ref(0);
 const fetchData = async () => {
@@ -38,11 +38,9 @@ const fetchData = async () => {
 const currentPage = ref(1); // الصفحة الحالية
 const sortColumn = ref(null); // العمود المستخدم للفرز
 const sortDirection = ref("asc");
-const errors = ref(null);
 const thNameFields = ["ID", "Name", "Email", "Role", "Actions"];
 const columns = [
-    { key: "id", label: "ID",  showInTabel: true,
-},
+    { key: "id", label: "ID", showInTabel: true },
     {
         key: "name",
         label: "Name",
@@ -52,10 +50,8 @@ const columns = [
         disabled: true,
         showInCreate: true,
         showInTabel: true,
-
         showInEdit: true,
         placeholder: "Enter Name",
-        errorMessages: ["The name field is required."],
     },
     {
         key: "email",
@@ -69,7 +65,6 @@ const columns = [
         required: true,
         disabled: true,
         placeholder: "Enter Email",
-        errorMessages: ["The email field is required."],
     },
     {
         key: "password",
@@ -80,31 +75,26 @@ const columns = [
         showInEdit: false,
         required: true,
         showInTabel: false,
-
         disabled: true,
         placeholder: "Enter Password",
-        errorMessages: ["The email field is required."],
     },
     {
         key: "password_confirmation",
         label: "Password Confirmation",
         name: "password_confirmation",
         showInTabel: false,
-
         type: "password",
         showInCreate: true,
         showInEdit: false,
         required: true,
         disabled: true,
         placeholder: "Enter password Confirmation",
-        errorMessages: ["The email field is required."],
     },
     {
         key: "roles",
         label: "Role",
         name: "roles",
         showInTabel: true,
-
         type: "radio",
         showInEdit: true,
         showInCreate: false,
@@ -188,7 +178,6 @@ const sortedUsers = computed(() => {
 onMounted(() => {
     loading.value = false;
 });
-watch(limitUser, fetchData); // تحديث البيانات عند تغيير عدد العناصر
 
 const showInfoModel = ref(false);
 const showEditModel = ref(false);
@@ -211,12 +200,8 @@ const createData = async (createData) => {
         await adminStore.createUser(createData);
         closeModal(true, true);
         viewAlert("success", "User Create successfully!");
-
     } catch (error) {
-        // console.error("Error updating data:", error);
-        console.log(adminStore.errors);
-
-         viewAlert("error", "Failed to updating user.");
+        viewAlert("error", "Failed to updating user.");
     }
 };
 const openInfoModel = (data) => {
@@ -230,7 +215,6 @@ const openEditModel = (data) => {
 };
 const updateData = async (updatedData) => {
     try {
-        console.log("Updating Data:", updatedData);
         await adminStore.updateUser(updatedData); // انتظار تحديث المستخدم
         closeModal(true, true);
         viewAlert("success", "User updating successfully!");
@@ -294,37 +278,32 @@ const viewAlert = (title, message) => {
     >
         <!--  -->
         <div class="container w-10/12 mx-auto">
-
-        <div
-            class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between  space-x-4 pb-4 "
-        >
-            <div class="relative">
-                <SearchInput
-                    v-model="searchKeyword"
-                    placeholder="Search users..."
-                    class="w-full"
-                >
-                    <template #icon>
-                        <SearchIcon />
-                    </template>
-                </SearchInput>
+            <div
+                class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between space-x-4 pb-4"
+            >
+                <div class="relative">
+                    <SearchInput
+                        v-model="searchKeyword"
+                        placeholder="Search users..."
+                        class="w-full"
+                    >
+                        <template #icon>
+                            <SearchIcon />
+                        </template>
+                    </SearchInput>
+                </div>
+                <div>
+                    <ItemsPerPage
+                        :modelValue="limitUser"
+                        v-model="limitUser"
+                        class=" "
+                        @update:modelValue="updateItemsPerPage"
+                    />
+                </div>
             </div>
-            <div>
-                <ItemsPerPage
-                    :modelValue="limitUser"
-                    v-model="limitUser"
-                    class=" "
-                    @update:modelValue="updateItemsPerPage"
-                />
-
-            </div>
-        </div>
-
-
 
             <DataTable :data="paginatedUsers" @sort="sort" :loading="loading">
                 <template #header>
-
                     <TabelTh
                         v-for="thNameField in thNameFields"
                         :key="thNameField"
@@ -369,7 +348,6 @@ const viewAlert = (title, message) => {
                     </DynamicRow>
                 </template>
             </DataTable>
-
 
             <Pagination
                 :currentPage="currentPage"
@@ -433,7 +411,7 @@ const viewAlert = (title, message) => {
                         :placeholder="column.placeholder"
                         :required="column.required"
                         :options="column.options"
-                        :errorMessage="column.errorMessage"
+                        :errorMessage="adminStore.errors[column.key]||null"
                         :autocomplete="column.autocomplete"
                         v-model="data[column.key][0].name"
                     />
@@ -453,7 +431,7 @@ const viewAlert = (title, message) => {
                 </template>
             </DynamicDelete>
             <DynamicCreate
-                 :columns="columns"
+                :columns="columns"
                 :show="showCreateModel"
                 :data="modelData"
                 title="create User"

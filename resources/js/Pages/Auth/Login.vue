@@ -16,12 +16,12 @@ const router = useRouter();
 
 async function sendData(data) {
     loading.value = true;
-     try {
-        await authStore.handleLogin(data); // انتظار انتهاء تسجيل الدخول
+    try {
+        await authStore.handleLogin(data);
+        form.value = { email: "", password: "" }; // Clear form on success
     } catch (error) {
-        console.log(error);
-        
-     } finally {
+        authStore.errors.general = "Invalid email or password";
+    } finally {
         loading.value = false;
     }
 }
@@ -96,11 +96,11 @@ onMounted(() => {
                             name="email"
                             id="email"
                             autocomplete="email"
-                            required="true"
+                            :required="true"
                             placeholder="Email Address"
                             label="Email Address"
                             v-model="form.email"
-                            :errorMessage="authStore.errors.email"
+                            :errorMessage="authStore.errors.email || null"
                         />
                         <!-- كلمة المرور -->
                         <InputForm
@@ -108,15 +108,14 @@ onMounted(() => {
                             name="password"
                             id="password"
                             autocomplete="password"
-                            required="true"
+                            :required="true"
                             placeholder="Password"
                             label="Password"
                             v-model="form.password"
-                            :errorMessage="authStore.errors.password"
+                            :errorMessage="authStore.errors.password || null"
                         />
 
                         <!-- رسالة الخطأ -->
-                         
 
                         <!-- زر تسجيل الدخول -->
                         <div>

@@ -6,73 +6,38 @@ use App\Models\Subject;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Requests\Admin\StoreNewSubjectRequst;
+
 
 class SubjectController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
+    public function index()
     {
-        $subjects = Cache::remember('subjects_page_' . $request->input('page', 1) . '_keyword_' . $request->input('keyword', ''), now()->addMinutes(10), function () use ($request) {
-            $query = Subject::select('id', 'name', 'success_mark', "full_mark") // اختر الأعمدة المهمة فقط
-                ->with('users'); 
-            if ($keyword = $request->input('keyword')) {
-                $query->where('name', 'like', "%$keyword%");
-            }
-            return $query->paginate(2);
-        });
-
+        $subjects = Subject::with("users")->get(["id", "name","success_mark","full_mark"]);
         return response()->json([
             'subjects' => $subjects,
         ]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(StoreNewSubjectRequst $request)
     {
-        //
+        $subject = Subject::create($request->input());
+        return response()->json(["subject" => $subject, 'message' => 'Subject Create Successfully'], 200);
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, Subject $subject)
     {
         //
+        $subject->update(
+            $request->input()
+        );
+        return response()->json(["subject" => $subject, 'message' => 'Subject updated successfully'], 200);
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy(Subject $subject)
     {
         //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $subject->delete();
+        return response()->json([
+            "subject" => ["id" => $subject->id],
+            "message" => "Subject deleted successfully"
+        ], 200);
     }
 }

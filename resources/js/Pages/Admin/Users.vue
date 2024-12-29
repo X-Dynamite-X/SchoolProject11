@@ -118,7 +118,7 @@ watch(limitUser, (newLimit) => {
 });
 
 const filteredUsers = computed(() => {
-    const keyword = searchKeyword.value.toLowerCase();
+    const keyword = searchKeyword.value.toLowerCase().trim();
     return users.value.filter(
         (user) =>
             user.name.toLowerCase().includes(keyword) ||

@@ -3,6 +3,8 @@ import { ref,onMounted , onUnmounted} from "vue";
 import { useAuthStore } from "@/Stores/auth";
 import BigLogo from "@/components/AllApp/BigLogo.vue";
 import InputForm from "@/components/FieldRequst/InputForm.vue";
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const authStore = useAuthStore();
 
 const email = ref("");
@@ -42,11 +44,11 @@ onUnmounted(() => {
                         name="email"
                         id="email"
                         autocomplete="email"
-                        required="true"
+                        :required="true"
                         placeholder="Email Address"
                         label="Your email:"
                         v-model="email"
-                        :errorMessage="authStore.errors.email"
+                        :errorMessage="authStore.errors.email ||null"
                     />
                 <div
                     v-if="authStore.status"
