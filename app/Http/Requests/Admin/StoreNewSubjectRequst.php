@@ -24,8 +24,9 @@ class StoreNewSubjectRequst extends FormRequest
         return [
             //
             'name' => 'required|string|max:15',
-            'success_mark' => 'required|numeric',
-            'full_mark' => 'required|numeric',
+
+            'success_mark' => 'required|numeric|min:0',
+            'full_mark' => 'required|numeric|min:0|gte:success_mark',
         ];
     }
     public function messages(): array
@@ -34,6 +35,7 @@ class StoreNewSubjectRequst extends FormRequest
             'name.required' => 'The name field is required',
             'success_mark.required' => 'The Success Mark field is required',
             'full_mark.required' => 'The Full Mark field is required',
+
         ];
     }
 }
