@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\api\v1\UserController;
 use App\Http\Controllers\api\v1\SubjectController;
+use App\Http\Controllers\api\v1\SubjectUsersController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -17,10 +19,14 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum')->name("api.user");
 
 
-Route::middleware(["role:admin","auth:sanctum","auth"])->name("admin.")->prefix("admin")->group(function(){
+Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefix("admin")->group(function () {
 
     Route::resource('/subject', SubjectController::class);
-    Route::resource('/user', UserController::class) ;
+    Route::resource('/user', UserController::class);
 
-
+    Route::prefix('subjectUsers/{subject}/')->controller(SubjectUsersController::class)-> group(function () {
+        Route::post('/',"store")->name('subjectUsers.store');
+        Route::put('/{user}',"update")->name("subjectUsers.update");
+        Route::delete('/{user}',"destroy")->name("subjectUsers.destroy");
+    });
 });

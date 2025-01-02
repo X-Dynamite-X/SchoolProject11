@@ -193,7 +193,7 @@ export const useAdminStore = defineStore("admin", {
                             name: data.name,
                             success_mark: data.success_mark,
                             full_mark: data.full_mark,
-                            
+
                         },
                         success: (response) => {
                             console.log("update is done");
@@ -240,6 +240,97 @@ export const useAdminStore = defineStore("admin", {
                 throw error;
             }
         },
+        // async createSubjectUsers(data) {
+        //     await csrf();
+        //     try {
+        //         return new Promise((resolve, reject) => {
+        //             $.ajax({
+        //                 type: "post",
+        //                 url: `/api/admin/subjectUsers/${data.id}`,
+        //                 data: data,
+        //                 success: (response) => {
+        //                     console.log("add User in Subject is  successfully:");
+        //                     console.log(response);
+
+        //                     // this.AllSubjects[response.subject.id]["users"].push(response.subject);
+        //                     resolve(response);
+        //                 },
+        //                 error: (error) => {
+        //                     console.error("subject create Error:", error);
+        //                     console.log(error.responseJSON.errors);
+
+        //                     this.Errors = error.responseJSON.errors;
+        //                     reject(error);
+        //                 },
+        //             });
+        //         });
+        //     } catch (error) {
+        //         console.error("subject create Error:", error);
+        //         throw error;
+        //     }
+        // },
+        async updateSubjectUsers(data) {
+            await csrf();
+            try {
+                console.log(data);
+
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "put",
+                        url: `/api/admin/subjectUsers/${data.subject_id}/${data.user_id}`,
+                        data: data,
+                        success: (response) => {
+                            console.log("add User in Subject is  successfully:");
+                            console.log(response);
+
+                            // this.AllSubjects[response.subject.id]["users"].push(response.subject);
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            console.error("subject create Error:", error);
+                            console.log(error.responseJSON.errors);
+
+                            this.Errors = error.responseJSON.errors;
+                            reject(error);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("subject create Error:", error);
+                throw error;
+            }
+        },
+        async deleteSubjectUsers(data) {
+            await csrf();
+
+            console.log(this.AllSubjects[data.subject_id]['users']);
+
+            try {
+                console.log(data);
+
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "delete",
+                        url: `/api/admin/subjectUsers/${data.subject_id}/${data.user_id}`,
+                        data: data,
+                        success: (response) => {
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            console.error("subject create Error:", error);
+                            console.log(error.responseJSON.errors);
+
+                            this.Errors = error.responseJSON.errors;
+                            reject(error);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("subject create Error:", error);
+                throw error;
+            }
+        },
+
         clearErrors() {
             this.Errors = {}; // طريقة لإعادة تعيين الأخطاء
         },

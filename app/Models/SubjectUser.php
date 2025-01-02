@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class SubjectUser extends Model
 {
     //
-    protected $table = 'subject_users'; 
+    protected $table = 'subject_users';
 
-    protected $fillable = ['mark'];
+    protected $fillable = ['user_id', 'subject_id','mark'];
 
      public function user()
     {

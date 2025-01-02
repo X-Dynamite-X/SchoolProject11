@@ -9,9 +9,8 @@ import DynamicRow from "@/components/Tabel/DynamicRow.vue";
 import EditIcon from "@/components/Icon/EditIcon.vue";
 import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
 import InfoIcon from "@/components/Icon/InfoIcon.vue";
-import DynamicInfo from "@/components/Model/DynamicInfo.vue";
+import DynamiteInfoTable from "@/components/Model/DynamiteInfoTable.vue";
 import DynamicEdit from "@/components/Model/DynamicEdit.vue";
-import InputRadio from "@/components/FieldRequst/InputRadio.vue";
 import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 import DynamicCreate from "@/components/Model/DynamicCreate.vue";
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
@@ -277,7 +276,6 @@ const viewAlert = (title, message) => {
                     />
                 </div>
             </div>
-
             <DataTable
                 :data="paginatedSubjects"
                 @sort="sort"
@@ -293,15 +291,6 @@ const viewAlert = (title, message) => {
                 </template>
                 <template #row="{ item }">
                     <DynamicRow :item="item" :columns="columns">
-                        <template #column-roles="{ item }">
-                            <span
-                                v-for="role in item.roles"
-                                :key="role.id"
-                                class="inline-block px-2 py-1 mr-1 text-xs font-semibold bg-blue-500 text-white rounded dark:bg-blue-600"
-                            >
-                                {{ role.name }}
-                            </span>
-                        </template>
                         <template #column-actions="{ item }">
                             <button
                                 :id="item.id"
@@ -355,23 +344,14 @@ const viewAlert = (title, message) => {
                 </svg>
             </button>
 
-            <DynamicInfo
-                :data="modelData"
+            <DynamiteInfoTable
+                :data="modelData.users"
                 :columns="columns"
                 :show="showInfoModel"
                 @close="closeModal"
+                :title="modelData.name"
             >
-                <template #column-roles="{ data, column }">
-                    <strong>{{ column.label }}:</strong>
-                    <span
-                        v-for="role in data.roles"
-                        :key="role.id"
-                        class="inline-block px-2 py-1 mr-1 text-xs font-semibold rounded"
-                    >
-                        {{ role.name }}
-                    </span>
-                </template>
-            </DynamicInfo>
+            </DynamiteInfoTable>
 
             <DynamicEdit
                 :data="modelData"
@@ -380,9 +360,9 @@ const viewAlert = (title, message) => {
                 @close="closeModal"
                 title="Edit Subject"
                 @update="updateData"
-                
+
              >
-          
+
             </DynamicEdit>
             <DynamicDelete
                 :data="modelData"

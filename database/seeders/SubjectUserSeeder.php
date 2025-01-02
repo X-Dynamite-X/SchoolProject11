@@ -2,6 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Subject;
+use App\Models\SubjectUser;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,11 +16,12 @@ class SubjectUserSeeder extends Seeder
     public function run(): void
     {
         //
-        $subjectUsers = [
-            [
-                "user_id" => 1,
-                "subject_id" => 1,
-                "mark" => 90
+        $subjectUsers =
+        [
+                [
+                    "user_id" => 1,
+                    "subject_id" => 1,
+                    "mark" => 90
             ],
             [
                 "user_id" => 1,
@@ -47,7 +51,7 @@ class SubjectUserSeeder extends Seeder
             [
                 "user_id" => 2,
                 "subject_id" => 1,
-                "mark" => 90
+                "mark" => 50
             ],
             [
                 "user_id" => 2,
@@ -78,7 +82,7 @@ class SubjectUserSeeder extends Seeder
             [
                 "user_id" => 4,
                 "subject_id" => 1,
-                "mark" => 90
+                "mark" => 70
             ],
             [
                 "user_id" => 4,
@@ -107,8 +111,23 @@ class SubjectUserSeeder extends Seeder
             ],
 
         ];
-        foreach ($subjectUsers as $subjectUser) {
-            \App\Models\SubjectUser::create($subjectUser);
+        $subjectUsers=[];
+        $users = User::all();
+        $subjects = Subject::all();
+        foreach($subjects as $subject)
+        {
+            foreach ($users as $user) {
+                SubjectUser::create([
+                    "user_id" => $user->id,
+                    "subject_id" => $subject->id,
+                    "mark" => $user->id%2==0 ? 75 : 80
+                ]);
+
+            }
         }
+
+        // foreach ($subjectUsers as $subjectUser) {
+        //     SubjectUser::create($subjectUser);
+        // }
     }
 }

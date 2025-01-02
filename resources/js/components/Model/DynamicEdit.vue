@@ -21,6 +21,10 @@ const prpos =defineProps({
         type: Object,
         required: true,
     },
+    data2:{
+        type:Object,
+        default:null
+    }
 });
 
 const oldData = ref(prpos.data);
@@ -76,6 +80,7 @@ const updateModal = () => {
                                         v-for="column in prpos.columns"
                                         :key="column.key"
                                     >
+
                                         <slot
                                             :name="`column-${column.key}`"
                                             :data="data"
@@ -88,7 +93,7 @@ const updateModal = () => {
                                                 :name="column.name"
                                                 :id="column.key"
                                                 :type="column.type"
-                                                :modelValue="prpos.data[column.key]"
+                                                :modelValue="prpos.data[column.key] ? prpos.data[column.key]:data2[column.name]"
                                                 :placeholder="column.placeholder"
                                                 :required="column.required"
                                                 :errorMessage="adminStore.errors[column.name] || null"

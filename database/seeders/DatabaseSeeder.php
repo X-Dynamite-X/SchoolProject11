@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
                  UserSeeder::class,
                 PermissionSeeder::class,
                 SubjectSeeder::class,
-                SubjectUserSeeder::class
+                // SubjectUserSeeder::class
             ]
         );
 
