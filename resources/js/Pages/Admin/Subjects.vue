@@ -26,7 +26,8 @@ const totalItems = ref(0);
 const fetchData = async () => {
     loading.value = true;
     try {
-        await adminStore.getSubject();
+        await adminStore.getSubjects();
+        await adminStore.getUsers();
         totalItems.value = subjects.value.length; // إجمالي عدد المستخدمين
     } catch (error) {
         console.error("Error fetching data:", error);
@@ -91,10 +92,9 @@ watch(limitSubject, (newLimit) => {
 
 const filteredSubjects = computed(() => {
     const keyword = searchKeyword.value.toLowerCase().trim();
-    return subjects.value.filter(
-        (subject) =>
-            subject.name.toLowerCase().includes(keyword)
-     );
+    return subjects.value.filter((subject) =>
+        subject.name.toLowerCase().includes(keyword)
+    );
 });
 
 const paginatedSubjects = computed(() => {
@@ -188,7 +188,9 @@ const openEditModel = (data) => {
 const updateData = async (updatedData) => {
     try {
         await adminStore.updateSubject(updatedData); // تنفيذ التحديث عبر المتجر
-        const index = subjects.value.findIndex(subject => subject.id === updatedData.id);
+        const index = subjects.value.findIndex(
+            (subject) => subject.id === updatedData.id
+        );
         if (index !== -1) {
             subjects.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
         }
@@ -350,6 +352,7 @@ const viewAlert = (title, message) => {
                 :show="showInfoModel"
                 @close="closeModal"
                 :title="modelData.name"
+                :subject_id="modelData.id"
             >
             </DynamiteInfoTable>
 
@@ -360,9 +363,7 @@ const viewAlert = (title, message) => {
                 @close="closeModal"
                 title="Edit Subject"
                 @update="updateData"
-
-             >
-
+            >
             </DynamicEdit>
             <DynamicDelete
                 :data="modelData"

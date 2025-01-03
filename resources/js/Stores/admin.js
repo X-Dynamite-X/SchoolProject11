@@ -125,7 +125,7 @@ export const useAdminStore = defineStore("admin", {
                 throw error;
             }
         },
-        async getSubject() {
+        async getSubjects() {
             if (this.AllSubjects.length > 0) {
                 return this.AllSubjects;
             } else {
@@ -240,35 +240,38 @@ export const useAdminStore = defineStore("admin", {
                 throw error;
             }
         },
-        // async createSubjectUsers(data) {
-        //     await csrf();
-        //     try {
-        //         return new Promise((resolve, reject) => {
-        //             $.ajax({
-        //                 type: "post",
-        //                 url: `/api/admin/subjectUsers/${data.id}`,
-        //                 data: data,
-        //                 success: (response) => {
-        //                     console.log("add User in Subject is  successfully:");
-        //                     console.log(response);
+        async createSubjectUsers(subject_id,data) {
+            await csrf();
+            console.log(data);
+            console.log(`/api/admin/subjectUsers/${subject_id}`);
 
-        //                     // this.AllSubjects[response.subject.id]["users"].push(response.subject);
-        //                     resolve(response);
-        //                 },
-        //                 error: (error) => {
-        //                     console.error("subject create Error:", error);
-        //                     console.log(error.responseJSON.errors);
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "post",
+                        url: `/api/admin/subjectUsers/${subject_id}`,
+                        data: data,
+                        success: (response) => {
+                            console.log("add User in Subject is  successfully:");
+                            console.log(response);
 
-        //                     this.Errors = error.responseJSON.errors;
-        //                     reject(error);
-        //                 },
-        //             });
-        //         });
-        //     } catch (error) {
-        //         console.error("subject create Error:", error);
-        //         throw error;
-        //     }
-        // },
+                            // this.AllSubjects[response.subject.id]["users"].push(response.subject);
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            console.error("subject create Error:", error);
+                            console.log(error.responseJSON.errors);
+
+                            this.Errors = error.responseJSON.errors;
+                            reject(error);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("subject create Error:", error);
+                throw error;
+            }
+        },
         async updateSubjectUsers(data) {
             await csrf();
             try {

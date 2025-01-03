@@ -29,6 +29,9 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    subject_id: {
+        type: Number,
+    },
 });
 const emit = defineEmits(["close"]);
 
@@ -37,14 +40,10 @@ const closeTableInModal = () => {
     emit("close"); // يجب تعريف emit هنا
 };
 
-//######################################################################3
 const adminStore = useAdminStore();
-const loading = ref(true);
 const searchKeyword = ref("");
 const limitSubjectUsers = ref(10);
 const subjectUsers = ref(props.data);
-const totalItems = ref(0);
-
 const currentPage = ref(1); // الصفحة الحالية
 const sortColumn = ref(null); // العمود المستخدم للفرز
 const sortDirection = ref("asc");
@@ -55,7 +54,8 @@ const columns = [
         key: "name",
         label: "Student Name",
         name: "name",
-        type: "text",
+        type: "checkbox",
+        option: "",
         showInCreate: true,
         showInEdit: true,
         required: true,
@@ -68,7 +68,7 @@ const columns = [
         label: "Mark",
         name: "mark",
         type: "number",
-        showInCreate: true,
+        showInCreate: false,
         showInEdit: true,
         required: true,
         showInTabel: true,
@@ -95,8 +95,6 @@ watch(limitSubjectUsers, (newLimit) => {
 
 const filteredSubjectUsers = computed(() => {
     const keyword = searchKeyword.value.toLowerCase().trim();
-    console.log(keyword);
-
     return subjectUsers.value.filter((subjectUser) =>
         subjectUser.name.toLowerCase().includes(keyword)
     );
@@ -157,21 +155,19 @@ const showDeleteModel = ref(false);
 const showCreateModel = ref(false);
 const modelData = ref({});
 const oldRolesData = ref(null);
+const option = ref([]);
 const openCreateModel = () => {
     showCreateModel.value = true;
-    "Name",
-        "Success Mark",
-        "Full Mark",
-        (modelData.value = {
-            name: "",
-            success_mark: "",
-            full_mark: "",
-        });
+    option.value = adminStore.users.filter((user) => {
+        return !subjectUsers.value.some(
+            (subjectUser) => subjectUser.id === user.id
+        );
+    });
 };
 const createData = async (createData) => {
+    console.log("Create Data:", createData);
     try {
-        console.log("Create Data:", createData);
-        await adminStore.createSubject(createData);
+        await adminStore.createSubjectUsers(props.subject_id, createData);
         closeModal(true, true);
         viewAlert("success", "subject Create successfully!");
     } catch (error) {
@@ -321,7 +317,7 @@ const viewAlert = (title, message) => {
                 <!-- Table -->
                 <div class="mt-4">
                     <div
-                        class="max-h-[35rem] touch-scroll overflow-auto border border-gray-300 dark:border-gray-700 rounded-md"
+                        class="max-h-[35rem] min-h-[30rem] touch-scroll overflow-auto border border-gray-300 dark:border-gray-700 rounded-md"
                     >
                         <DataTable :data="paginatedSubjectUsers" @sort="sort">
                             <template #header>
@@ -411,7 +407,7 @@ const viewAlert = (title, message) => {
             <DynamicCreate
                 :columns="columns"
                 :show="showCreateModel"
-                :data="modelData"
+                :data="option"
                 title="create Subject"
                 @create="createData"
                 @close="closeModal"
