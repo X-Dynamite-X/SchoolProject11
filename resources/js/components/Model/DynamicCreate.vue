@@ -23,13 +23,12 @@ const prpos = defineProps({
         type: Object,
         required: true,
     },
-
 });
 
 const emit = defineEmits(["close", "create"]);
 
 const closeModal = () => {
-    console.log( adminStore.errors);
+    console.log(adminStore.errors);
     adminStore.clearErrors();
     emit("close");
 };
@@ -71,15 +70,17 @@ const createModal = () => {
                                         v-for="column in prpos.columns"
                                         :key="column.key"
                                     >
-                                         <slot
+                                        <slot
                                             :name="`column-${column.key}`"
                                             :data="data"
                                             :column="column"
                                         >
-
                                             <!-- العرض الافتراضي إذا لم يكن هناك slot -->
                                             <InputForm
-                                                v-if="column.key !== 'id' && column.showInCreate"
+                                                v-if="
+                                                    column.key !== 'id' &&
+                                                    column.showInCreate
+                                                "
                                                 :label="column.label"
                                                 :name="column.name"
                                                 :id="column.key"
@@ -87,18 +88,19 @@ const createModal = () => {
                                                 :modelValue="
                                                     prpos.data[column.key]
                                                 "
-                                                v-model="
-                                                    prpos.data[column.key]
-                                                "
+                                                v-model="prpos.data[column.key]"
                                                 :placeholder="
                                                     column.placeholder
                                                 "
                                                 :required="column.required"
-                                                :errorMessage="adminStore.errors[column.name]|| null"
+                                                :errorMessage="
+                                                    adminStore.errors[
+                                                        column.name
+                                                    ] || null
+                                                "
                                                 :autocomplete="
                                                     column.autocomplete
                                                 "
-
                                             />
                                         </slot>
                                     </div>
@@ -117,13 +119,15 @@ const createModal = () => {
                     >
                         Cancel
                     </button>
-                    <button
-                        type="button"
-                        class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-green-700 sm:mt-0 sm:w-auto"
-                        @click="createModal()"
-                    >
-                        Create
-                    </button>
+                    <slot name="actionsCreateBtn">
+                        <button
+                            type="button"
+                            class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-green-700 sm:mt-0 sm:w-auto"
+                            @click="createModal()"
+                        >
+                            Create
+                        </button>
+                    </slot>
                     <slot name="actions"> </slot>
                 </div>
             </div>

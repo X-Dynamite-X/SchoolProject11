@@ -14,6 +14,7 @@ import DynamicCreate from "@/components/Model/DynamicCreate.vue";
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
+import InputSelect from "@/components/FieldRequst//InputSelect.vue";
 // Props
 
 const props = defineProps({
@@ -48,19 +49,22 @@ const currentPage = ref(1); // الصفحة الحالية
 const sortColumn = ref(null); // العمود المستخدم للفرز
 const sortDirection = ref("asc");
 const thNameFields = ["ID", "Student Name", "Mark", "Actions"];
+
 const columns = [
     { key: "id", label: "ID", showInTabel: true },
     {
         key: "name",
         label: "Student Name",
-        name: "name",
-        type: "checkbox",
-        option: "",
+        name: "user_ids",
+        type: "select",
+        id: "user_ids",
+        label: "Select Student",
         showInCreate: true,
         showInEdit: true,
         required: true,
         showInTabel: true,
-        disabled: true,
+        disabled: false,
+        multiple: true,
         placeholder: "Enter Name",
     },
     {
@@ -164,15 +168,14 @@ const openCreateModel = () => {
         );
     });
 };
-const createData = async (createData) => {
-    console.log("Create Data:", createData);
-    try {
-        await adminStore.createSubjectUsers(props.subject_id, createData);
-        closeModal(true, true);
-        viewAlert("success", "subject Create successfully!");
-    } catch (error) {
-        viewAlert("error", "Failed to updating subject.");
-    }
+const formData = ref({ user_ids: [] });
+
+const handleSelectedOption = (option) => {
+    formData.value.user_ids.push(option); // إضافة الخيار المحدد إلى البيانات
+    console.log("Selected user_ids:", formData.value.user_ids);
+};
+const createData = async () => {
+    console.log("Create Data:", formData.value);
 };
 
 const openEditModel = (data) => {
@@ -223,7 +226,7 @@ const deleteData = async (data) => {
     closeModal();
     try {
         let x = await adminStore.deleteSubjectUsers(DeleteData);
-
+        formData.value=null
         let index = subjectUsers.value.findIndex(
             (item) => item.id === DeleteData.user_id
         );
@@ -263,6 +266,7 @@ const viewAlert = (title, message) => {
         showAlert.value = false;
     }, 3000);
 };
+
 </script>
 <template>
     <div v-if="showAlert" class="fixed top-20 right-3 w-1/4 z-50">
@@ -412,6 +416,29 @@ const viewAlert = (title, message) => {
                 @create="createData"
                 @close="closeModal"
             >
+                <template #column-name="{ data, column }">
+                    <InputSelect
+                        :multiple="column.multiple"
+                        :options="data"
+                        :errorMessage="adminStore"
+                        :id="column.id"
+                        :name="column.name"
+                        :disabled="column.disabled"
+                        :required="column.required"
+                        :label="column.label"
+                        @create="handleSelectedOption"
+                    >
+                    </InputSelect>
+                </template>
+                <template #actionsCreateBtn>
+                    <button
+                            type="button"
+                            class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-green-700 sm:mt-0 sm:w-auto"
+                            @click="createData(formData.value)"
+                        >
+                            Create2
+                        </button>
+                </template>
             </DynamicCreate>
         </div>
         <button
