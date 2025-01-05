@@ -29,8 +29,9 @@ class SubjectUsersController extends Controller
             ->whereIn('users.id', $valid_users->pluck('id')) // تحديد الجدول "users" بوضوح
             ->get();
         return response()->json([
-            "message" => "Users added to subject successfully",
+            "message" => "Users added to subject successfully ",
             "users" => $added_users,
+            "subject_id"=> $subject->id,
         ]);
     }
 

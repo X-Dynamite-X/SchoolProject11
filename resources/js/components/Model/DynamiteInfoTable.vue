@@ -2,7 +2,9 @@
 import { onMounted, ref, defineEmits, computed, watch } from "vue";
 import { useAdminStore } from "@/Stores/admin";
 import TabelTh from "@/components/Tabel/TabelTh.vue";
+import InputCheckBox from "@/components/FieldRequst/InputCheckBox.vue";
 import SearchInput from "@/components/FieldRequst/SearchInput.vue";
+
 import SearchIcon from "@/components/Icon/SearchIcon.vue";
 import DataTable from "@/components/Tabel/DataTable.vue";
 import DynamicRow from "@/components/Tabel/DynamicRow.vue";
@@ -159,10 +161,10 @@ const showDeleteModel = ref(false);
 const showCreateModel = ref(false);
 const modelData = ref({});
 const oldRolesData = ref(null);
-const option = ref([]);
+const options = ref([]);
 const openCreateModel = () => {
     showCreateModel.value = true;
-    option.value = adminStore.users.filter((user) => {
+    options.value = adminStore.users.filter((user) => {
         return !subjectUsers.value.some(
             (subjectUser) => subjectUser.id === user.id
         );
@@ -171,11 +173,29 @@ const openCreateModel = () => {
 const formData = ref({ user_ids: [] });
 
 const handleSelectedOption = (option) => {
+    formData.value.user_ids = [];
     formData.value.user_ids.push(option); // إضافة الخيار المحدد إلى البيانات
     console.log("Selected user_ids:", formData.value.user_ids);
 };
+
 const createData = async () => {
-    console.log("Create Data:", formData.value);
+    try {
+        console.log("Create Data:", formData.value);
+        const data = await adminStore.createSubjectUsers(
+            props.subject_id,
+            formData.value.user_ids
+        );
+        console.log(data.users);
+        data.users.forEach((user) => {
+            subjectUsers.value.push(user);
+            console.log(user);
+        });
+
+        closeModal(true, true);
+        viewAlert("success", data.message);
+    } catch (error) {
+        console.log(error);
+    }
 };
 
 const openEditModel = (data) => {
@@ -226,7 +246,6 @@ const deleteData = async (data) => {
     closeModal();
     try {
         let x = await adminStore.deleteSubjectUsers(DeleteData);
-        formData.value=null
         let index = subjectUsers.value.findIndex(
             (item) => item.id === DeleteData.user_id
         );
@@ -245,7 +264,7 @@ const closeModal = (isEdit = false, saveChanges = false) => {
     showEditModel.value = false;
     showDeleteModel.value = false;
     showCreateModel.value = false;
-
+    adminStore.clearErrors();
     if (!isEdit && !saveChanges) {
         if (oldRolesData.value !== null) {
             modelData.value.roles[0].name = oldRolesData.value;
@@ -266,7 +285,6 @@ const viewAlert = (title, message) => {
         showAlert.value = false;
     }, 3000);
 };
-
 </script>
 <template>
     <div v-if="showAlert" class="fixed top-20 right-3 w-1/4 z-50">
@@ -411,16 +429,16 @@ const viewAlert = (title, message) => {
             <DynamicCreate
                 :columns="columns"
                 :show="showCreateModel"
-                :data="option"
+                :data="options"
                 title="create Subject"
                 @create="createData"
                 @close="closeModal"
             >
                 <template #column-name="{ data, column }">
-                    <InputSelect
+                    <InputCheckBox
                         :multiple="column.multiple"
                         :options="data"
-                        :errorMessage="adminStore"
+                        :errorMessage="adminStore.errors"
                         :id="column.id"
                         :name="column.name"
                         :disabled="column.disabled"
@@ -428,16 +446,16 @@ const viewAlert = (title, message) => {
                         :label="column.label"
                         @create="handleSelectedOption"
                     >
-                    </InputSelect>
+                    </InputCheckBox>
                 </template>
                 <template #actionsCreateBtn>
                     <button
-                            type="button"
-                            class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-green-700 sm:mt-0 sm:w-auto"
-                            @click="createData(formData.value)"
-                        >
-                            Create2
-                        </button>
+                        type="button"
+                        class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-green-700 sm:mt-0 sm:w-auto"
+                        @click="createData(formData.value)"
+                    >
+                        Create2
+                    </button>
                 </template>
             </DynamicCreate>
         </div>

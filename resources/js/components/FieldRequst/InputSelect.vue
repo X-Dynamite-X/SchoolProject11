@@ -36,14 +36,15 @@ defineProps({
 });
 
 const emit = defineEmits(["create"]);
+
 function addOptionIds(option) {
-    console.log("Option selected:", option); // التحقق من القيمة
-    emit("create", option); // إرسال الخيار المحدد إلى المكون الرئيسي
+    console.log("Option selected:", option);
+    emit("create", option);
 }
 </script>
 
 <template>
-    <form class="max-w-sm mx-auto">
+    <form class="max-w-sm mx-auto" method="post" >
         <label
             for="countries"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"

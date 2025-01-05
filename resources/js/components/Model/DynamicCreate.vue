@@ -128,7 +128,7 @@ const createModal = () => {
                             Create
                         </button>
                     </slot>
-                    <slot name="actions"> </slot>
+                    <slot name="actions"></slot>
                 </div>
             </div>
         </div>

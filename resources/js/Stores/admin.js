@@ -45,7 +45,7 @@ export const useAdminStore = defineStore("admin", {
                 }
             }
         },
-        async createSubject(data) {
+        async createUser(data) {
             await csrf();
             try {
                 return new Promise((resolve, reject) => {
@@ -137,7 +137,7 @@ export const useAdminStore = defineStore("admin", {
                             url: "/api/admin/subject ",
                             dataType: "json",
                             success: (data) => {
-                                 this.AllSubjects = data.subjects;
+                                this.AllSubjects = data.subjects;
                                 resolve(data);
                             },
                             error: (error) => {
@@ -163,7 +163,10 @@ export const useAdminStore = defineStore("admin", {
                         url: `/api/admin/subject`,
                         data: data,
                         success: (response) => {
-                            console.log("subject create successfully:", response);
+                            console.log(
+                                "subject create successfully:",
+                                response
+                            );
 
                             this.AllSubjects.push(response.subject);
                             resolve(response);
@@ -193,13 +196,11 @@ export const useAdminStore = defineStore("admin", {
                             name: data.name,
                             success_mark: data.success_mark,
                             full_mark: data.full_mark,
-
                         },
                         success: (response) => {
                             console.log("update is done");
                             console.log(response);
                             // this.AllSubjects[response.subject.id] = response.subject
-
 
                             resolve(response);
                         },
@@ -222,7 +223,10 @@ export const useAdminStore = defineStore("admin", {
                         type: "DELETE",
                         url: `/api/admin/subject/${data.id}`,
                         success: async (response) => {
-                            console.log("Subject deleted successfully:", response);
+                            console.log(
+                                "Subject deleted successfully:",
+                                response
+                            );
                             console.log(response);
                             this.AllSubjects = this.AllSubjects.filter(
                                 (subject) => subject.id !== data.id
@@ -236,26 +240,28 @@ export const useAdminStore = defineStore("admin", {
                     });
                 });
             } catch (error) {
-                console.error("Unexpected Error During Subject Deletion:", error);
+                console.error(
+                    "Unexpected Error During Subject Deletion:",
+                    error
+                );
                 throw error;
             }
         },
-        async createSubjectUsers(subject_id,data) {
+        async createSubjectUsers(subject_id, data) {
             await csrf();
-            console.log(data);
+            console.log(data[0]);
             console.log(`/api/admin/subjectUsers/${subject_id}`);
-
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "post",
                         url: `/api/admin/subjectUsers/${subject_id}`,
-                        data: data,
+                        data: {
+                            user_ids: data[0],
+                            subject_id: subject_id,
+                        },
                         success: (response) => {
-                            console.log("add User in Subject is  successfully:");
-                            console.log(response);
 
-                            // this.AllSubjects[response.subject.id]["users"].push(response.subject);
                             resolve(response);
                         },
                         error: (error) => {
@@ -283,7 +289,9 @@ export const useAdminStore = defineStore("admin", {
                         url: `/api/admin/subjectUsers/${data.subject_id}/${data.user_id}`,
                         data: data,
                         success: (response) => {
-                            console.log("add User in Subject is  successfully:");
+                            console.log(
+                                "add User in Subject is  successfully:"
+                            );
                             console.log(response);
 
                             // this.AllSubjects[response.subject.id]["users"].push(response.subject);
@@ -305,11 +313,10 @@ export const useAdminStore = defineStore("admin", {
         },
         async deleteSubjectUsers(data) {
             await csrf();
+ 
 
-            console.log(this.AllSubjects[data.subject_id]['users']);
-
+            console.log(data);
             try {
-                console.log(data);
 
                 return new Promise((resolve, reject) => {
                     $.ajax({

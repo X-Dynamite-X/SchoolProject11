@@ -20,7 +20,7 @@ class SubjectController extends Controller
     }
     public function store(StoreNewSubjectRequst $request)
     {
-        $subject = Subject::create($request->input());
+        $subject = Subject::create($request->input())->load('users');
         return response()->json(["subject" => $subject, 'message' => 'Subject Create Successfully'], 200);
     }
     public function update(Request $request, Subject $subject)
