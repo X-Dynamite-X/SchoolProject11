@@ -251,6 +251,7 @@ const closeModal = (isEdit = false, saveChanges = false) => {
             modelData.value.roles[0].name = oldRolesData.value;
         }
     }
+    adminStore.clearErrors();
 };
 
 const showAlert = ref(false);
