@@ -55,6 +55,9 @@ const thNameFields = ["ID", "Student Name", "Mark", "Actions"];
 const columns = [
     { key: "id", label: "ID", showInTabel: true },
     {
+        key: "actions",
+    },
+    {
         key: "name",
         label: "Student Name",
         name: "user_ids",

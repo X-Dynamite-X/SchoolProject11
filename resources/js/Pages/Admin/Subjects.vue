@@ -42,6 +42,9 @@ const thNameFields = ["ID", "Name", "Success Mark", "Full Mark", "Actions"];
 const columns = [
     { key: "id", label: "ID", showInTabel: true },
     {
+        key: "actions",
+     },
+    {
         key: "name",
         label: "Name",
         name: "name",
