@@ -16,8 +16,7 @@ import DynamicCreate from "@/components/Model/DynamicCreate.vue";
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
-import InputSelect from "@/components/FieldRequst//InputSelect.vue";
-// Props
+import InputSelect from "@/components/FieldRequst/InputSelect.vue";
 
 const props = defineProps({
     show: {
@@ -37,18 +36,17 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(["close"]);
-
-// Functions
+ 
 const closeTableInModal = () => {
-    emit("close"); // يجب تعريف emit هنا
+    emit("close");
 };
 
 const adminStore = useAdminStore();
 const searchKeyword = ref("");
 const limitSubjectUsers = ref(10);
 const subjectUsers = ref(props.data);
-const currentPage = ref(1); // الصفحة الحالية
-const sortColumn = ref(null); // العمود المستخدم للفرز
+const currentPage = ref(1);
+const sortColumn = ref(null);
 const sortDirection = ref("asc");
 const thNameFields = ["ID", "Student Name", "Mark", "Actions"];
 
@@ -95,11 +93,11 @@ watch(
 
 watch(searchKeyword, (newKeyword) => {
     searchKeyword.value = newKeyword;
-    currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
+    currentPage.value = 1;
 });
 
 watch(limitSubjectUsers, (newLimit) => {
-    currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
+    currentPage.value = 1;
 });
 
 const filteredSubjectUsers = computed(() => {
@@ -112,31 +110,30 @@ const filteredSubjectUsers = computed(() => {
 const paginatedSubjectUsers = computed(() => {
     const startIndex = Number(
         (currentPage.value - 1) * limitSubjectUsers.value
-    ); // تحويل إلى عدد
-    const endIndex = startIndex + Number(limitSubjectUsers.value); // تحويل إلى عدد
+    );
+    const endIndex = startIndex + Number(limitSubjectUsers.value);
     return sortedSubjectUsers.value.slice(startIndex, endIndex);
 });
 
 const totalPages = computed(() =>
     Math.ceil(filteredSubjectUsers.value.length / limitSubjectUsers.value)
 );
-// تغيير الصفحة
+
 const changePage = (page) => {
     if (page >= 1 && page <= totalPages.value) {
         currentPage.value = page;
     }
 };
 
-// تحديث عدد العناصر في الصفحة
+
 const updateItemsPerPage = (newLimit) => {
     limitSubjectUsers.value = newLimit;
-    currentPage.value = 1; // إعادة ضبط الصفحة إلى الأولى
+    currentPage.value = 1;
 };
 
-// تغيير العمود المستخدم للفرز
 const sort = (column) => {
     const columnKey = columns.find((col) => col.label === column)?.key;
-    if (!columnKey) return; // تجاهل إذا لم يتم العثور على العمود
+    if (!columnKey) return;
 
     if (sortColumn.value === columnKey) {
         sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
@@ -150,8 +147,8 @@ const sortedSubjectUsers = computed(() => {
     if (!sortColumn.value) return filteredSubjectUsers.value;
 
     return [...filteredSubjectUsers.value].sort((a, b) => {
-        const valA = a[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
-        const valB = b[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
+        const valA = a[sortColumn.value] ?? "";
+        const valB = b[sortColumn.value] ?? "";
 
         if (valA < valB) return sortDirection.value === "asc" ? -1 : 1;
         if (valA > valB) return sortDirection.value === "asc" ? 1 : -1;
@@ -177,7 +174,7 @@ const formData = ref({ user_ids: [] });
 
 const handleSelectedOption = (option) => {
     formData.value.user_ids = [];
-    formData.value.user_ids.push(option); // إضافة الخيار المحدد إلى البيانات
+    formData.value.user_ids.push(option);
     console.log("Selected user_ids:", formData.value.user_ids);
 };
 
@@ -214,7 +211,7 @@ const updateData = async (updatedData) => {
         };
 
         try {
-            const response = await adminStore.updateSubjectUsers(data); // تنفيذ التحديث عبر المتجر
+            const response = await adminStore.updateSubjectUsers(data);
             const index = subjectUsers.value.findIndex(
                 (subjectUser) => subjectUser.id === updatedData.id
             );
@@ -222,7 +219,7 @@ const updateData = async (updatedData) => {
                 console.log(subjectUsers.value[index]["pivot"].mark);
 
                 subjectUsers.value[index]["pivot"].mark =
-                    updatedData.pivot_mark; // استبدال العنصر بالكامل
+                    updatedData.pivot_mark;
             }
             closeModal(true, true);
             console.log(response);
@@ -239,7 +236,7 @@ const updateData = async (updatedData) => {
 
 const openDeleteModel = (data) => {
     showDeleteModel.value = true;
-    modelData.value = { ...data }; // إنشاء نسخة مستقلة من البيانات
+    modelData.value = { ...data };
 };
 const deleteData = async (data) => {
     let DeleteData = {
@@ -259,7 +256,7 @@ const deleteData = async (data) => {
         viewAlert("success", response.message);
     } catch (error) {
         console.error("Error deleting Subject:", error);
-        // عرض إشعار الخطأ
+
         viewAlert("error", "Failed to delete Subject.");
     }
 };
@@ -283,7 +280,6 @@ const viewAlert = (title, message) => {
     alertMessage.value = message;
     showAlert.value = true;
 
-    // إخفاء الإشعار تلقائيًا بعد 3 ثوانٍ
     setTimeout(() => {
         showAlert.value = false;
     }, 3000);
