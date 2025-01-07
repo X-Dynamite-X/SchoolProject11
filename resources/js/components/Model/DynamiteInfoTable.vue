@@ -184,18 +184,16 @@ const handleSelectedOption = (option) => {
 const createData = async () => {
     try {
         console.log("Create Data:", formData.value);
-        const data = await adminStore.createSubjectUsers(
+        const response = await adminStore.createSubjectUsers(
             props.subject_id,
             formData.value.user_ids
         );
-        console.log(data.users);
-        data.users.forEach((user) => {
+        response.users.forEach((user) => {
             subjectUsers.value.push(user);
             console.log(user);
         });
-
         closeModal(true, true);
-        viewAlert("success", data.message);
+        viewAlert("success", response.message);
     } catch (error) {
         console.log(error);
     }
@@ -216,7 +214,7 @@ const updateData = async (updatedData) => {
         };
 
         try {
-            await adminStore.updateSubjectUsers(data); // تنفيذ التحديث عبر المتجر
+            const response = await adminStore.updateSubjectUsers(data); // تنفيذ التحديث عبر المتجر
             const index = subjectUsers.value.findIndex(
                 (subjectUser) => subjectUser.id === updatedData.id
             );
@@ -227,7 +225,9 @@ const updateData = async (updatedData) => {
                     updatedData.pivot_mark; // استبدال العنصر بالكامل
             }
             closeModal(true, true);
-            viewAlert("success", "Subject updated successfully!");
+            console.log(response);
+
+            viewAlert("success", response.message);
         } catch (error) {
             console.error("Error updating data:", error);
             viewAlert("error", "Failed to update subject.");
@@ -248,7 +248,7 @@ const deleteData = async (data) => {
     };
     closeModal();
     try {
-        let x = await adminStore.deleteSubjectUsers(DeleteData);
+        const response = await adminStore.deleteSubjectUsers(DeleteData);
         let index = subjectUsers.value.findIndex(
             (item) => item.id === DeleteData.user_id
         );
@@ -256,7 +256,7 @@ const deleteData = async (data) => {
             subjectUsers.value.splice(index, 1);
         }
 
-        viewAlert("success", "Subject deleted successfully!");
+        viewAlert("success", response.message);
     } catch (error) {
         console.error("Error deleting Subject:", error);
         // عرض إشعار الخطأ

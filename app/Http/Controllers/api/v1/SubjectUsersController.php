@@ -29,7 +29,7 @@ class SubjectUsersController extends Controller
             ->whereIn('users.id', $valid_users->pluck('id')) // تحديد الجدول "users" بوضوح
             ->get();
         return response()->json([
-            "message" => "Users added to subject successfully ",
+            "message" => "Users Added to Subject Successfully",
             "users" => $added_users,
             "subject_id"=> $subject->id,
         ]);
@@ -44,8 +44,8 @@ class SubjectUsersController extends Controller
             ->where('user_id', $user->id)
             ->first();
         if ($subjectUser) {
-            $subjectUser->update(["message" => "user in subject updated successfully", 'mark' => $request->mark]);
-            return response()->json(["subjectUser" => $subjectUser]);
+            $subjectUser->update(['mark' => $request->mark]);
+            return response()->json(["subjectUser" => $subjectUser,"message" => "User in Subject Updated Successfully"]);
         }
         return response()->json(["message" => "subjectUser not found"]);
     }
@@ -61,6 +61,6 @@ class SubjectUsersController extends Controller
 
         $subjectUser->delete();
 
-        return response()->json(["message" => "user in subject deleted successfully", "user_id" => $user->id, "subject_id" => $subject->id]);
+        return response()->json(["message" => "User in Subject Deleted Successfully", "user_id" => $user->id, "subject_id" => $subject->id]);
     }
 }

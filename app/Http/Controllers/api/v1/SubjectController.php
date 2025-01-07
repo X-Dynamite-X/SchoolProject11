@@ -29,7 +29,7 @@ class SubjectController extends Controller
         $subject->update(
             $request->input()
         );
-        return response()->json(["subject" => $subject, 'message' => 'Subject updated successfully'], 200);
+        return response()->json(["subject" => $subject, 'message' => 'Subject Updated Successfully'], 200);
     }
     public function destroy(Subject $subject)
     {
@@ -37,7 +37,7 @@ class SubjectController extends Controller
         $subject->delete();
         return response()->json([
             "subject" => ["id" => $subject->id],
-            "message" => "Subject deleted successfully"
+            "message" => "Subject Deleted Successfully"
         ], 200);
     }
 }

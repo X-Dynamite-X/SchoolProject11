@@ -43,7 +43,7 @@ const columns = [
     { key: "id", label: "ID", showInTabel: true },
     {
         key: "actions",
-     },
+    },
     {
         key: "name",
         label: "Name",
@@ -172,9 +172,9 @@ const openCreateModel = () => {
 const createData = async (createData) => {
     try {
         console.log("Create Data:", createData);
-        await adminStore.createSubject(createData);
+        const response = await adminStore.createSubject(createData);
         closeModal(true, true);
-        viewAlert("success", "subject Create successfully!");
+        viewAlert("success", response.message);
     } catch (error) {
         viewAlert("error", "Failed to updating subject.");
     }
@@ -190,7 +190,7 @@ const openEditModel = (data) => {
 };
 const updateData = async (updatedData) => {
     try {
-        await adminStore.updateSubject(updatedData); // تنفيذ التحديث عبر المتجر
+        const response = await adminStore.updateSubject(updatedData); // تنفيذ التحديث عبر المتجر
         const index = subjects.value.findIndex(
             (subject) => subject.id === updatedData.id
         );
@@ -198,7 +198,7 @@ const updateData = async (updatedData) => {
             subjects.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
         }
         closeModal(true, true);
-        viewAlert("success", "Subject updated successfully!");
+        viewAlert("success", response.message);
     } catch (error) {
         console.error("Error updating data:", error);
         viewAlert("error", "Failed to update subject.");
@@ -213,8 +213,8 @@ const deleteData = async (data) => {
     console.log("Deleting Subject:", data);
     closeModal();
     try {
-        await adminStore.deleteSubject(data);
-        viewAlert("success", "Subject deleted successfully!");
+        const response = await adminStore.deleteSubject(data);
+        viewAlert("success", response.message);
     } catch (error) {
         console.error("Error deleting Subject:", error);
         // عرض إشعار الخطأ

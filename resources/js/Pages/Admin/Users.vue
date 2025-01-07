@@ -94,7 +94,9 @@ const columns = [
         placeholder: "Enter password Confirmation",
     },
     {
-
+        key: "roles",
+        label: "Roles",
+        name: "roles",
         showInTabel: true,
         type: "radio",
         showInEdit: true,
@@ -242,16 +244,17 @@ const deleteData = async (data) => {
     }
 };
 const closeModal = (isEdit = false, saveChanges = false) => {
-    showInfoModel.value = false;
-    showEditModel.value = false;
-    showDeleteModel.value = false;
-    showCreateModel.value = false;
-
     if (!isEdit && !saveChanges) {
         if (oldRolesData.value !== null) {
             modelData.value.roles[0].name = oldRolesData.value;
         }
     }
+    showInfoModel.value = false;
+    showEditModel.value = false;
+    showDeleteModel.value = false;
+    showCreateModel.value = false;
+
+
     adminStore.clearErrors();
 };
 
