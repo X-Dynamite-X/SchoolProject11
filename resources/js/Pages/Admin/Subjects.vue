@@ -176,7 +176,7 @@ const createData = async (createData) => {
         closeModal(true, true);
         viewAlert("success", response.message);
     } catch (error) {
-        viewAlert("error", "Failed to updating subject.");
+        viewAlert("error", "Failed to create subject.");
     }
 };
 const openInfoModel = (data) => {

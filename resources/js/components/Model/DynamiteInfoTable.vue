@@ -36,7 +36,7 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(["close"]);
- 
+
 const closeTableInModal = () => {
     emit("close");
 };
@@ -175,24 +175,25 @@ const formData = ref({ user_ids: [] });
 const handleSelectedOption = (option) => {
     formData.value.user_ids = [];
     formData.value.user_ids.push(option);
-    console.log("Selected user_ids:", formData.value.user_ids);
+
 };
 
 const createData = async () => {
     try {
-        console.log("Create Data:", formData.value);
+
         const response = await adminStore.createSubjectUsers(
             props.subject_id,
             formData.value.user_ids
         );
         response.users.forEach((user) => {
             subjectUsers.value.push(user);
-            console.log(user);
+
         });
         closeModal(true, true);
         viewAlert("success", response.message);
     } catch (error) {
-        console.log(error);
+        viewAlert("error", "Failed to add user in subject.");
+
     }
 };
 
@@ -227,7 +228,7 @@ const updateData = async (updatedData) => {
             viewAlert("success", response.message);
         } catch (error) {
             console.error("Error updating data:", error);
-            viewAlert("error", "Failed to update subject.");
+            viewAlert("error", "Failed to update user data in  subject.");
         }
     } else {
         closeModal();
@@ -257,7 +258,7 @@ const deleteData = async (data) => {
     } catch (error) {
         console.error("Error deleting Subject:", error);
 
-        viewAlert("error", "Failed to delete Subject.");
+        viewAlert("error", "Failed to delete user in  Subject.");
     }
 };
 const closeModal = (isEdit = false, saveChanges = false) => {
