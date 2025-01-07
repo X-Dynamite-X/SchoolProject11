@@ -21,8 +21,7 @@ defineProps({
                 :item="item"
                 :field="column.key"
             >
-
-                <!-- العرض الافتراضي إذا لم يكن هناك slot -->
+                  <!-- العرض الافتراضي إذا لم يكن هناك slot -->
                 {{ item[column.key] }}
             </slot>
         </td>

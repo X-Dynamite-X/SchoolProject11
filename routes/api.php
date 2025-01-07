@@ -13,8 +13,8 @@ use App\Http\Controllers\api\v1\SubjectUsersController;
 
 Route::get('/user', function (Request $request) {
     return response()->json([
-        "user" => $request->user()->load("subjects"), // Authenticated user details
-        "roles" => $request->user()->roles()->get() // Fetch the actual roles from the database
+        "user" => $request->user()->load(["subjects","roles"]), // Authenticated user details
+          // Fetch the actual roles from the database
     ]);
 })->middleware('auth:sanctum')->name("api.user");
 

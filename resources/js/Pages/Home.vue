@@ -17,8 +17,23 @@ import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
 const authStore = useAuthStore();
-const thNameFields = ["ID", "Name Subject", "Mark"];
-const columns = [
+const thNameUsersFields = ["ID", "name", "email", "roles"];
+const columnsUsers = [
+    { key: "id", label: "ID", showInTabel: true },
+    {
+        key: "name",
+        name: "name",
+        showInTabel: true,
+    },
+    {
+        key: "email",
+        name: "email",
+        showInTabel: true,
+    },
+    { key: "roles", showInTabel: true, label: "Role", name: "roles" },
+];
+const thNameSubjectsFields = ["ID", "Name Subject", "Mark"];
+const columnsSubject = [
     { key: "id", label: "ID", showInTabel: true },
     {
         key: "name",
@@ -56,22 +71,48 @@ const columns = [
                     />
                 </div>
             </div> -->
-        <DataTable :data="authStore.user.user.subjects" :loading="false">
-            <template #header>
-                <TabelTh
-                    v-for="thNameField in thNameFields"
-                    :key="thNameField"
-                    :nameFeild="thNameField"
-                />
-            </template>
-            <template #row="{ item }">
-                <DynamicRow :item="item" :columns="columns">
-                    <template #column-mark="{ item }">
-                        {{ item["pivot"].mark }}
-                    </template>
-                </DynamicRow>
-            </template>
-        </DataTable>
+        <div class="py-4">
+            <DataTable :data="authStore.user" :loading="false">
+                <template #header>
+                    <TabelTh
+                        v-for="thNameField in thNameUsersFields"
+                        :key="thNameField"
+                        :nameFeild="thNameField"
+                    />
+                </template>
+                <template #row="{ item }">
+                    <DynamicRow :item="item" :columns="columnsUsers">
+                        <template #column-roles="{ item }">
+                            <span
+                                v-for="role in item.roles"
+                                :key="role.id"
+                                class="inline-block px-2 py-1 mr-1 text-xs font-semibold bg-blue-500 text-white rounded dark:bg-blue-600"
+                            >
+                                {{ role.name }}
+                            </span>
+                        </template>
+                    </DynamicRow>
+                </template>
+            </DataTable>
+        </div>
+        <div class="py-4">
+            <DataTable :data="authStore.user.user.subjects" :loading="false">
+                <template #header>
+                    <TabelTh
+                        v-for="thNameField in thNameSubjectsFields"
+                        :key="thNameField"
+                        :nameFeild="thNameField"
+                    />
+                </template>
+                <template #row="{ item }">
+                    <DynamicRow :item="item" :columns="columnsSubject">
+                        <template #column-mark="{ item }">
+                            {{ item["pivot"].mark }}
+                        </template>
+                    </DynamicRow>
+                </template>
+            </DataTable>
+        </div>
 
         <!-- <Pagination
                 :currentPage="currentPage"

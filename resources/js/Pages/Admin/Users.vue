@@ -94,9 +94,7 @@ const columns = [
         placeholder: "Enter password Confirmation",
     },
     {
-        key: "roles",
-        label: "Role",
-        name: "roles",
+ 
         showInTabel: true,
         type: "radio",
         showInEdit: true,

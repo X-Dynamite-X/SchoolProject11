@@ -24,7 +24,7 @@ export const useAuthStore = defineStore("auth", {
     actions: {
         async getUser() {
             if (this.authUser) {
-                
+
                 return this.authUser;
             } else {
                 await csrf();
@@ -34,7 +34,8 @@ export const useAuthStore = defineStore("auth", {
                         method: "GET",
                     });
                     this.authUser = response;
-                    this.authRole = response.roles;
+
+                    this.authRole = response.user.roles;
                 } catch (error) {
                     this.authUser = null;
                 }
