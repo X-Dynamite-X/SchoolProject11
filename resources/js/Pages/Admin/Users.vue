@@ -94,7 +94,7 @@ const columns = [
         placeholder: "Enter password Confirmation",
     },
     {
- 
+
         showInTabel: true,
         type: "radio",
         showInEdit: true,
@@ -198,9 +198,9 @@ const openCreateModel = () => {
 const createData = async (createData) => {
     try {
         console.log("Create Data:", createData);
-        await adminStore.createUser(createData);
+        const response = await adminStore.createUser(createData);
         closeModal(true, true);
-        viewAlert("success", "User Create successfully!");
+        viewAlert("success", response.message);
     } catch (error) {
         viewAlert("error", "Failed to updating user.");
     }
@@ -216,9 +216,9 @@ const openEditModel = (data) => {
 };
 const updateData = async (updatedData) => {
     try {
-        await adminStore.updateUser(updatedData); // انتظار تحديث المستخدم
+        const response =await adminStore.updateUser(updatedData); // انتظار تحديث المستخدم
         closeModal(true, true);
-        viewAlert("success", "User updating successfully!");
+        viewAlert("success", response.message);
         modelData.value = { ...updatedData };
     } catch (error) {
         console.error("Error updating data:", error);
@@ -233,8 +233,8 @@ const deleteData = async (data) => {
     console.log("Deleting User:", data);
     closeModal();
     try {
-        await adminStore.deleteUser(data);
-        viewAlert("success", "User deleted successfully!");
+        const response =await adminStore.deleteUser(data);
+        viewAlert("success", response.message);
     } catch (error) {
         console.error("Error deleting user:", error);
         // عرض إشعار الخطأ

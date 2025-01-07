@@ -47,7 +47,7 @@ watch(
                     v-if="
                         (isAuth === item.auth && item.allUser) ||
                         (isAuth === item.auth &&
-                            item.role === authStore.roles[0].name)
+                            item.role === authStore.roles.name)
                     "
                 >
                     {{ item.name }}

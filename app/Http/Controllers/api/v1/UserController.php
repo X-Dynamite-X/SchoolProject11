@@ -41,7 +41,7 @@ class UserController extends Controller
             return response()->json([
                 "user" => ["id" => $userId],
 
-                "message" => "User deleted successfully"
+                "message" => "User Deleted Successfully"
             ], 200);
         } catch (\Exception $e) {
             // التعامل مع الأخطاء
@@ -54,6 +54,6 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $user->syncRoles($request->input("roles"));
-        return response()->json(["user" => $user, 'message' => 'User updated successfully'], 200);
+        return response()->json(["user" => $user, 'message' => 'User Updated Successfully'], 200);
     }
 }

@@ -76,17 +76,16 @@ router.beforeEach(async (to, from, next) => {
     }
 
     const isAuthenticated = authStore.user;
-    const userRole = isAuthenticated?.roles?.[0]?.name || null;
+    const userRole = isAuthenticated.user.roles?.[0].name || null;
 
-    // قوائم الصفحات العامة (التي يمكن الوصول إليها بدون تسجيل الدخول)
- // قوائم الصفحات العامة (التي يمكن الوصول إليها بدون تسجيل الدخول)
+ 
     const publicPages = [
         "login",
         "register",
         "ForgotPassword",
         "ResetPassword",
     ];
-    const adminOnlyPages = ["adminUsers","adminSubjects"];
+    const adminOnlyPages = ["adminUsers", "adminSubjects"];
     const userRestrictedPages = [...publicPages, "adminHome"];
 
     // إذا لم يكن المستخدم مصادقًا (غير مسجل الدخول) ويحاول الوصول إلى صفحات محمية

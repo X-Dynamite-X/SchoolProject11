@@ -34,8 +34,11 @@ export const useAuthStore = defineStore("auth", {
                         method: "GET",
                     });
                     this.authUser = response;
+                    console.log(this.authUser.user.roles[0]);
 
-                    this.authRole = response.user.roles;
+                    this.authRole = response.user.roles[0];
+                    console.log(this.authRole );
+
                 } catch (error) {
                     this.authUser = null;
                 }

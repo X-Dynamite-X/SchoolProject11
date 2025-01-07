@@ -48,31 +48,12 @@ const columnsSubject = [
 </script>
 <template>
     <div class="container w-10/12 mx-auto">
-        <!-- <div
-                class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between space-x-4 pb-4"
-            >
-                <div class="relative">
-                    <SearchInput
-                        v-model="searchKeyword"
-                        placeholder="Search users..."
-                        class="w-full"
-                    >
-                        <template #icon>
-                            <SearchIcon />
-                        </template>
-                    </SearchInput>
-                </div>
-                <div>
-                    <ItemsPerPage
-                        :modelValue="limitUser"
-                        v-model="limitUser"
-                        class=" "
-                        @update:modelValue="updateItemsPerPage"
-                    />
-                </div>
-            </div> -->
         <div class="py-4">
-            <DataTable :data="authStore.user" :availableData="false" :loading="false">
+            <DataTable
+                :data="authStore.user"
+                :availableData="false"
+                :loading="false"
+            >
                 <template #header>
                     <TabelTh
                         v-for="thNameField in thNameUsersFields"
@@ -113,11 +94,5 @@ const columnsSubject = [
                 </template>
             </DataTable>
         </div>
-
-        <!-- <Pagination
-                :currentPage="currentPage"
-                :totalPages="totalPages"
-                @change-page="changePage"
-            />
-    --></div>
+    </div>
 </template>

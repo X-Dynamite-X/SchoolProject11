@@ -13,8 +13,6 @@ defineProps({
 });
 const isAuth = ref(false);
 onMounted(() => {
-    console.log(localStorage.getItem("authUser"));
-
     if (authStore.user) {
         isAuth.value = true;
     } else {

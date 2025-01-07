@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
     return response()->json([
         "user" => $request->user()->load(["subjects","roles"]), // Authenticated user details
           // Fetch the actual roles from the database
+        //   "roles" => $request->user()->roles()->get(),
     ]);
 })->middleware('auth:sanctum')->name("api.user");
 
