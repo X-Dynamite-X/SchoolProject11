@@ -4,15 +4,23 @@ defineProps({
     loading: Boolean, // حالة التحميل
     columns: Array, // تعريف الأعمدة
     id: String, // معرّف الجدول
+    availableData:{
+        type:Boolean,
+        default:true
+    },
 });
 
 const emit = defineEmits(["sort"]); // تعريف الحدث 'sort'
 </script>
 
 <template>
-    <table :id="id" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-300 overflow-scroll  ">
-
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-200">
+    <table
+        :id="id"
+        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-300 overflow-scroll"
+    >
+        <thead
+            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-200"
+        >
             <slot name="header" />
         </thead>
         <tbody>
@@ -23,12 +31,10 @@ const emit = defineEmits(["sort"]); // تعريف الحدث 'sort'
     </table>
 
     <!-- عرض رسالة عند التحميل -->
-    <div v-if="loading" class="mt-4 text-center text-gray-500">
-        Loading...
-    </div>
+    <div v-if="loading" class="mt-4 text-center text-gray-500">Loading...</div>
 
     <!-- عرض رسالة عند عدم وجود بيانات -->
-    <div v-else-if="!data.length" class="mt-4 text-center text-gray-500">
+    <div v-else-if="!data.length && availableData  " class="mt-4 text-center text-gray-500">
         No data available.
     </div>
 </template>

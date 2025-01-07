@@ -72,7 +72,7 @@ const columnsSubject = [
                 </div>
             </div> -->
         <div class="py-4">
-            <DataTable :data="authStore.user" :loading="false">
+            <DataTable :data="authStore.user" :availableData="false" :loading="false">
                 <template #header>
                     <TabelTh
                         v-for="thNameField in thNameUsersFields"
