@@ -47,7 +47,7 @@ const columnsSubject = [
 ];
 </script>
 <template>
-    <div class="container w-10/12 mx-auto">
+    <div class="container w-10/12 mx-auto ">
         <div class="py-4">
             <DataTable
                 :data="authStore.user"

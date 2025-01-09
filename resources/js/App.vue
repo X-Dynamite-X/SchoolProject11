@@ -5,6 +5,7 @@ import Navigation from "@/Layouts/Navigation.vue";
 const menuItems = [
     { name: "Users", to: "adminUsers", auth: true, allUser: false, role: "admin" },
     { name: "Subjects", to: "adminSubjects", auth: true, allUser: false, role: "admin" },
+    {name:'Message',to:"message",auth:true,allUser:true},
     { name: "Home", to: "home", auth: true, allUser: true },
     { name: "Login", to: "login", auth: false, allUser: true },
     { name: "Register", to: "register", auth: false, allUser: true }
@@ -23,7 +24,7 @@ const toggleMobileMenu = ref(false);
     <router-view v-slot="{ Component, route }">
     <div
         :key="route.name"
-        class="dark:bg-gray-900 text-gray-900 dark:text-white min-h-[92.96vh] max-h-[92.96vh]"
+        class="dark:bg-gray-900 text-gray-900 dark:text-white min-h-[100vh] max-h-[100vh] pt-16"
     >
         <Component :is="Component" />
     </div>

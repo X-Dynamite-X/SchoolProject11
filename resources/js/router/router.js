@@ -8,7 +8,7 @@ import ForgotPsasword from "@/Pages/Auth/ForgotPsasword.vue";
 import ResetPassword from "@/Pages/Auth/ResetPassword.vue";
 import NotFound from "@/Pages/Errors/NotFound.vue"; // استيراد صفحة 404
 import UsersAdmin from "@/Pages/Admin/Users.vue";
-import UsersAdmin2 from "@/Pages/Admin/t.vue";
+import Message from "@/Pages/Message.vue";
 
 import SubjectsAdmin from "@/Pages/Admin/Subjects.vue";
 
@@ -50,6 +50,11 @@ const routes = [
         name: "adminSubjects",
     },
     {
+        path: "/message",
+        component: Message,
+        name: "message",
+    },
+    {
         path: "/:catchAll(.*)",
         component: NotFound,
         name: "NotFound",
@@ -76,9 +81,9 @@ router.beforeEach(async (to, from, next) => {
     }
 
     const isAuthenticated = authStore.user;
-    const userRole = isAuthenticated.user.roles?.[0].name || null;
+    const userRole = isAuthenticated?.user?.roles?.[0].name || null;
 
- 
+
     const publicPages = [
         "login",
         "register",
