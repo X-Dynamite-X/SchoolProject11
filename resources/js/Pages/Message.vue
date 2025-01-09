@@ -2,7 +2,12 @@
 import { ref, computed } from "vue";
 
 const chats = ref([
-    { id: 1, name: "Ahmed", lastMessage: "Hi!", messages: [{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }] },
+    { id: 1, name: "Ahmed", lastMessage: "Hi!", messages: [{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true },
+    { text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
+    ,{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
+    ,{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
+    ,{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
+    ] },
     { id: 2, name: "Sarah", lastMessage: "How are you?", messages: [] },
     { id: 3, name: "Mohammed", lastMessage: "Good morning!", messages: [] },
 ]);
@@ -90,7 +95,7 @@ const sendMessage = () => {
                 </header>
 
                 <!-- الرسائل -->
-                <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                <div class="flex-1  touch-scroll overflow-y-auto p-4 space-y-3">
                     <div
                         v-for="(message, index) in activeChat?.messages || []"
                         :key="index"
@@ -128,4 +133,3 @@ const sendMessage = () => {
         </main>
     </div>
 </template>
- 
