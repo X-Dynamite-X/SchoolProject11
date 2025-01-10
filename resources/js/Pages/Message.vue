@@ -1,63 +1,71 @@
 <script setup>
-import { onMounted, ref, computed, watch } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { useMessageStore } from "@/Stores/message";
-    const messageStore = useMessageStore();
-    const loading = ref(true);
+import { useAuthStore } from "@/Stores/Auth";
 
+const authStore = useAuthStore();
 
-const chats = ref([
-    { id: 1, name: "Ahmed", lastMessage: "Hi!", messages: [{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true },
-    { text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
-    ,{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
-    ,{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
-    ,{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true }
-    ] },
-    { id: 2, name: "Sarah", lastMessage: "How are you?", messages: [] },
-    { id: 3, name: "Mohammed", lastMessage: "Good morning!", messages: [] },
-]);
+const messageStore = useMessageStore();
+const loading = ref(true);
 
+// المحادثات المحملة من الـ API
+const conversations = ref([]);
+
+// المحادثة النشطة
 const activeChatId = ref(null);
+
+// الرسالة الجديدة
 const newMessage = ref("");
+
+// البحث
 const searchQuery = ref("");
-const fetchDataConversation =async () => {
-    try{
+
+// تحميل المحادثات من الـ API
+const fetchDataConversation = async () => {
+    try {
         await messageStore.getConversations();
-        console.log(messageStore.conversations);
-
-    }catch{
-
-    }finally {
+        conversations.value = messageStore.conversations; // استبدال البيانات بالمحادثات
+    } catch (error) {
+        console.error("Failed to fetch conversations:", error);
+    } finally {
         loading.value = false;
     }
-}
+};
+
+// استدعاء بيانات المحادثات عند التركيب
 onMounted(() => {
-    fetchDataConversation()
-
+    fetchDataConversation();
 });
-// الدالة لحساب المحادثة النشطة
+
+// المحادثة النشطة
 const activeChat = computed(() => {
-    return chats.value.find((chat) => chat.id === activeChatId.value);
-});
-
-// الدالة لتصفية المحادثات بناءً على البحث
-const filteredChats = computed(() => {
-    return chats.value.filter(chat =>
-        chat.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    return conversations.value.find(
+        (conversation) => conversation.id === activeChatId.value
     );
 });
 
-// تغيير المحادثة النشطة
+// تصفية المحادثات بناءً على البحث
+const filteredChats = computed(() => {
+    return conversations.value.filter((conversation) =>
+        conversation.other_user.name
+            .toLowerCase()
+            .includes(searchQuery.value.toLowerCase())
+    );
+});
+
+// اختيار المحادثة النشطة
 const selectChat = (chatId) => {
     activeChatId.value = chatId;
 };
 
 // إرسال رسالة جديدة
-const sendMessage = () => {
+const sendMessage = (id) => {
     if (newMessage.value.trim() && activeChat.value) {
         activeChat.value.messages.push({
             text: newMessage.value,
-            isSender: true,
+            sender_id: id,
         });
+        console.log(activeChat.value);
         newMessage.value = "";
     }
 };
@@ -81,20 +89,24 @@ const sendMessage = () => {
             </div>
             <ul>
                 <li
-                    v-for="chat in filteredChats"
-                    :key="chat.id"
+                    v-for="conversation in filteredChats"
+                    :key="conversation.id"
                     class="p-2 border-b hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
                     :class="{
                         'bg-gray-300 dark:bg-gray-700':
-                            chat.id === activeChatId,
+                            conversation.id === activeChatId,
                     }"
-                    @click="selectChat(chat.id)"
+                    @click="selectChat(conversation.id)"
                 >
                     <div class="font-semibold dark:text-white">
-                        {{ chat.name }}
+                        {{ conversation.other_user.name }}
                     </div>
                     <div class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ chat.lastMessage }}
+                        {{
+                            conversation.messages?.[
+                                conversation.messages.length - 1
+                            ]?.text || "No messages yet"
+                        }}
                     </div>
                 </li>
             </ul>
@@ -108,23 +120,26 @@ const sendMessage = () => {
                     class="p-4 bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700"
                 >
                     <h2 class="text-lg font-bold dark:text-white">
-                        {{ activeChat?.name || "Select a chat" }}
+                        {{ activeChat?.other_user?.name || "Select a chat" }}
                     </h2>
                 </header>
 
                 <!-- الرسائل -->
-                <div class="flex-1  touch-scroll overflow-y-auto p-4 space-y-3">
+                <div class="flex-1 touch-scroll overflow-y-auto p-4 space-y-3">
                     <div
                         v-for="(message, index) in activeChat?.messages || []"
                         :key="index"
-                        :class="{
-                            'ml-auto bg-blue-500 text-white': message.isSender,
-                            'mr-auto bg-gray-200 dark:bg-gray-700 dark:text-white':
-                                !message.isSender,
-                        }"
+                        :class="[
+                            message.sender_id == authStore.user.user.id
+                                ? 'ml-auto bg-blue-500 text-white'
+                                : 'mr-auto bg-gray-200 dark:bg-gray-700 dark:text-white',
+                        ]"
                         class="p-2 rounded-lg max-w-md"
                     >
                         {{ message.text }}
+                        <div class="text-xs text-gray-400 mt-1">
+                            {{ message.created_at }}
+                        </div>
                     </div>
                 </div>
 
@@ -132,7 +147,10 @@ const sendMessage = () => {
                 <footer
                     class="p-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700"
                 >
-                    <form @submit.prevent="sendMessage" class="flex space-x-2">
+                    <form
+                        @submit.prevent="sendMessage(authStore.user.user.id)"
+                        class="flex space-x-2"
+                    >
                         <input
                             v-model="newMessage"
                             type="text"

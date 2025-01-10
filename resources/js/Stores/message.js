@@ -5,15 +5,15 @@ const csrf = () => $.get("/sanctum/csrf-cookie");
 
 export const useMessageStore = defineStore("message", {
     state: () => ({
-        AllConversation: [],
+        AllConversations: [],
     }),
     getters: {
-        conversations: (state) => state.AllConversation,
+        conversations: (state) => state.AllConversations,
     },
     actions: {
         async getConversations() {
-            if (this.AllConversation.length > 0) {
-                return this.AllConversation;
+            if (this.AllConversations.length > 0) {
+                return this.AllConversations;
             } else {
                 try {
                     return new Promise((resolve, reject) => {
@@ -22,9 +22,9 @@ export const useMessageStore = defineStore("message", {
                             url: "/api/conversation",
                             dataType: "json",
                             success: (response) => {
-                                console.log(response.conversation);
+                                console.log(response.data);
 
-                                this.AllConversation = response.conversations;
+                                this.AllConversations = response.data;
                                 resolve(response);
                             },
                             error: (error) => {
