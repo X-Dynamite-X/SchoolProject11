@@ -12,11 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('conversations', function (Blueprint $table) {
-            // $table->foreignId('user1_id');
-            // $table->foreignId('user2_id');
-
-            // $table->foreign('user1_id')->references('id')->on('users')->onDelete('cascade');
-            // $table->foreign('user2_id')->references('id')->on('users')->onDelete('cascade');
             $table->id();
             $table->unsignedBigInteger('user_one_id');
             $table->unsignedBigInteger('user_two_id');
