@@ -70,12 +70,11 @@ const sendMessage = (id) => {
     }
 };
 </script>
-
 <template>
-    <div class="flex h-[92vh] dark:bg-gray-900">
+    <div class="flex flex-col md:flex-row h-screen dark:bg-gray-900">
         <!-- قائمة المحادثات -->
         <aside
-            class="w-full touch-scroll md:w-1/3 lg:w-1/4 bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-r border-gray-300 overflow-y-auto"
+            class="w-full md:w-1/3 lg:w-1/4 bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-b md:border-b-0 md:border-r border-gray-300 overflow-y-auto"
         >
             <div class="p-4 flex flex-col">
                 <h2 class="text-lg font-bold dark:text-white">Chats</h2>
@@ -114,7 +113,7 @@ const sendMessage = (id) => {
 
         <!-- واجهة الدردشة -->
         <main class="flex-1 bg-white dark:bg-gray-900">
-            <div class="h-[92vh] flex flex-col">
+            <div class="h-full flex flex-col">
                 <!-- الرأس -->
                 <header
                     class="p-4 bg-gray-100 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700"
@@ -129,7 +128,7 @@ const sendMessage = (id) => {
                     <div
                         v-for="(message, index) in activeChat?.messages || []"
                         :key="index"
-                        :class="[
+                        :class="[ 
                             message.sender_id == authStore.user.user.id
                                 ? 'ml-auto bg-blue-500 text-white'
                                 : 'mr-auto bg-gray-200 dark:bg-gray-700 dark:text-white',
