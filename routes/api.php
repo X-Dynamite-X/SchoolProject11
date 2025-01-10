@@ -14,16 +14,17 @@ use App\Http\Controllers\api\v1\ConversationController;
 
 Route::get('/user', function (Request $request) {
     return response()->json([
-        "user" => $request->user()->load(["subjects","roles"]), // Authenticated user details
-          // Fetch the actual roles from the database
-        //   "roles" => $request->user()->roles()->get(),
+        "user" => $request->user()->load(["subjects","roles"]),
     ]);
 })->middleware('auth:sanctum')->name("api.user");
 
 Route::resource('/conversation', ConversationController::class);
 
-Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefix("admin")->group(function () {
+Route::middleware([  "auth:sanctum", "auth"])->group(function () {
+    // Route::resource('/conversation', ConversationController::class);
 
+});
+Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefix("admin")->group(function () {
     Route::resource('/subject', SubjectController::class);
     Route::resource('/user', UserController::class);
     Route::prefix('subjectUsers/{subject}/')->controller(SubjectUsersController::class)-> group(function () {

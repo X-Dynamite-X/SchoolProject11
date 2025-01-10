@@ -1,5 +1,9 @@
 <script setup>
-import { ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
+import { useMessageStore } from "@/Stores/message";
+    const messageStore = useMessageStore();
+    const loading = ref(true);
+
 
 const chats = ref([
     { id: 1, name: "Ahmed", lastMessage: "Hi!", messages: [{ text: "test", isSender: true }, { text: "test", isSender: true }, { text: "test", isSender: false }, { text: "test", isSender: true },
@@ -15,7 +19,21 @@ const chats = ref([
 const activeChatId = ref(null);
 const newMessage = ref("");
 const searchQuery = ref("");
+const fetchDataConversation =async () => {
+    try{
+        await messageStore.getConversations();
+        console.log(messageStore.conversations);
 
+    }catch{
+
+    }finally {
+        loading.value = false;
+    }
+}
+onMounted(() => {
+    fetchDataConversation()
+
+});
 // الدالة لحساب المحادثة النشطة
 const activeChat = computed(() => {
     return chats.value.find((chat) => chat.id === activeChatId.value);

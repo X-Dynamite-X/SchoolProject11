@@ -4,6 +4,7 @@ namespace App\Http\Requests\Chat;
 
 use App\Models\Conversation;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ConversationRequest extends FormRequest
@@ -26,7 +27,7 @@ class ConversationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user_one_id = $this->input('user_one_id');
+        $user_one_id = Auth::user()->id;
         $user_two_id = $this->input('user_two_id');
 
         return [

@@ -34,7 +34,7 @@ export const useAdminStore = defineStore("admin", {
                                 const errors =
                                     error.responseJSON?.message ||
                                     "An error occurred";
-                                reject(error);
+                                reject(errors);
                             },
                         });
                     });
@@ -256,7 +256,7 @@ export const useAdminStore = defineStore("admin", {
         async updateSubjectUsers(data) {
             await csrf();
             try {
-              
+
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "put",
