@@ -29,12 +29,14 @@ class DatabaseSeeder extends Seeder
         $user->save();
         $this->call(
             [
-                 UserSeeder::class,
+                UserSeeder::class,
                 PermissionSeeder::class,
                 SubjectSeeder::class,
+                ConversationSeeder::class,
+                MessageSeeder::class,
+
                 // SubjectUserSeeder::class
             ]
         );
-
     }
 }

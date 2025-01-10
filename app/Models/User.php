@@ -51,4 +51,11 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Subject::class, 'subject_users')->withPivot('mark');
     }
+    public function sendMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+
+
 }
