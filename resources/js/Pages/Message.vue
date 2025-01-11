@@ -81,27 +81,24 @@ const isWideScreen = computed(() => {
 <template>
     <div class="flex h-[92.9vh] dark:bg-gray-900">
         <button
-    @click="toggleSidebar"
-    class="absolute top-[9%] right-[10%] md:hidden p-2 bg-blue-500 text-white rounded-md max-h-[3rem] shadow-lg hover:bg-blue-600 z-10 transition-transform duration-300"
- >
-    <template v-if="isSidebarVisible">
-        <CloseIcon class="transition-transform duration-150" />
-      
-    </template>
-    <template v-else>
-        <MenuIcon class="transition-transform duration-150" />
- 
-    </template>
-</button>
-
+            @click="toggleSidebar"
+            class="absolute top-[9%] right-[10%] md:hidden p-2 bg-blue-500 text-white rounded-md max-h-[3rem] shadow-lg hover:bg-blue-600 z-10 transition-transform duration-300"
+        >
+            <template v-if="isSidebarVisible">
+                <CloseIcon class="transition-transform duration-150" />
+            </template>
+            <template v-else>
+                <MenuIcon class="transition-transform duration-150" />
+            </template>
+        </button>
 
         <!-- قائمة المحادثات -->
         <aside
             v-show="isSidebarVisible || isWideScreen"
-            class="absolute md:static w-[100vw]    md:w-1/3 lg:w-1/4 bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-r border-gray-300 overflow-y-auto transition-transform transform md:translate-x-0"
+            class="absolute md:static w-[100vw] md:w-1/3 lg:w-1/4 bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-r border-gray-300 overflow-y-auto transition-transform transform md:translate-x-0"
             :class="{ '-translate-x-full': !isSidebarVisible && !isWideScreen }"
         >
-            <div class="p-4 flex flex-col ">
+            <div class="p-4 flex flex-col">
                 <h2 class="text-lg font-bold dark:text-white">Chats</h2>
                 <!-- شريط البحث -->
                 <input
@@ -162,12 +159,10 @@ const isWideScreen = computed(() => {
                     >
                         {{ message.text }}
                         <div class="text-xs text-gray-400 mt-1">
-                            {{ message.created_at  }}
+                            {{ message.created_at }}
                         </div>
                     </div>
                 </div>
-
-                <!-- إدخال الرسائل -->
                 <footer
                     class="p-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700"
                 >
