@@ -20,7 +20,10 @@ class MessageResource extends JsonResource
             'sender_id' => $this->sender_id,
             'text' => $this->text,
             'is_read' => $this->is_read,
-            'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at)->format('y-m-d H:i:s'),
+            'created_at'=>Carbon::parse($this->created_at)->format('j/n/Y, g:i:s A'),
+            
+            //'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at)->format('y-m-d H:i:s'),
         ];
     }
 }
+// 'created_at' => Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at)->format('y-m-d H:i:s'),
