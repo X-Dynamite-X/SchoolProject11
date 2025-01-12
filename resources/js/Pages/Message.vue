@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, watch, computed } from "vue";
 import { useMessageStore } from "@/Stores/message";
 import { useAuthStore } from "@/Stores/Auth";
 import CloseIcon from "@/components/Icon/CloseIcon.vue";
@@ -15,6 +15,7 @@ const activeChatId = ref(null); // المحادثة النشطة
 const newMessage = ref(""); // الرسالة الجديدة
 const searchQuery = ref(""); // البحث
 const isSidebarVisible = ref(false); // التحكم في إظهار القائمة الجانبية
+const conversationQuery = ref([""]);
 
 // تحميل المحادثات من الـ API
 const fetchDataConversation = async () => {
@@ -41,12 +42,31 @@ const activeChat = computed(() => {
 });
 
 // تصفية المحادثات بناءً على البحث
+watch(searchQuery, async (newQuery) => {
+    if (newQuery.length > 0) {
+        try {
+            // استدعاء API من المخزن (store)
+            const response = await messageStore.searchConversations(newQuery);
+            if (response.conversations) {
+                conversationQuery.value = response.conversations; // تحديث المحادثات
+            }
+        } catch (error) {
+            console.error("Error fetching conversations:", error);
+        }
+    }
+});
 const filteredChats = computed(() => {
-    return conversations.value.filter((conversation) =>
-        conversation?.other_user?.name
-            ?.toLowerCase()
-            .includes(searchQuery.value.toLowerCase())
-    );
+    if (searchQuery.value.length === 0) {
+        return conversations.value.filter((conversation) =>
+            conversation?.other_user?.name
+                ?.toLowerCase()
+                .includes(searchQuery.value.toLowerCase())
+        );
+    } else {
+        return conversationQuery.value.filter(
+            (conversation) => conversation.name
+        );
+    }
 });
 
 // اختيار المحادثة النشطة
@@ -54,8 +74,31 @@ const selectChat = (chatId) => {
     activeChatId.value = chatId;
     isSidebarVisible.value = false; // إخفاء القائمة عند اختيار محادثة على الشاشات الصغيرة
 };
+const createChat = async (userId) => {
+    // البحث عن المحادثة الموجودة مع المستخدم المطلوب
+    const existingConversation = conversations.value.find(
+        (conversation) => conversation.other_user.id === userId
+    );
 
-// إرسال رسالة جديدة
+    if (existingConversation) {
+        // إذا كانت المحادثة موجودة، اخترها فقط
+        selectChat(existingConversation.id);
+        return; // إنهاء الدالة
+    } 
+    try {
+        const response = await messageStore.createConversation(userId);
+
+        // إضافة المحادثة الجديدة إلى قائمة المحادثات (اختياري)
+        if (response.conversation) {
+            conversations.value.push(response.conversation);
+            searchQuery.value="";
+            selectChat(response.conversation.id);
+        }
+    } catch (error) {
+        console.error("Failed to create conversation:", error);
+    }
+};
+
 const sendMessage = (id) => {
     if (newMessage.value.trim() && activeChat.value) {
         activeChat.value.messages.push({
@@ -108,29 +151,56 @@ const isWideScreen = computed(() => {
                     class="mt-2 p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring focus:ring-blue-200 dark:focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 />
             </div>
-            <ul>
-                <li
-                    v-for="conversation in filteredChats"
-                    :key="conversation.id"
-                    class="p-2 border-b hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
-                    :class="{
-                        'bg-gray-300 dark:bg-gray-700':
-                            conversation.id === activeChatId,
-                    }"
-                    @click="selectChat(conversation.id)"
-                >
-                    <div class="font-semibold dark:text-white">
-                        {{ conversation.other_user.name }}
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                        {{
-                            conversation.messages?.[
-                                conversation.messages.length - 1
-                            ]?.text || "No messages yet"
-                        }}
-                    </div>
-                </li>
-            </ul>
+            <template v-if="searchQuery.length === 0">
+                <ul>
+                    <li
+                        v-for="conversation in filteredChats"
+                        :key="conversation.id"
+                        class="p-2 border-b hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                        :class="{
+                            'bg-gray-300 dark:bg-gray-700':
+                                conversation.id === activeChatId,
+                        }"
+                        @click="selectChat(conversation.id)"
+                    >
+                        <div class="font-semibold dark:text-white">
+                            {{ conversation.other_user.name }}
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            {{
+                                conversation.messages?.[
+                                    conversation.messages.length - 1
+                                ]?.text || "No messages yet"
+                            }}
+                        </div>
+                    </li>
+                </ul>
+            </template>
+            <template v-else>
+                <ul>
+                    <li
+                        v-for="conversation in filteredChats"
+                        :key="conversation.id"
+                        class="p-2 border-b hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer"
+                        :class="{
+                            'bg-gray-300 dark:bg-gray-700':
+                                conversation.id === activeChatId,
+                        }"
+                        @click="createChat(conversation.id)"
+                    >
+                        <div class="font-semibold dark:text-white">
+                            {{ conversation.name }}
+                        </div>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                            {{
+                                conversation.messages?.[
+                                    conversation.messages.length - 1
+                                ]?.text || "No messages yet"
+                            }}
+                        </div>
+                    </li>
+                </ul>
+            </template>
         </aside>
 
         <!-- واجهة الدردشة -->

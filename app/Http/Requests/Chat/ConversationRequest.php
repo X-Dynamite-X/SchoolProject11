@@ -27,33 +27,37 @@ class ConversationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user_one_id = Auth::user()->id;
-        $user_two_id = $this->input('user_two_id');
-
+        // جلب معرف المستخدم الحالي
+        $user_one_id = Auth::id();
+        $user_two_id = $this->input('user_two_id'); // المستخدم الآخر
+    
         return [
-            'user_one_id' => [
+            'user_two_id' => [
                 'required',
+                'exists:users,id', // التحقق من أن المستخدم الآخر موجود في جدول المستخدمين
                 function ($attribute, $value, $fail) use ($user_one_id, $user_two_id) {
+                    // التحقق من أن المحادثة بين المستخدمين غير موجودة مسبقًا
                     $exists = Conversation::where(function ($query) use ($user_one_id, $user_two_id) {
                         $query->where('user_one_id', $user_one_id)
-                            ->where('user_two_id', $user_two_id);
+                              ->where('user_two_id', $user_two_id);
                     })->orWhere(function ($query) use ($user_one_id, $user_two_id) {
                         $query->where('user_one_id', $user_two_id)
-                            ->where('user_two_id', $user_one_id);
+                              ->where('user_two_id', $user_one_id);
                     })->exists();
                     if ($exists) {
                         $fail('This conversation already exists between the selected users.');
                     }
                 },
             ],
-            'user_two_id' => 'required',
         ];
     }
+    
     public function messages(): array
     {
         return [
-            'user_one_id.required' => 'The first user is required.',
             'user_two_id.required' => 'The second user is required.',
+            'user_two_id.exists' => 'The selected user does not exist.',
         ];
     }
+    
 }
