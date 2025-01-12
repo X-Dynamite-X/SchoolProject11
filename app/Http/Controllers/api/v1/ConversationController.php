@@ -54,19 +54,7 @@ class ConversationController extends Controller
     public function store(Request $request)
     {
 
-        // $conversation = Conversation::create([
-        //     'user_one_id' => Auth::id(),
-        //     'user_two_id' => $request->input('user_two_id'),
-        // ])->load(
-        //     'messages',
-        //     'user2:id,name,email'
-        // );
-
-        // return response()->json([
-        //     'conversation' => $conversation,
-        //     'message' => 'Conversation created successfully.'
-        // ]);
-        $conversation = Conversation::create([
+         $conversation = Conversation::create([
             'user_one_id' => Auth::id(),
             'user_two_id' => $request->input('user_two_id'),
         ])->load('messages', 'user2:id,name,email');
