@@ -29,19 +29,16 @@ const fetchDataConversation = async () => {
     }
 };
 
-// استدعاء المحادثات عند التحميل
 onMounted(() => {
     fetchDataConversation();
 });
 
-// المحادثة النشطة
 const activeChat = computed(() => {
     return conversations.value.find(
         (conversation) => conversation.id === activeChatId.value
     );
 });
 
-// تصفية المحادثات بناءً على البحث
 watch(searchQuery, async (newQuery) => {
     if (newQuery.length > 0) {
         try {
@@ -69,7 +66,6 @@ const filteredChats = computed(() => {
     }
 });
 
-// اختيار المحادثة النشطة
 const selectChat = (chatId) => {
     activeChatId.value = chatId;
     isSidebarVisible.value = false; // إخفاء القائمة عند اختيار محادثة على الشاشات الصغيرة
@@ -84,14 +80,14 @@ const createChat = async (userId) => {
         // إذا كانت المحادثة موجودة، اخترها فقط
         selectChat(existingConversation.id);
         return; // إنهاء الدالة
-    } 
+    }
     try {
         const response = await messageStore.createConversation(userId);
 
         // إضافة المحادثة الجديدة إلى قائمة المحادثات (اختياري)
         if (response.conversation) {
             conversations.value.push(response.conversation);
-            searchQuery.value="";
+            searchQuery.value = "";
             selectChat(response.conversation.id);
         }
     } catch (error) {
@@ -110,14 +106,24 @@ const sendMessage = (id) => {
     }
 };
 
-// التحكم في القائمة الجانبية
 const toggleSidebar = () => {
     isSidebarVisible.value = !isSidebarVisible.value;
 };
 
-// التحقق من الشاشات الكبيرة
 const isWideScreen = computed(() => {
     return window.innerWidth >= 768;
+});
+
+const addConversationChannel = window.Echo.private(
+    `user_${authStore.user.user.id}`
+);
+addConversationChannel.listen(".add-conversation", function (data) {
+    const newConversation = {
+        id: data.conversation.id,
+        messages: data.conversation.messages,
+        other_user: data.conversation.other_user,
+    };
+    conversations.value.push(newConversation);
 });
 </script>
 

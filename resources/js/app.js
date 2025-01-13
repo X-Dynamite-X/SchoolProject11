@@ -1,4 +1,6 @@
 import "@/axios";
+import "@/echo";
+
 import { createApp, markRaw } from "vue";
 import { createPinia } from "pinia";
 import router from "@/router/router";

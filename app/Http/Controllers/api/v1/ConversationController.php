@@ -8,6 +8,7 @@ use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Events\Message\NewConversationEvent;
 use App\Http\Requests\Chat\ConversationRequest;
 use App\Http\Resources\Chat\ConversationResource;
 
@@ -33,7 +34,7 @@ class ConversationController extends Controller
 
     public function show(Request $request)
     {
-        $userId = 1; // معرف المستخدم الحالي
+        $userId = Auth::id(); // استبدل بـ Auth::id() للحصول على ID المستخدم المُسجل دخوله
         $serch = $request->input('serch');
 
         // البحث مع استبعاد المستخدم الحالي
@@ -51,18 +52,24 @@ class ConversationController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(ConversationRequest $request)
     {
 
-         $conversation = Conversation::create([
+        $conversation = Conversation::create([
             'user_one_id' => Auth::id(),
             'user_two_id' => $request->input('user_two_id'),
-        ])->load('messages', 'user2:id,name,email');
+        ])->load('messages', 'user1:id,name,email', 'user2:id,name,email')
+        ;
 
-        // إعادة بناء البيانات مع تغيير اسم المفتاح
+        // إعادة بناء البيانات مع تغيير اسم
+        $conversationEventData = $conversation->toArray();
+        $conversationEventData['other_user'] = $conversationEventData['user1'];
+        unset($conversationEventData['user1'], $conversationEventData['user2']);
+        event(new NewConversationEvent($conversationEventData));
+
         $conversationData = $conversation->toArray();
         $conversationData['other_user'] = $conversationData['user2'];
-        unset($conversationData['user2']); // إزالة المفتاح القديم
+        unset($conversationData['user1'], $conversationData['user2']); // إزالة المفتاح القديم
 
         return response()->json([
             'conversation' => $conversationData,
