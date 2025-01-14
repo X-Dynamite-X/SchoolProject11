@@ -16,7 +16,7 @@ const newMessage = ref(""); // الرسالة الجديدة
 const searchQuery = ref(""); // البحث
 const isSidebarVisible = ref(false); // التحكم في إظهار القائمة الجانبية
 const conversationQuery = ref([""]);
-
+const conversationId = ref("");
 // تحميل المحادثات من الـ API
 const fetchDataConversation = async () => {
     try {
@@ -26,6 +26,7 @@ const fetchDataConversation = async () => {
         console.error("Failed to fetch conversations:", error);
     } finally {
         loading.value = false;
+        responseNewMessage();
     }
 };
 
@@ -68,6 +69,7 @@ const filteredChats = computed(() => {
 
 const selectChat = (chatId) => {
     activeChatId.value = chatId;
+    conversationId.value = chatId;
     isSidebarVisible.value = false; // إخفاء القائمة عند اختيار محادثة على الشاشات الصغيرة
 };
 const createChat = async (userId) => {
@@ -102,8 +104,16 @@ const sendMessage = (id) => {
             sender_id: id,
             created_at: new Date().toLocaleString(),
         });
+        let data = {
+            text: newMessage.value,
+            conversationId: conversationId.value,
+        };
         newMessage.value = "";
+        createNewMessage(data);
     }
+};
+const createNewMessage = async (data) => {
+    await messageStore.createMessage(data);
 };
 
 const toggleSidebar = () => {
@@ -125,6 +135,41 @@ addConversationChannel.listen(".add-conversation", function (data) {
     };
     conversations.value.push(newConversation);
 });
+function responseNewMessage() {
+    for (let i = 0; i < conversations.value.length; i++) {
+        let conversationId = conversations.value[i].id;
+        const addMessageChannel = window.Echo.private(
+            `conversation_${conversationId}`
+        );
+        console.log(`conversation_${conversationId}`);
+        addMessageChannel.listen(".new-message", function (data) {
+            if (data.sender_id != authStore.user.user.id) {
+                console.log(data);
+                console.log(data.sender_id != authStore.user.user.id);
+
+                const newMessage = {
+                    id: data.message_id ?? null, // يمكنك تضمين `message_id` إذا توفر
+                    sender_id: data.sender_id,
+                    text: data.text,
+                    created_at: data.created_at,
+                };
+                const existingConversation = conversations.value.find(
+                    (conv) => conv.id === data.conversation_id
+                );
+                if (existingConversation) {
+                    existingConversation.messages.push(newMessage);
+                    console.log(
+                        `Message added to conversation ID: ${data.conversation_id}`
+                    );
+                } else {
+                    console.warn(
+                        `Conversation with ID ${data.conversation_id} not found.`
+                    );
+                }
+            }
+        });
+    }
+}
 </script>
 
 <template>

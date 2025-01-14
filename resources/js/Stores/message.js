@@ -6,7 +6,7 @@ const csrf = () => $.get("/sanctum/csrf-cookie");
 export const useMessageStore = defineStore("message", {
     state: () => ({
         AllConversations: [],
-         
+
         Errors: [],
     }),
     getters: {
@@ -46,8 +46,6 @@ export const useMessageStore = defineStore("message", {
             }
         },
         async searchConversations(serch) {
-      
-
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -83,7 +81,35 @@ export const useMessageStore = defineStore("message", {
                         },
                         error: (error) => {
                             console.error("Error:", error);
-                        }
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("User Fetch Error:", error);
+                throw error;
+            }
+        },
+        async createMessage(data) {
+            await csrf();
+            console.log(data);
+
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/message",
+                        data: {
+                            conversation_id: data["conversationId"],
+                            text: data["text"],
+                        },
+                        success: (response) => {
+                            console.log(response);
+
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            console.error("Error:", error.responseJSON.message);
+                        },
                     });
                 });
             } catch (error) {

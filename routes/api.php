@@ -6,9 +6,10 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\api\v1\UserController;
+use App\Http\Controllers\api\v1\MessageController;
 use App\Http\Controllers\api\v1\SubjectController;
-use App\Http\Controllers\api\v1\SubjectUsersController;
 use App\Http\Controllers\api\v1\ConversationController;
+use App\Http\Controllers\api\v1\SubjectUsersController;
 
 
 
@@ -19,6 +20,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum')->name("api.user");
 
 Route::resource('/conversation', ConversationController::class);
+Route::resource('/message', MessageController::class);
 
 Route::middleware([  "auth:sanctum", "auth"])->group(function () {
     // Route::resource('/conversation', ConversationController::class);
