@@ -12,15 +12,17 @@ use App\Http\Requests\Chat\TextMessageRequest;
 class MessageController extends Controller
 {
     //
-    public function store(TextMessageRequest $request){
+    public function store(TextMessageRequest $request)
+    {
 
         $message = Message::create(
             [
-                'sender_id'=>Auth::id(),
+                'sender_id' => Auth::id(),
                 'conversation_id' => $request->input('conversation_id'),
                 'text' => $request->input('text'),
+                'created_at' => $request->input('created_at')
             ]
-        ) ;
+        );
         // dd($message);
 
         event(new NewMessageEvent($message));
@@ -29,9 +31,7 @@ class MessageController extends Controller
             'newMessage' => $message,
             'message' => 'Message Create Successfully',
         ]);
-
-
     }
-    public function update(){}
-    public function delete(){}
+    public function update() {}
+    public function delete() {}
 }

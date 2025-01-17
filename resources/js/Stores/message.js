@@ -101,6 +101,7 @@ export const useMessageStore = defineStore("message", {
                         data: {
                             conversation_id: data["conversationId"],
                             text: data["text"],
+                            created_at:data['created_at']
                         },
                         success: (response) => {
                             console.log(response);

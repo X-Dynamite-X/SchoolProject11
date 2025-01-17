@@ -10,7 +10,7 @@ class Message extends Model
 {
     //
     use HasFactory;
-    protected $fillable = ['conversation_id', 'sender_id',  'text',"is_read"];
+    protected $fillable = ['conversation_id', "created_at", 'sender_id',  'text', "is_read"];
 
     public function conversation(): BelongsTo
     {
@@ -24,9 +24,4 @@ class Message extends Model
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
-
-    /**
-     * Get the receiver of the message.
-     */
-
 }

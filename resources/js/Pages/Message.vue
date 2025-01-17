@@ -107,13 +107,16 @@ const createChat = async (userId) => {
 
 const sendMessage = (id) => {
     if (newMessage.value.trim() && activeChat.value) {
+        let created_at = new Date().toLocaleString()
         activeChat.value.messages.push({
             text: newMessage.value,
             sender_id: id,
-            created_at: new Date().toLocaleString(),
+            created_at: created_at,
         });
         let data = {
             text: newMessage.value,
+            created_at: created_at,
+
             conversationId: conversationId.value,
         };
         setTimeout(scrollToBottom, 100);
@@ -153,9 +156,6 @@ function responseNewMessage() {
         console.log(`conversation_${conversationId}`);
         addMessageChannel.listen(".new-message", function (data) {
             if (data.sender_id != authStore.user.user.id) {
-                console.log(data);
-                console.log(data.sender_id != authStore.user.user.id);
-
                 const newMessage = {
                     id: data.message_id ?? null, // يمكنك تضمين `message_id` إذا توفر
                     sender_id: data.sender_id,
@@ -167,6 +167,7 @@ function responseNewMessage() {
                 );
                 if (existingConversation) {
                     existingConversation.messages.push(newMessage);
+                    setTimeout(scrollToBottom, 100);
                     console.log(
                         `Message added to conversation ID: ${data.conversation_id}`
                     );
