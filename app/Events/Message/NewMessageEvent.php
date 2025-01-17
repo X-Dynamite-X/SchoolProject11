@@ -29,6 +29,7 @@ class NewMessageEvent implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
+            "id" => $this->message->id,
             'text' => $this->message->text,
             'created_at'=>$this->message->created_at->format('j/n/Y, g:i:s A'),
             'sender_id'=>$this->message->sender_id,
@@ -38,3 +39,9 @@ class NewMessageEvent implements ShouldBroadcast
     }
 }
 
+/** 
+ * edit user turn list  in a last message
+ * add is read a message or not
+ * fexad  spenar login page
+ *
+ */

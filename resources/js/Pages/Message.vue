@@ -17,7 +17,8 @@ const searchQuery = ref(""); // البحث
 const isSidebarVisible = ref(false); // التحكم في إظهار القائمة الجانبية
 const conversationQuery = ref([""]);
 const conversationId = ref("");
-// تحميل المحادثات من الـ API
+const messagesContainer = ref(null); // المرجع الخاص بعنصر الرسائل
+
 const fetchDataConversation = async () => {
     try {
         await messageStore.getConversations();
@@ -27,6 +28,12 @@ const fetchDataConversation = async () => {
     } finally {
         loading.value = false;
         responseNewMessage();
+    }
+};
+const scrollToBottom = () => {
+    if (messagesContainer.value) {
+        messagesContainer.value.scrollTop =
+            messagesContainer.value.scrollHeight;
     }
 };
 
@@ -71,6 +78,7 @@ const selectChat = (chatId) => {
     activeChatId.value = chatId;
     conversationId.value = chatId;
     isSidebarVisible.value = false; // إخفاء القائمة عند اختيار محادثة على الشاشات الصغيرة
+    setTimeout(scrollToBottom, 100); // الانتظار قليلاً لضمان تحديث DOM
 };
 const createChat = async (userId) => {
     // البحث عن المحادثة الموجودة مع المستخدم المطلوب
@@ -108,6 +116,7 @@ const sendMessage = (id) => {
             text: newMessage.value,
             conversationId: conversationId.value,
         };
+        setTimeout(scrollToBottom, 100);
         newMessage.value = "";
         createNewMessage(data);
     }
@@ -267,7 +276,10 @@ function responseNewMessage() {
                 </header>
 
                 <!-- الرسائل -->
-                <div class="flex-1 touch-scroll overflow-y-auto p-4 space-y-3">
+                <div
+                    ref="messagesContainer"
+                    class="flex-1 touch-scroll overflow-y-auto p-4 space-y-3"
+                >
                     <div
                         v-for="(message, index) in activeChat?.messages || []"
                         :key="index"
