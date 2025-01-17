@@ -10,7 +10,14 @@ class Message extends Model
 {
     //
     use HasFactory;
-    protected $fillable = ['conversation_id', "created_at", 'sender_id',  'text', "is_read"];
+    protected $fillable = [
+        'conversation_id',
+        "updated_at",
+        "created_at",
+        'sender_id',
+        'text',
+        "is_read"
+    ];
 
     public function conversation(): BelongsTo
     {

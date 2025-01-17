@@ -20,13 +20,11 @@ class MessageController extends Controller
                 'sender_id' => Auth::id(),
                 'conversation_id' => $request->input('conversation_id'),
                 'text' => $request->input('text'),
-                'created_at' => $request->input('created_at')
+                'created_at' => $request->input('created_at'),
+                "updated_at" => null,
             ]
         );
-        // dd($message);
-
         event(new NewMessageEvent($message));
-
         return response()->json([
             'newMessage' => $message,
             'message' => 'Message Create Successfully',
