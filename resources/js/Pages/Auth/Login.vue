@@ -21,8 +21,6 @@ async function sendData(data) {
         form.value = { email: "", password: "" }; // Clear form on success
     } catch (error) {
         authStore.errors.general = "Invalid email or password";
-    } finally {
-        loading.value = false;
     }
 }
 
@@ -33,7 +31,7 @@ onMounted(() => {
 
 <template>
     <template v-if="loading">
-        <div class="flex items-center justify-center h-screen">
+        <div class="flex items-center justify-center h-screen max-h-[92vh]">
             <div
                 class="flex flex-col items-center justify-center bg-white border border-gray-300 rounded-lg shadow-lg p-6 w-80 dark:bg-gray-800 dark:border-gray-700"
             >

@@ -31,16 +31,15 @@ class NewMessageEvent implements ShouldBroadcast
         return [
             "id" => $this->message->id,
             'text' => $this->message->text,
-            'created_at'=>$this->message->created_at->format('j/n/Y, g:i:s A'),
-            'sender_id'=>$this->message->sender_id,
-            'conversation_id'=>$this->message->conversation_id,
+            'created_at' => $this->message->created_at->format('j/n/Y, g:i:s A'),
+            'sender_id' => $this->message->sender_id,
+            'conversation_id' => $this->message->conversation_id,
 
         ];
     }
 }
 
-/** 
- * edit user turn list  in a last message
+/**
  * add is read a message or not
  * fexad  spenar login page
  *
