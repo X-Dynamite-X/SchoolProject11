@@ -12,7 +12,7 @@ const conversations = ref([]);
 const activeChatId = ref(null);
 const newMessage = ref("");
 const searchQuery = ref("");
-const isSidebarVisible = ref(false);
+const isSidebarVisible = ref(true);
 const conversationQuery = ref([""]);
 const conversationId = ref("");
 const messagesContainer = ref(null);
@@ -40,6 +40,7 @@ onMounted(() => {
 });
 
 const activeChat = computed(() => {
+    toggleSidebar();
     return conversations.value.find(
         (conversation) => conversation.id === activeChatId.value
     );
@@ -281,9 +282,16 @@ function moveConversationsInLastMessage(currentIndex) {
                         </div>
                         <div class="text-sm text-gray-500 dark:text-gray-400">
                             {{
-                                conversation.messages?.[
+                                (
+                                    conversation.messages?.[
+                                        conversation.messages.length - 1
+                                    ]?.text || "No messages yet"
+                                ).slice(0, 20) +
+                                (conversation.messages?.[
                                     conversation.messages.length - 1
-                                ]?.text || "No messages yet"
+                                ]?.text?.length > 20
+                                    ? "..."
+                                    : "")
                             }}
                         </div>
                     </li>
@@ -338,17 +346,20 @@ function moveConversationsInLastMessage(currentIndex) {
                         :key="index"
                         :class="[
                             message.sender_id == authStore.user.user.id
-                                ? 'ml-auto bg-blue-500 text-white'
+                                ? 'ml-auto bg-blue-500 text-white text-end'
                                 : 'mr-auto bg-gray-200 dark:bg-gray-700 dark:text-white',
                         ]"
-                        class="p-2 rounded-lg max-w-md"
+                        class="p-2 rounded-lg max-w-md w-fit break-words"
                     >
-                        {{ message.text }}
+                        <div class="break-words">
+                            {{ message.text }}
+                        </div>
                         <div class="text-xs text-gray-400 mt-1">
                             {{ message.created_at }}
                         </div>
                     </div>
                 </div>
+
                 <footer
                     class="p-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700"
                 >

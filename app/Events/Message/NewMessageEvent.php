@@ -34,9 +34,7 @@ class NewMessageEvent implements ShouldBroadcast
             'created_at' => $this->message->created_at->format('j/n/Y, g:i:s A'),
             'sender_id' => $this->message->sender_id,
             'conversation_id' => $this->message->conversation_id,
-
         ];
     }
 }
 
- 
