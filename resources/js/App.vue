@@ -64,6 +64,6 @@ const toggleMobileMenu = ref(false);
 
 .touch-scroll::-webkit-scrollbar {
     display: none; /* إخفاء الشريط */
-}
+} 
 
 </style>

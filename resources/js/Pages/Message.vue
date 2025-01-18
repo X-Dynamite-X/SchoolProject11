@@ -252,7 +252,7 @@ function moveConversationsInLastMessage(currentIndex) {
         <!-- قائمة المحادثات -->
         <aside
             v-show="isSidebarVisible || isWideScreen"
-            class="absolute md:static w-[100vw] md:w-1/3 lg:w-1/4 bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-r border-gray-300 overflow-y-auto transition-transform transform md:translate-x-0"
+            class="absolute md:static max-h-[92vh] w-[100vw] md:w-1/3 lg:w-1/4 bg-gray-100 dark:bg-gray-800 dark:border-gray-700 border-r border-gray-300 overflow-y-auto transition-transform transform md:translate-x-0 touch-scroll hide-scrollbar"
             :class="{ '-translate-x-full': !isSidebarVisible && !isWideScreen }"
         >
             <div class="p-4 flex flex-col">
@@ -266,7 +266,7 @@ function moveConversationsInLastMessage(currentIndex) {
                 />
             </div>
             <template v-if="searchQuery.length === 0">
-                <ul>
+                <ul class="overflow-y-scroll touch-scroll">
                     <li
                         v-for="conversation in filteredChats"
                         :key="conversation.id"
@@ -298,7 +298,7 @@ function moveConversationsInLastMessage(currentIndex) {
                 </ul>
             </template>
             <template v-else>
-                <ul>
+                <ul class="overflow-y-scroll touch-scroll ">
                     <li
                         v-for="conversation in filteredChats"
                         :key="conversation.id"
