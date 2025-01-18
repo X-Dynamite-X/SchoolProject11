@@ -7,8 +7,6 @@ import MenuIcon from "@/components/Icon/MenuIcon.vue";
 
 const authStore = useAuthStore();
 const messageStore = useMessageStore();
-
-// المتغيرات الأساسية
 const loading = ref(true);
 const conversations = ref([]);
 const activeChatId = ref(null);
@@ -50,7 +48,6 @@ const activeChat = computed(() => {
 watch(searchQuery, async (newQuery) => {
     if (newQuery.length > 0) {
         try {
-            // استدعاء API من المخزن (store)
             const response = await messageStore.searchConversations(newQuery);
             if (response.conversations) {
                 conversationQuery.value = response.conversations;
@@ -138,7 +135,6 @@ const toggleSidebar = () => {
 const isWideScreen = computed(() => {
     return window.innerWidth >= 768;
 });
-// add new  convestion chanel
 const addConversationChannel = window.Echo.private(
     `user_${authStore.user.user.id}`
 );
@@ -150,7 +146,6 @@ addConversationChannel.listen(".add-conversation", function (data) {
     };
     conversations.value.push(newConversation);
 });
-// crate all chane in convestion
 
 function responseNewMessage() {
     for (let i = 0; i < conversations.value.length; i++) {
