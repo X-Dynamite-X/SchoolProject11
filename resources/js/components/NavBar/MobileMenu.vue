@@ -40,7 +40,7 @@ watch(
                     v-if="
                         (isAuth === item.auth && item.allUser) ||
                         (isAuth === item.auth &&
-                            item.role === authStore.roles[0].name)
+                            item.role === authStore.roles.name)
                     "
                     :class="[
                         'block rounded-md px-3 py-2 text-base font-medium',

@@ -40,7 +40,6 @@ onMounted(() => {
 });
 
 const activeChat = computed(() => {
-    toggleSidebar();
     return conversations.value.find(
         (conversation) => conversation.id === activeChatId.value
     );
@@ -87,6 +86,7 @@ const selectChat = (chatId) => {
     activeChatId.value = chatId;
     conversationId.value = chatId;
     isSidebarVisible.value = false;
+
     setTimeout(scrollToBottom, 100);
 };
 const createChat = async (userId) => {
@@ -104,6 +104,7 @@ const createChat = async (userId) => {
         if (response.conversation) {
             conversations.value.push(response.conversation);
             searchQuery.value = "";
+
             selectChat(response.conversation.id);
         }
     } catch (error) {
@@ -239,7 +240,7 @@ function moveConversationsInLastMessage(currentIndex) {
     <div class="flex h-[92.9vh] dark:bg-gray-900">
         <button
             @click="toggleSidebar"
-            class="absolute top-[9%] right-[10%] md:hidden p-2 bg-blue-500 text-white rounded-md max-h-[3rem] shadow-lg hover:bg-blue-600 z-10 transition-transform duration-300"
+            class="absolute top-[9%] right-[2%] md:hidden p-2 bg-blue-500 text-white rounded-md max-h-[3rem] shadow-lg hover:bg-blue-600 z-10 transition-transform duration-300"
         >
             <template v-if="isSidebarVisible">
                 <CloseIcon class="transition-transform duration-150" />
@@ -298,7 +299,7 @@ function moveConversationsInLastMessage(currentIndex) {
                 </ul>
             </template>
             <template v-else>
-                <ul class="overflow-y-scroll touch-scroll ">
+                <ul class="overflow-y-scroll touch-scroll">
                     <li
                         v-for="conversation in filteredChats"
                         :key="conversation.id"
