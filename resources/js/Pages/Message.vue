@@ -10,14 +10,14 @@ const messageStore = useMessageStore();
 
 // المتغيرات الأساسية
 const loading = ref(true);
-const conversations = ref([]); // المحادثات المحملة من الـ API
-const activeChatId = ref(null); // المحادثة النشطة
-const newMessage = ref(""); // الرسالة الجديدة
-const searchQuery = ref(""); // البحث
-const isSidebarVisible = ref(false); // التحكم في إظهار القائمة الجانبية
+const conversations = ref([]);
+const activeChatId = ref(null);
+const newMessage = ref("");
+const searchQuery = ref("");
+const isSidebarVisible = ref(false);
 const conversationQuery = ref([""]);
 const conversationId = ref("");
-const messagesContainer = ref(null); // المرجع الخاص بعنصر الرسائل
+const messagesContainer = ref(null);
 
 const fetchDataConversation = async () => {
     try {
@@ -53,7 +53,7 @@ watch(searchQuery, async (newQuery) => {
             // استدعاء API من المخزن (store)
             const response = await messageStore.searchConversations(newQuery);
             if (response.conversations) {
-                conversationQuery.value = response.conversations; // تحديث المحادثات
+                conversationQuery.value = response.conversations;
             }
         } catch (error) {
             console.error("Error fetching conversations:", error);
@@ -77,24 +77,21 @@ const filteredChats = computed(() => {
 const selectChat = (chatId) => {
     activeChatId.value = chatId;
     conversationId.value = chatId;
-    isSidebarVisible.value = false; // إخفاء القائمة عند اختيار محادثة على الشاشات الصغيرة
-    setTimeout(scrollToBottom, 100); // الانتظار قليلاً لضمان تحديث DOM
+    isSidebarVisible.value = false;
+    setTimeout(scrollToBottom, 100);
 };
 const createChat = async (userId) => {
-    // البحث عن المحادثة الموجودة مع المستخدم المطلوب
     const existingConversation = conversations.value.find(
         (conversation) => conversation.other_user.id === userId
     );
 
     if (existingConversation) {
-        // إذا كانت المحادثة موجودة، اخترها فقط
         selectChat(existingConversation.id);
-        return; // إنهاء الدالة
+        return;
     }
     try {
         const response = await messageStore.createConversation(userId);
 
-        // إضافة المحادثة الجديدة إلى قائمة المحادثات (اختياري)
         if (response.conversation) {
             conversations.value.push(response.conversation);
             searchQuery.value = "";
@@ -107,7 +104,7 @@ const createChat = async (userId) => {
 
 const sendMessage = (id) => {
     if (newMessage.value.trim() && activeChat.value) {
-        let created_at = new Date().toLocaleString()
+        let created_at = new Date().toLocaleString();
         activeChat.value.messages.push({
             text: newMessage.value,
             sender_id: id,
@@ -116,10 +113,16 @@ const sendMessage = (id) => {
         let data = {
             text: newMessage.value,
             created_at: created_at,
-
             conversationId: conversationId.value,
         };
         setTimeout(scrollToBottom, 100);
+
+        let index = conversations.value.findIndex(
+            (conversation) => conversation.id === activeChatId.value
+        );
+
+        moveConversationsInLastMessage(index);
+
         newMessage.value = "";
         createNewMessage(data);
     }
@@ -135,7 +138,7 @@ const toggleSidebar = () => {
 const isWideScreen = computed(() => {
     return window.innerWidth >= 768;
 });
-
+// add new  convestion chanel
 const addConversationChannel = window.Echo.private(
     `user_${authStore.user.user.id}`
 );
@@ -147,17 +150,18 @@ addConversationChannel.listen(".add-conversation", function (data) {
     };
     conversations.value.push(newConversation);
 });
+// crate all chane in convestion
+
 function responseNewMessage() {
     for (let i = 0; i < conversations.value.length; i++) {
         let conversationId = conversations.value[i].id;
         const addMessageChannel = window.Echo.private(
             `conversation_${conversationId}`
         );
-        console.log(`conversation_${conversationId}`);
         addMessageChannel.listen(".new-message", function (data) {
             if (data.sender_id != authStore.user.user.id) {
                 const newMessage = {
-                    id: data.message_id ?? null, // يمكنك تضمين `message_id` إذا توفر
+                    id: data.message_id ?? null,
                     sender_id: data.sender_id,
                     text: data.text,
                     created_at: data.created_at,
@@ -165,20 +169,28 @@ function responseNewMessage() {
                 const existingConversation = conversations.value.find(
                     (conv) => conv.id === data.conversation_id
                 );
+
                 if (existingConversation) {
                     existingConversation.messages.push(newMessage);
-                    setTimeout(scrollToBottom, 100);
-                    console.log(
-                        `Message added to conversation ID: ${data.conversation_id}`
+                    if (activeChatId.value === data.conversation_id) {
+                        setTimeout(scrollToBottom, 100);
+                    }
+                    let index = conversations.value.findIndex(
+                        (conversation) =>
+                            conversation.id === data.conversation_id
                     );
-                } else {
-                    console.warn(
-                        `Conversation with ID ${data.conversation_id} not found.`
-                    );
+                    moveConversationsInLastMessage(index);
                 }
             }
         });
     }
+}
+function moveConversationsInLastMessage(currentIndex) {
+    if (currentIndex !== 0) {
+        const [movedConversation] = conversations.value.splice(currentIndex, 1);
+        conversations.value.unshift(movedConversation);
+    }
+    return conversations.value;
 }
 </script>
 

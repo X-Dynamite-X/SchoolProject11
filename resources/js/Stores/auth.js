@@ -24,7 +24,6 @@ export const useAuthStore = defineStore("auth", {
     actions: {
         async getUser() {
             if (this.authUser) {
-
                 return this.authUser;
             } else {
                 await csrf();
@@ -54,7 +53,7 @@ export const useAuthStore = defineStore("auth", {
                     },
                 });
                 this.getUser();
-                router.push("/");
+                this.router.push("/");
             } catch (error) {
                 if (error.status === 422) {
                     this.authErrors = error.responseJSON.errors;

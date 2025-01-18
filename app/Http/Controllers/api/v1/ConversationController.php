@@ -19,6 +19,7 @@ class ConversationController extends Controller
     {
         $userId = Auth::id(); // استبدل بـ Auth::id() للحصول على ID المستخدم المُسجل دخوله
 
+        // استرجاع المحادثات التي تحتوي على الرسائل
         $conversations = Conversation::where("user_one_id", $userId)
             ->orWhere("user_two_id", $userId)
             ->with([
@@ -27,10 +28,18 @@ class ConversationController extends Controller
                 'user2:id,name,email',
             ])
             ->get();
+        $conversations = $conversations->sortByDesc( function ($conversation) {
+            if ($conversation->messages->isNotEmpty()) {
+                return $conversation->messages->last()->created_at;
+            }
+            return null;
+        });
 
         // إرجاع البيانات باستخدام Resource
         return ConversationResource::collection($conversations);
     }
+
+
 
     public function show(Request $request)
     {
@@ -58,8 +67,7 @@ class ConversationController extends Controller
         $conversation = Conversation::create([
             'user_one_id' => Auth::id(),
             'user_two_id' => $request->input('user_two_id'),
-        ])->load('messages', 'user1:id,name,email', 'user2:id,name,email')
-        ;
+        ])->load('messages', 'user1:id,name,email', 'user2:id,name,email');
 
         // إعادة بناء البيانات مع تغيير اسم
         $conversationEventData = $conversation->toArray();

@@ -1,20 +1,10 @@
 <script setup>
 import { useAuthStore } from "@/Stores/auth";
 import TabelTh from "@/components/Tabel/TabelTh.vue";
-import SearchInput from "@/components/FieldRequst/SearchInput.vue";
-import SearchIcon from "@/components/Icon/SearchIcon.vue";
+ 
 import DataTable from "@/components/Tabel/DataTable.vue";
 import DynamicRow from "@/components/Tabel/DynamicRow.vue";
-import EditIcon from "@/components/Icon/EditIcon.vue";
-import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
-import InfoIcon from "@/components/Icon/InfoIcon.vue";
-import DynamicInfo from "@/components/Model/DynamicInfo.vue";
-import DynamicEdit from "@/components/Model/DynamicEdit.vue";
-import InputRadio from "@/components/FieldRequst/InputRadio.vue";
-import DynamicDelete from "@/components/Model/DynamicDelete.vue";
-import DynamicCreate from "@/components/Model/DynamicCreate.vue";
-import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
-import Pagination from "@/components/Tabel/Pagination.vue";
+
 import Alerts from "@/components/AllApp/Alerts.vue";
 const authStore = useAuthStore();
 const thNameUsersFields = ["ID", "name", "email", "roles"];
@@ -50,7 +40,7 @@ const columnsSubject = [
     <div class="container w-10/12 mx-auto ">
         <div class="py-4">
             <DataTable
-                :data="authStore.user"
+                :data="authStore?.user "
                 :availableData="false"
                 :loading="false"
             >
@@ -77,7 +67,7 @@ const columnsSubject = [
             </DataTable>
         </div>
         <div class="py-4">
-            <DataTable :data="authStore.user.user.subjects" :loading="false">
+            <DataTable :data="authStore.user.user.subjects ? authStore.user.user.subjects :[] " :loading="false">
                 <template #header>
                     <TabelTh
                         v-for="thNameField in thNameSubjectsFields"
