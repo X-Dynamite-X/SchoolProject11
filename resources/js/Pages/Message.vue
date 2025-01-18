@@ -45,17 +45,28 @@ const activeChat = computed(() => {
     );
 });
 
-watch(searchQuery, async (newQuery) => {
-    if (newQuery.length > 0) {
-        try {
-            const response = await messageStore.searchConversations(newQuery);
-            if (response.conversations) {
-                conversationQuery.value = response.conversations;
-            }
-        } catch (error) {
-            console.error("Error fetching conversations:", error);
-        }
+let debounceTimer = null; // متغير لتخزين المؤقت
+
+watch(searchQuery, (newQuery) => {
+    if (debounceTimer) {
+        clearTimeout(debounceTimer); // مسح المؤقت السابق إذا كان موجودًا
     }
+
+    // إعداد مؤقت جديد ليتم التنفيذ بعد التوقف عن الكتابة
+    debounceTimer = setTimeout(async () => {
+        if (newQuery.length > 0) {
+            try {
+                const response = await messageStore.searchConversations(
+                    newQuery
+                );
+                if (response.conversations) {
+                    conversationQuery.value = response.conversations;
+                }
+            } catch (error) {
+                console.error("Error fetching conversations:", error);
+            }
+        }
+    }, 300); // الانتظار 300 مللي ثانية (يمكنك ضبطها)
 });
 const filteredChats = computed(() => {
     if (searchQuery.value.length === 0) {
@@ -125,7 +136,9 @@ const sendMessage = (id) => {
     }
 };
 const createNewMessage = async (data) => {
-    await messageStore.createMessage(data);
+    const response = await messageStore.createMessage(data);
+
+    addChanelNewConversation(response.conversationId);
 };
 
 const toggleSidebar = () => {
@@ -145,7 +158,38 @@ addConversationChannel.listen(".add-conversation", function (data) {
         other_user: data.conversation.other_user,
     };
     conversations.value.push(newConversation);
+    addChanelNewConversation(newConversation.id);
 });
+function addChanelNewConversation(conversationId) {
+    const addMessageChannel = window.Echo.private(
+        `conversation_${conversationId}`
+    );
+    addMessageChannel.listen(".new-message", function (data) {
+        if (data.sender_id != authStore.user.user.id) {
+            const newMessage = {
+                id: data.message_id ?? null,
+                sender_id: data.sender_id,
+                text: data.text,
+                created_at: data.created_at,
+            };
+            const existingConversation = conversations.value.find(
+                (conv) => conv.id === data.conversation_id
+            );
+
+            if (existingConversation) {
+                existingConversation.messages.push(newMessage);
+                if (activeChatId.value === data.conversation_id) {
+                    setTimeout(scrollToBottom, 100);
+                }
+                let index = conversations.value.findIndex(
+                    (conversation) => conversation.id === data.conversation_id
+                );
+
+                moveConversationsInLastMessage(index);
+            }
+        }
+    });
+}
 
 function responseNewMessage() {
     for (let i = 0; i < conversations.value.length; i++) {
@@ -174,6 +218,7 @@ function responseNewMessage() {
                         (conversation) =>
                             conversation.id === data.conversation_id
                     );
+
                     moveConversationsInLastMessage(index);
                 }
             }

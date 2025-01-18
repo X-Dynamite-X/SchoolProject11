@@ -18,14 +18,8 @@ const form = ref({
 
 async function sendData(data) {
     loading.value = true;
-    try {
-        await authStore.handleRegister(data);
-        router.push({ name: "welcome" });
-    } catch (error) {
-        console.log(error);
-    } finally {
-        loading.value = false;
-    }
+    const response = await authStore.handleRegister(data);
+    loading.value = response;
 }
 </script>
 
@@ -78,7 +72,7 @@ async function sendData(data) {
                             v-model="form.name"
                             placeholder="Enter User Name"
                             label="Enter User Name"
-                            :errorMessage="authStore.errors.name ||null"
+                            :errorMessage="authStore.errors.name || null"
                         />
                         <InputForm
                             type="email"
@@ -89,7 +83,7 @@ async function sendData(data) {
                             v-model="form.email"
                             placeholder="Email Address"
                             label="Email Address"
-                            :errorMessage="authStore.errors.email ||null"
+                            :errorMessage="authStore.errors.email || null"
                         />
                         <InputForm
                             type="password"
@@ -100,7 +94,7 @@ async function sendData(data) {
                             v-model="form.password"
                             placeholder="Password"
                             label="Password"
-                            :errorMessage="authStore.errors.password ||null"
+                            :errorMessage="authStore.errors.password || null"
                         />
                         <InputForm
                             type="password"
@@ -108,7 +102,9 @@ async function sendData(data) {
                             id="password_confirmation"
                             autocomplete="new-password"
                             :required="true"
-                            :errorMessage="authStore.errors.password_confirmation ||null"
+                            :errorMessage="
+                                authStore.errors.password_confirmation || null
+                            "
                             v-model="form.password_confirmation"
                             placeholder="Password Confirmation"
                             label="Password Confirmation"

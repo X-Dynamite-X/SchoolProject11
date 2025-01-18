@@ -16,12 +16,9 @@ const router = useRouter();
 
 async function sendData(data) {
     loading.value = true;
-    try {
-        await authStore.handleLogin(data);
-        form.value = { email: "", password: "" }; // Clear form on success
-    } catch (error) {
-        authStore.errors.general = "Invalid email or password";
-    }
+    const response = await authStore.handleLogin(data);  
+    form.value = { email: "", password: "" };
+    loading.value = response;
 }
 
 onMounted(() => {

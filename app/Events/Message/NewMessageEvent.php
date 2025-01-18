@@ -39,8 +39,4 @@ class NewMessageEvent implements ShouldBroadcast
     }
 }
 
-/**
- * add is read a message or not
- * fexad  spenar login page
- *
- */
+ 

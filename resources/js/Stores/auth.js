@@ -34,7 +34,6 @@ export const useAuthStore = defineStore("auth", {
                     });
                     this.authUser = response;
                     this.authRole = response.user.roles[0];
-
                 } catch (error) {
                     this.authUser = null;
                 }
@@ -52,12 +51,13 @@ export const useAuthStore = defineStore("auth", {
                         password: data.password,
                     },
                 });
-                this.getUser();
                 this.router.push("/");
+                return true;
             } catch (error) {
                 if (error.status === 422) {
                     this.authErrors = error.responseJSON.errors;
                 }
+                return false;
             }
         },
         async handleRegister(data) {
@@ -75,10 +75,12 @@ export const useAuthStore = defineStore("auth", {
                     },
                 });
                 await this.handleLogout();
+                return true;
             } catch (error) {
                 if (error.status === 422) {
                     this.authErrors = error.responseJSON.errors;
                 }
+                return false;
             }
         },
         async handleLogout() {

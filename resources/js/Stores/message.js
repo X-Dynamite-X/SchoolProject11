@@ -26,8 +26,7 @@ export const useMessageStore = defineStore("message", {
                             url: "/api/conversation",
                             dataType: "json",
                             success: (response) => {
-                                console.log(response.data);
-
+ 
                                 this.AllConversations = response.data;
                                 resolve(response);
                             },
@@ -91,7 +90,6 @@ export const useMessageStore = defineStore("message", {
         },
         async createMessage(data) {
             await csrf();
-            console.log(data);
 
             try {
                 return new Promise((resolve, reject) => {
@@ -104,7 +102,6 @@ export const useMessageStore = defineStore("message", {
                             created_at:data['created_at']
                         },
                         success: (response) => {
-                            console.log(response);
 
                             resolve(response);
                         },
