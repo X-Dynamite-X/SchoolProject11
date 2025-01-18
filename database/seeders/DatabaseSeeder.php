@@ -13,13 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+
         $this->call(
             [
                 RoleSeeder::class,
 
             ]
-        );
+        ); 
+
         $user = User::factory()->create([
             'name' => 'dynamite',
             'email' => 'dynamite@gmail.com',
@@ -27,6 +28,8 @@ class DatabaseSeeder extends Seeder
         ]);
         $user->assignRole("admin");
         $user->save();
+        User::factory(100)->create();
+
         $this->call(
             [
                 UserSeeder::class,
