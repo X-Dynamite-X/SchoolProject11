@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
                 RoleSeeder::class,
 
             ]
-        ); 
+        );
 
         $user = User::factory()->create([
             'name' => 'dynamite',
@@ -37,7 +37,6 @@ class DatabaseSeeder extends Seeder
                 SubjectSeeder::class,
                 ConversationSeeder::class,
                 MessageSeeder::class,
-
                 // SubjectUserSeeder::class
             ]
         );
