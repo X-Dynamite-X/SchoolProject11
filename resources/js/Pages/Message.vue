@@ -138,10 +138,9 @@ const sendMessage = (id) => {
     }
 };
 const createNewMessage = async (data) => {
-    const response = await messageStore.createMessage(data);
+      await messageStore.createMessage(data);
 
-    addChanelNewConversation(response.conversationId);
-};
+ };
 
 const toggleSidebar = () => {
     isSidebarVisible.value = !isSidebarVisible.value;
@@ -199,6 +198,7 @@ function responseNewMessage() {
         const addMessageChannel = window.Echo.private(
             `conversation_${conversationId}`
         );
+
         addMessageChannel.listen(".new-message", function (data) {
             if (data.sender_id != authStore.user.user.id) {
                 const newMessage = {
