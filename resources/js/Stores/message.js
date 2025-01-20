@@ -1,12 +1,9 @@
 import { defineStore } from "pinia";
 import $, { error, get } from "jquery";
-
 const csrf = () => $.get("/sanctum/csrf-cookie");
-
 export const useMessageStore = defineStore("message", {
     state: () => ({
         AllConversations: [],
-
         Errors: [],
     }),
     getters: {
@@ -26,7 +23,6 @@ export const useMessageStore = defineStore("message", {
                             url: "/api/conversation",
                             dataType: "json",
                             success: (response) => {
- 
                                 this.AllConversations = response.data;
                                 resolve(response);
                             },
@@ -99,10 +95,9 @@ export const useMessageStore = defineStore("message", {
                         data: {
                             conversation_id: data["conversationId"],
                             text: data["text"],
-                            created_at:data['created_at']
+                            created_at: data["created_at"],
                         },
                         success: (response) => {
-
                             resolve(response);
                         },
                         error: (error) => {

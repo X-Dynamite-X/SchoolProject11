@@ -4,7 +4,8 @@ import { useMessageStore } from "@/Stores/message";
 import { useAuthStore } from "@/Stores/Auth";
 import CloseIcon from "@/components/Icon/CloseIcon.vue";
 import MenuIcon from "@/components/Icon/MenuIcon.vue";
-
+import CheckDouble from "@/components/Icon/CheckDouble.vue";
+import Check from "@/components/Icon/Check.vue";
 const authStore = useAuthStore();
 const messageStore = useMessageStore();
 const loading = ref(true);
@@ -138,9 +139,8 @@ const sendMessage = (id) => {
     }
 };
 const createNewMessage = async (data) => {
-      await messageStore.createMessage(data);
-
- };
+    await messageStore.createMessage(data);
+};
 
 const toggleSidebar = () => {
     isSidebarVisible.value = !isSidebarVisible.value;
@@ -193,39 +193,59 @@ function addChanelNewConversation(conversationId) {
 }
 
 function responseNewMessage() {
-    for (let i = 0; i < conversations.value.length; i++) {
-        let conversationId = conversations.value[i].id;
-        const addMessageChannel = window.Echo.private(
-            `conversation_${conversationId}`
-        );
+    const connectedChannels = new Set();
 
-        addMessageChannel.listen(".new-message", function (data) {
-            if (data.sender_id != authStore.user.user.id) {
-                const newMessage = {
-                    id: data.message_id ?? null,
-                    sender_id: data.sender_id,
-                    text: data.text,
-                    created_at: data.created_at,
-                };
-                const existingConversation = conversations.value.find(
-                    (conv) => conv.id === data.conversation_id
-                );
+    // استخدام Map لتخزين المحادثات بحيث يسهل الوصول إليها
+    const conversationMap = new Map(
+        conversations.value.map((conv) => [conv.id, conv])
+    );
 
-                if (existingConversation) {
-                    existingConversation.messages.push(newMessage);
-                    if (activeChatId.value === data.conversation_id) {
-                        setTimeout(scrollToBottom, 100);
-                    }
-                    let index = conversations.value.findIndex(
-                        (conversation) =>
-                            conversation.id === data.conversation_id
+    // نمر عبر جميع المحادثات المتاحة
+    conversations.value.forEach((conversation) => {
+        if (!connectedChannels.has(conversation.id)) {
+            // الاتصال بالقناة الخاصة بالمحادثة
+            const addMessageChannel = window.Echo.private(
+                `conversation_${conversation.id}`
+            );
+
+            // إضافة القناة إلى مجموعة القنوات المتصلة
+            connectedChannels.add(conversation.id);
+
+            // الاستماع لرسائل جديدة
+            addMessageChannel.listen(".new-message", function (data) {
+                if (data.sender_id !== authStore.user.user.id) {
+                    const newMessage = {
+                        id: data.message_id ?? null,
+                        sender_id: data.sender_id,
+                        text: data.text,
+                        created_at: data.created_at,
+                    };
+
+                    // البحث عن المحادثة في المحادثات المتاحة
+                    const existingConversation = conversationMap.get(
+                        data.conversation_id
                     );
 
-                    moveConversationsInLastMessage(index);
+                    if (existingConversation) {
+                        // إضافة الرسالة الجديدة
+                        existingConversation.messages.push(newMessage);
+
+                        // التمرير للأسفل إذا كانت المحادثة هي النشطة
+                        if (activeChatId.value === data.conversation_id) {
+                            scrollToBottom();
+                        }
+
+                        // إعادة ترتيب المحادثات بناءً على آخر رسالة
+                        const index = conversations.value.findIndex(
+                            (conversation) =>
+                                conversation.id === data.conversation_id
+                        );
+                        moveConversationsInLastMessage(index);
+                    }
                 }
-            }
-        });
-    }
+            });
+        }
+    });
 }
 function moveConversationsInLastMessage(currentIndex) {
     if (currentIndex !== 0) {
@@ -352,15 +372,33 @@ function moveConversationsInLastMessage(currentIndex) {
                         ]"
                         class="p-2 rounded-lg max-w-md w-fit break-words"
                     >
+                        <!-- محتوى الرسالة -->
                         <div class="break-words">
                             {{ message.text }}
                         </div>
+
+                        <!-- وقت الإرسال -->
                         <div class="text-xs text-gray-400 mt-1">
                             {{ message.created_at }}
                         </div>
+
+                        <!-- حالة الرسالة (إذا كان المستخدم الحالي هو المرسل) -->
+                        <div
+                            v-if="message.sender_id == authStore.user.user.id"
+                            class="text-xs mt-1 flex items-center space-x-1 justify-end"
+                        >
+                            <span
+                                v-if="message.is_read == message.id % 2"
+                                >
+                                <CheckDouble />
+                            </span>
+                            <span v-else class="text-gray-400">
+                                <Check/>
+                                 
+                            </span>
+                        </div>
                     </div>
                 </div>
-
                 <footer
                     class="p-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700"
                 >
