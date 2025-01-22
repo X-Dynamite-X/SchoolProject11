@@ -87,7 +87,8 @@ const selectChat = (chatId) => {
     activeChatId.value = chatId;
     conversationId.value = chatId;
     isSidebarVisible.value = false;
-
+    messageStore.editCheckValueInMessage(chatId);
+    checkInAuntherUserIsReadMessageOrNot(chatId);
     setTimeout(scrollToBottom, 100);
 };
 const createChat = async (userId) => {
@@ -254,6 +255,33 @@ function moveConversationsInLastMessage(currentIndex) {
     }
     return conversations.value;
 }
+function isReadMessageInConversation(conversationId) {
+    const conversation = conversations.value.find(
+        (conversation) => conversation.id === conversationId
+    );
+    const messages = conversation.messages;
+    messages.forEach((message) => {
+        if (
+            message.is_read === false &&
+            message.sender_id === authStore.user.user.id
+        ) {
+            message.is_read = true;
+        }
+    });
+}
+function checkInAuntherUserIsReadMessageOrNot(conversationId) {
+    var channel = Echo.private(
+        `message_in_conversation_${conversationId}_isRead`
+    );
+    channel.listen(".read-message", function (data) {
+        // alert(data.conversation_id);
+        console.log(data.conversation_id);
+        console.log(data.messages);
+
+
+        isReadMessageInConversation(conversationId);
+    });
+}
 </script>
 
 <template>
@@ -387,14 +415,11 @@ function moveConversationsInLastMessage(currentIndex) {
                             v-if="message.sender_id == authStore.user.user.id"
                             class="text-xs mt-1 flex items-center space-x-1 justify-end"
                         >
-                            <span
-                                v-if="message.is_read == message.id % 2"
-                                >
+                            <span v-if="message.is_read == true">
                                 <CheckDouble />
                             </span>
                             <span v-else class="text-gray-400">
-                                <Check/>
-                                 
+                                <Check />
                             </span>
                         </div>
                     </div>

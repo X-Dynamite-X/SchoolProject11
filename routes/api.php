@@ -19,11 +19,13 @@ Route::get('/user', function (Request $request) {
     ]);
 })->middleware('auth:sanctum')->name("api.user");
 
-Route::resource('/conversation', ConversationController::class);
-Route::resource('/message', MessageController::class);
+// Route::resource('/conversation', ConversationController::class);
+// Route::resource('/message', MessageController::class);
 
-Route::middleware([  "auth:sanctum", "auth"])->group(function () {
-    // Route::resource('/conversation', ConversationController::class);
+Route::middleware([  "auth:sanctum", "auth"])->group(  function () {
+    Route::resource('/conversation', ConversationController::class);
+    Route::put('/conversation/{conversationId}/isRead',[ConversationController::class,'isOpenConversation']);
+    Route::resource('/message', MessageController::class);
 
 });
 Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefix("admin")->group(function () {

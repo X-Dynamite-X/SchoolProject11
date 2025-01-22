@@ -14,8 +14,14 @@ Broadcast::channel('conversation_{id}', function ($user, $id) {
     if (!$conversation) {
         return false;
     }
-     return (int) $conversation->user_one_id === (int) $user->id ||
-           (int) $conversation->user_two_id === (int) $user->id;
-
-    // return true;
+    return (int) $conversation->user_one_id === (int) $user->id ||
+        (int) $conversation->user_two_id === (int) $user->id;
+});
+Broadcast::channel('message_in_conversation_{id}_isRead', function ($user, $id) {
+    $conversation = Conversation::find($id);
+    if (!$conversation) {
+        return false;
+    }
+    return (int) $conversation->user_one_id === (int) $user->id ||
+        (int) $conversation->user_two_id === (int) $user->id;
 });

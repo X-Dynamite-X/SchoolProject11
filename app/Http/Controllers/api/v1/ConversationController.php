@@ -8,6 +8,7 @@ use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Events\Message\IsReadeMssages;
 use App\Events\Message\NewConversationEvent;
 use App\Http\Requests\Chat\ConversationRequest;
 use App\Http\Resources\Chat\ConversationResource;
@@ -28,7 +29,7 @@ class ConversationController extends Controller
                 'user2:id,name,email',
             ])
             ->get();
-        $conversations = $conversations->sortByDesc( function ($conversation) {
+        $conversations = $conversations->sortByDesc(function ($conversation) {
             if ($conversation->messages->isNotEmpty()) {
                 return $conversation->messages->last()->created_at;
             }
@@ -84,4 +85,19 @@ class ConversationController extends Controller
             'message' => 'Conversation created successfully.',
         ]);
     }
+    public function isOpenConversation(Conversation $conversationId)
+    {
+        $isNotReadMessages = $conversationId->messages->where('is_read', '!=', true)
+            ->where('sender_id', '!=', Auth::id());
+        foreach ($isNotReadMessages as $message) {
+            $message->update(['is_read' => true]);
+        }
+        if (sizeof($isNotReadMessages) > 0) {
+
+            // dd($isNotReadMessages);
+            broadcast(new IsReadeMssages($conversationId->id, $isNotReadMessages));
+        }
+        return response()->json(['message' => 'Conversation opened successfully.', "isNotReadMessages" => $isNotReadMessages]);
+    }
+    public function destroy() {}
 }

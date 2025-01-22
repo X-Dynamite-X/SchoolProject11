@@ -110,5 +110,23 @@ export const useMessageStore = defineStore("message", {
                 throw error;
             }
         },
+        async editCheckValueInMessage(conversationId){
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "put",
+                        url: `/api/conversation/${conversationId}/isRead`,
+                        dataType: "json",
+                        success: (response) => {
+                            console.log(response);
+                            resolve(response);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("User Fetch Error:", error);
+                throw error;
+            }
+        }
     },
 });

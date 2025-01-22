@@ -20,6 +20,7 @@ class MessageController extends Controller
                 'sender_id' => Auth::id(),
                 'conversation_id' => $request->input('conversation_id'),
                 'text' => $request->input('text'),
+                "is_read"=>false,
                 'created_at' => $request->input('created_at'),
                 "updated_at" => null,
             ]
@@ -33,4 +34,3 @@ class MessageController extends Controller
     public function update() {}
     public function delete() {}
 }
- 
