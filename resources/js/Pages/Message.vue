@@ -261,11 +261,9 @@ function isReadMessageInConversation(conversationId) {
     );
     const messages = conversation.messages;
     messages.forEach((message) => {
-        if (
-            message.is_read === false &&
-            message.sender_id === authStore.user.user.id
-        ) {
+        if (message.sender_id === authStore.user.user.id && !message.is_read) {
             message.is_read = true;
+            console.log(message);
         }
     });
 }
@@ -274,12 +272,7 @@ function checkInAuntherUserIsReadMessageOrNot(conversationId) {
         `message_in_conversation_${conversationId}_isRead`
     );
     channel.listen(".read-message", function (data) {
-        // alert(data.conversation_id);
-        console.log(data.conversation_id);
-        console.log(data.messages);
-
-
-        isReadMessageInConversation(conversationId);
+        isReadMessageInConversation(data.conversation_id);
     });
 }
 </script>
