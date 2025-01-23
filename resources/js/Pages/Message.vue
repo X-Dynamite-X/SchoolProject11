@@ -88,7 +88,8 @@ const selectChat = (chatId) => {
     conversationId.value = chatId;
     isSidebarVisible.value = false;
     messageStore.editCheckValueInMessage(chatId);
-    checkInAuntherUserIsReadMessageOrNot(chatId);
+    checkInAuntherUserIsReadMessageOrNot();
+
     setTimeout(scrollToBottom, 100);
 };
 const createChat = async (userId) => {
@@ -192,7 +193,6 @@ function addChanelNewConversation(conversationId) {
         }
     });
 }
-
 function responseNewMessage() {
     const connectedChannels = new Set();
 
@@ -231,9 +231,11 @@ function responseNewMessage() {
                         // إضافة الرسالة الجديدة
                         existingConversation.messages.push(newMessage);
 
-                        // التمرير للأسفل إذا كانت المحادثة هي النشطة
+                        // التحقق مما إذا كانت المحادثة النشطة هي نفس المحادثة الحالية
                         if (activeChatId.value === data.conversation_id) {
-                            scrollToBottom();
+                            // التمرير للأسفل
+                            setTimeout(scrollToBottom, 100);
+                            messageStore.editCheckValueInMessage(data.conversation_id);
                         }
 
                         // إعادة ترتيب المحادثات بناءً على آخر رسالة
@@ -248,6 +250,7 @@ function responseNewMessage() {
         }
     });
 }
+
 function moveConversationsInLastMessage(currentIndex) {
     if (currentIndex !== 0) {
         const [movedConversation] = conversations.value.splice(currentIndex, 1);
@@ -255,24 +258,76 @@ function moveConversationsInLastMessage(currentIndex) {
     }
     return conversations.value;
 }
+
 function isReadMessageInConversation(conversationId) {
+    // العثور على المحادثة بناءً على المعرف
     const conversation = conversations.value.find(
         (conversation) => conversation.id === conversationId
     );
-    const messages = conversation.messages;
-    messages.forEach((message) => {
+
+    // التحقق من وجود المحادثة
+    if (!conversation || !conversation.messages) {
+        console.warn(`Conversation with ID ${conversationId} not found.`);
+        return;
+    }
+
+    // تحديث الرسائل غير المقروءة
+    conversation.messages.forEach((message) => {
         if (message.sender_id === authStore.user.user.id && !message.is_read) {
             message.is_read = true;
-            console.log(message);
+            console.log(message.text);
         }
     });
 }
-function checkInAuntherUserIsReadMessageOrNot(conversationId) {
-    var channel = Echo.private(
-        `message_in_conversation_${conversationId}_isRead`
+
+const oldConversationId = ref(null);
+let checkReadMessageChannel = null;
+
+function checkInAuntherUserIsReadMessageOrNot() {
+    if (!activeChatId.value) {
+        console.warn("Invalid conversation ID.");
+        return;
+    }
+
+    // إذا كانت القناة مفتوحة لنفس المحادثة
+    console.log(
+        checkReadMessageChannel &&
+            oldConversationId.value === activeChatId.value
     );
-    channel.listen(".read-message", function (data) {
-        isReadMessageInConversation(data.conversation_id);
+
+    if (
+        checkReadMessageChannel &&
+        oldConversationId.value === activeChatId.value
+    ) {
+        console.log("Already listening to the active conversation channel.");
+
+        return isReadMessageInConversation(activeChatId.value);
+    }
+
+    // إذا كان هناك قناة مفتوحة بالفعل، قم بإيقاف الاستماع
+    if (checkReadMessageChannel) {
+        checkReadMessageChannel.stopListening(".read-message");
+        checkReadMessageChannel = null;
+    }
+
+    // تحديث معرف المحادثة القديمة
+    oldConversationId.value = activeChatId.value;
+    console.log("oldConversationId.value");
+    console.log(oldConversationId.value);
+
+    // إنشاء اشتراك جديد في القناة
+    checkReadMessageChannel = Echo.private(
+        `message_in_conversation_${activeChatId.value}_isRead`
+    );
+
+    // الاستماع لحدث "read-message"
+    checkReadMessageChannel.listen(".read-message", (data) => {
+        if (data.conversation_id) {
+            console.log("Read message event received:", data);
+            isReadMessageInConversation(data.conversation_id);
+        } else {
+            console.warn("Received data does not contain conversation_id.");
+        }
     });
 }
 </script>
