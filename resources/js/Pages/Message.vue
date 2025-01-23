@@ -275,7 +275,7 @@ function isReadMessageInConversation(conversationId) {
     conversation.messages.forEach((message) => {
         if (message.sender_id === authStore.user.user.id && !message.is_read) {
             message.is_read = true;
-            console.log(message.text);
+
         }
     });
 }
@@ -290,18 +290,14 @@ function checkInAuntherUserIsReadMessageOrNot() {
     }
 
     // إذا كانت القناة مفتوحة لنفس المحادثة
-    console.log(
-        checkReadMessageChannel &&
-            oldConversationId.value === activeChatId.value
-    );
+
 
     if (
         checkReadMessageChannel &&
         oldConversationId.value === activeChatId.value
     ) {
-        console.log("Already listening to the active conversation channel.");
-
-        return isReadMessageInConversation(activeChatId.value);
+    
+        return ;
     }
 
     // إذا كان هناك قناة مفتوحة بالفعل، قم بإيقاف الاستماع
@@ -312,8 +308,7 @@ function checkInAuntherUserIsReadMessageOrNot() {
 
     // تحديث معرف المحادثة القديمة
     oldConversationId.value = activeChatId.value;
-    console.log("oldConversationId.value");
-    console.log(oldConversationId.value);
+
 
     // إنشاء اشتراك جديد في القناة
     checkReadMessageChannel = Echo.private(
@@ -323,8 +318,7 @@ function checkInAuntherUserIsReadMessageOrNot() {
     // الاستماع لحدث "read-message"
     checkReadMessageChannel.listen(".read-message", (data) => {
         if (data.conversation_id) {
-            console.log("Read message event received:", data);
-            isReadMessageInConversation(data.conversation_id);
+             isReadMessageInConversation(data.conversation_id);
         } else {
             console.warn("Received data does not contain conversation_id.");
         }

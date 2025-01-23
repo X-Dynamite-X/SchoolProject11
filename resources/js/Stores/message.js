@@ -118,7 +118,7 @@ export const useMessageStore = defineStore("message", {
                         url: `/api/conversation/${conversationId}/isRead`,
                         dataType: "json",
                         success: (response) => {
-                            console.log(response);
+                             
                             resolve(response);
                         },
                     });
