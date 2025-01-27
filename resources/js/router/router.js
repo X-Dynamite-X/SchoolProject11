@@ -9,7 +9,7 @@ import ResetPassword from "@/Pages/Auth/ResetPassword.vue";
 import NotFound from "@/Pages/Errors/NotFound.vue"; // استيراد صفحة 404
 import UsersAdmin from "@/Pages/Admin/Users.vue";
 import Message from "@/Pages/Message.vue";
-
+import TestPage from "@/Pages/Admin/t.vue";
 import SubjectsAdmin from "@/Pages/Admin/Subjects.vue";
 
 const routes = [
@@ -51,7 +51,7 @@ const routes = [
     },
     {
         path: "/message",
-        component: Message,
+        component: TestPage,
         name: "message",
     },
     {
