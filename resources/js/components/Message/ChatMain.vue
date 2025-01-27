@@ -8,6 +8,8 @@ import ChatSidebar from "@/components/Message/ChatSidebar.vue";
 import ChatHeader from "@/components/Message/ChatHeader.vue";
 import ChatMessages from "@/components/Message/ChatMessages.vue";
 import ChatFooter from "@/components/Message/ChatFooter.vue";
+
+// المتغيرات العامة
 const authStore = useAuthStore();
 const messageStore = useMessageStore();
 const loading = ref(true);
@@ -15,9 +17,11 @@ const conversations = ref([]);
 const activeChatId = ref(null);
 const searchQuery = ref("");
 const isSidebarVisible = ref(true);
-const conversationQuery = ref([""]);
+const conversationQuery = ref([]);
 const conversationId = ref("");
-const messagesContainer = ref(null); // تأكد من أن القيمة الافتراضية هي null وليس string
+const messagesContainer = ref(null);
+const oldConversationId = ref(null);
+let checkReadMessageChannel = null;
 
 // استرجاع المحادثات
 const fetchDataConversation = async () => {
@@ -43,19 +47,17 @@ const moveConversationsInLastMessage = (currentIndex) => {
 
 // التمرير إلى أسفل
 const scrollToBottom = () => {
-    console.log("test");
-
     if (messagesContainer.value) {
-        messagesContainer.value.scrollTop =
-            messagesContainer.value.scrollHeight;
+        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
     }
 };
 
 provide("scrollToBottom", scrollToBottom);
+
 // تحديث الرسائل غير المقروءة
 const isReadMessageInConversation = (conversationId) => {
     const conversation = conversations.value.find(
-        (conversation) => conversation.id === conversationId
+        (conv) => conv.id === conversationId
     );
 
     if (!conversation || !conversation.messages) {
@@ -69,6 +71,8 @@ const isReadMessageInConversation = (conversationId) => {
         }
     });
 };
+
+// الاستجابة للرسائل الجديدة
 const responseNewMessage = () => {
     const connectedChannels = new Set();
     const conversationMap = new Map(
@@ -82,7 +86,7 @@ const responseNewMessage = () => {
             );
             connectedChannels.add(conversation.id);
 
-            addMessageChannel.listen(".new-message", function (data) {
+            addMessageChannel.listen(".new-message", (data) => {
                 if (data.sender_id !== authStore.user.user.id) {
                     const newMessage = {
                         id: data.message_id ?? null,
@@ -100,14 +104,12 @@ const responseNewMessage = () => {
 
                         if (activeChatId.value === data.conversation_id) {
                             setTimeout(scrollToBottom, 100);
-                            messageStore.editCheckValueInMessage(
-                                data.conversation_id
-                            );
+                       
+                            cheakMessageIsRead(data.conversation_id);
                         }
 
                         const index = conversations.value.findIndex(
-                            (conversation) =>
-                                conversation.id === data.conversation_id
+                            (conv) => conv.id === data.conversation_id
                         );
                         moveConversationsInLastMessage(index);
                     }
@@ -117,67 +119,42 @@ const responseNewMessage = () => {
     });
 };
 
-onMounted(() => {
-    fetchDataConversation();
-});
-const activeChat = computed(() => {
-    return conversations.value.find(
-        (conversation) => conversation.id === activeChatId.value
-    );
-});
-let debounceTimer = null;
-watch(searchQuery, (newQuery) => {
-    if (debounceTimer) {
-        clearTimeout(debounceTimer); // مسح المؤقت السابق إذا كان موجودًا
-    }
-
-    // إعداد مؤقت جديد ليتم التنفيذ بعد التوقف عن الكتابة
-    debounceTimer = setTimeout(async () => {
-        if (newQuery.length > 0) {
-            try {
-                const response = await messageStore.searchConversations(
-                    newQuery
-                );
-                if (response.conversations) {
-                    conversationQuery.value = response.conversations;
-                }
-            } catch (error) {
-                console.error("Error fetching conversations:", error);
-            }
-        }
-    }, 300); // الانتظار 300 مللي ثانية (يمكنك ضبطها)
-});
-const filteredChats = computed(() => {
-    if (searchQuery.value.length === 0) {
-        return conversations.value.filter((conversation) =>
-            conversation?.other_user?.name
-                ?.toLowerCase()
-                .includes(searchQuery.value.toLowerCase())
-        );
-    } else {
-        return conversationQuery.value.filter(
-            (conversation) => conversation.name
-        );
-    }
-});
-// تحديد محادثة
-
-const oldConversationId = ref(null);
-let checkReadMessageChannel = null;
-
+// تحديد المحادثة النشطة
 const selectChat = (chatId) => {
     activeChatId.value = chatId;
     conversationId.value = chatId;
     isSidebarVisible.value = false;
-    if(oldConversationId.value!==activeChatId.value){
-    messageStore.editCheckValueInMessage(chatId);
 
+    if (oldConversationId.value !== chatId) {
+        cheakMessageIsRead(chatId);
     }
-        checkInAuntherUserIsReadMessageOrNot();
+
+    checkInAuntherUserIsReadMessageOrNot();
 };
 
-// التحقق من قراءة الرسائل
+// التحقق من الرسائل غير المقروءة
+const cheakMessageIsRead = (conversationId) => {
+    const conversation = conversations.value.find(
+        (conv) => conv.id === conversationId
+    );
 
+    if (!conversation || !conversation.messages) {
+        console.warn(`Conversation with ID ${conversationId} not found.`);
+        return;
+    }
+
+    const hasUnreadMessages = conversation.messages.some(
+        (message) => message.sender_id !== authStore.user.user.id && !message.is_read
+    );
+
+    if (hasUnreadMessages) {
+        messageStore.editCheckValueInMessage(conversationId);
+    } else {
+        console.log("No unread messages found.");
+    }
+};
+
+// التحقق من قراءة الرسائل من المستخدم الآخر
 const checkInAuntherUserIsReadMessageOrNot = () => {
     if (!activeChatId.value) {
         console.warn("Invalid conversation ID.");
@@ -209,19 +186,19 @@ const checkInAuntherUserIsReadMessageOrNot = () => {
             console.warn("Received data does not contain conversation_id.");
         }
     });
-
 };
 
 // إنشاء محادثة جديدة
 const createChat = async (userId) => {
     const existingConversation = conversations.value.find(
-        (conversation) => conversation.other_user.id === userId
+        (conv) => conv.other_user.id === userId
     );
 
     if (existingConversation) {
         selectChat(existingConversation.id);
         return;
     }
+
     try {
         const response = await messageStore.createConversation(userId);
 
@@ -234,9 +211,12 @@ const createChat = async (userId) => {
         console.error("Failed to create conversation:", error);
     }
 };
+
+// تحديث استعلام البحث
 const updateSearchQuery = (newQuery) => {
     searchQuery.value = newQuery;
 };
+
 // إرسال رسالة
 const sendMessage = (userId, messageText) => {
     if (messageText.trim() && activeChat.value) {
@@ -253,16 +233,12 @@ const sendMessage = (userId, messageText) => {
             conversationId: activeChatId.value,
         };
 
-        // نقل المحادثة إلى الأعلى
         const currentIndex = conversations.value.findIndex(
-            (conversation) => conversation.id === activeChatId.value
+            (conv) => conv.id === activeChatId.value
         );
         moveConversationsInLastMessage(currentIndex);
 
-        // التمرير إلى الأسفل
         setTimeout(scrollToBottom, 100);
-
-        // إرسال الرسالة إلى الخادم
         createNewMessage(data);
     }
 };
@@ -277,8 +253,55 @@ const toggleSidebar = () => {
     isSidebarVisible.value = !isSidebarVisible.value;
 };
 
+// التحقق من عرض الشريط الجانبي على الشاشات الكبيرة
 const isWideScreen = computed(() => {
     return window.innerWidth >= 768;
+});
+
+// استرجاع المحادثات عند التحميل
+onMounted(() => {
+    fetchDataConversation();
+});
+
+// تحديد المحادثة النشطة
+const activeChat = computed(() => {
+    return conversations.value.find(
+        (conv) => conv.id === activeChatId.value
+    );
+});
+
+// مراقبة استعلام البحث
+let debounceTimer = null;
+watch(searchQuery, (newQuery) => {
+    if (debounceTimer) {
+        clearTimeout(debounceTimer);
+    }
+
+    debounceTimer = setTimeout(async () => {
+        if (newQuery.length > 0) {
+            try {
+                const response = await messageStore.searchConversations(newQuery);
+                if (response.conversations) {
+                    conversationQuery.value = response.conversations;
+                }
+            } catch (error) {
+                console.error("Error fetching conversations:", error);
+            }
+        }
+    }, 300);
+});
+
+// تصفية المحادثات
+const filteredChats = computed(() => {
+    if (searchQuery.value.length === 0) {
+        return conversations.value.filter((conv) =>
+            conv?.other_user?.name
+                ?.toLowerCase()
+                .includes(searchQuery.value.toLowerCase())
+        );
+    } else {
+        return conversationQuery.value.filter((conv) => conv.name);
+    }
 });
 </script>
 

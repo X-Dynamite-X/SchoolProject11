@@ -1,6 +1,22 @@
 import { defineStore } from "pinia";
 import $, { error, get } from "jquery";
-const csrf = () => $.get("/sanctum/csrf-cookie");
+let csrfV = null;
+
+const csrf = async () => {
+    if (csrfV === null) {
+        try {
+            // جلب الـ CSRF token إذا لم يكن موجودًا
+            csrfV = await $.get("/sanctum/csrf-cookie");
+            return csrfV;
+        } catch (error) {
+            console.error("Failed to fetch CSRF token:", error);
+            throw error; // إعادة رمي الخطأ للتعامل معه في مكان آخر
+        }
+    } else {
+        // إعادة الـ CSRF token المحفوظ إذا كان موجودًا
+        return csrfV;
+    }
+};
 export const useMessageStore = defineStore("message", {
     state: () => ({
         AllConversations: [],
@@ -61,7 +77,7 @@ export const useMessageStore = defineStore("message", {
             }
         },
         async createConversation(userId) {
-            await csrf();
+            // await csrf();
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -85,7 +101,7 @@ export const useMessageStore = defineStore("message", {
             }
         },
         async createMessage(data) {
-            await csrf();
+            // await csrf();
 
             try {
                 return new Promise((resolve, reject) => {
@@ -110,7 +126,7 @@ export const useMessageStore = defineStore("message", {
                 throw error;
             }
         },
-        async editCheckValueInMessage(conversationId){
+        async editCheckValueInMessage(conversationId) {
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -118,7 +134,6 @@ export const useMessageStore = defineStore("message", {
                         url: `/api/conversation/${conversationId}/isRead`,
                         dataType: "json",
                         success: (response) => {
-                             
                             resolve(response);
                         },
                     });
@@ -127,6 +142,6 @@ export const useMessageStore = defineStore("message", {
                 console.error("User Fetch Error:", error);
                 throw error;
             }
-        }
+        },
     },
 });
