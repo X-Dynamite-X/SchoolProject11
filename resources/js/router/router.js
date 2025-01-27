@@ -51,7 +51,7 @@ const routes = [
     },
     {
         path: "/message",
-        component: TestPage,
+        component: Message,
         name: "message",
     },
     {
