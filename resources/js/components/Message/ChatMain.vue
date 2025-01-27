@@ -161,17 +161,22 @@ const filteredChats = computed(() => {
     }
 });
 // تحديد محادثة
+
+const oldConversationId = ref(null);
+let checkReadMessageChannel = null;
+
 const selectChat = (chatId) => {
     activeChatId.value = chatId;
     conversationId.value = chatId;
     isSidebarVisible.value = false;
+    if(oldConversationId.value!==activeChatId.value){
     messageStore.editCheckValueInMessage(chatId);
-    checkInAuntherUserIsReadMessageOrNot();
+
+    }
+        checkInAuntherUserIsReadMessageOrNot();
 };
 
 // التحقق من قراءة الرسائل
-const oldConversationId = ref(null);
-let checkReadMessageChannel = null;
 
 const checkInAuntherUserIsReadMessageOrNot = () => {
     if (!activeChatId.value) {
@@ -204,6 +209,7 @@ const checkInAuntherUserIsReadMessageOrNot = () => {
             console.warn("Received data does not contain conversation_id.");
         }
     });
+
 };
 
 // إنشاء محادثة جديدة
