@@ -19,7 +19,7 @@
     <body>
         <div id="app"></div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+       
     </body>
 
  </html>
