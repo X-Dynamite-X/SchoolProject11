@@ -1,4 +1,3 @@
-import "@/axios";
 import "@/echo";
 
 import { createApp, markRaw } from "vue";

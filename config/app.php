@@ -14,7 +14,7 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
-    'frontend_url' => env('FRONTEND_URL', 'https://192.168.100.10:8000'),
+    'frontend_url' => env('FRONTEND_URL', 'https://localhost:8000'),
 
     /*
     |--------------------------------------------------------------------------

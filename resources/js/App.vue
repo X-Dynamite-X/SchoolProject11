@@ -17,6 +17,21 @@ const menuItems = [
         allUser: false,
         role: "admin",
     },
+    {
+        name: "Role",
+        to: "adminRole",
+        auth: true,
+        allUser: false,
+        role: "admin",
+    },
+    {
+        name: "Permission",
+        to: "adminPermission",
+        auth: true,
+        allUser: false,
+        role: "admin",
+    },
+
     { name: "Message", to: "message", auth: true, allUser: true },
     { name: "Home", to: "home", auth: true, allUser: true },
     { name: "Login", to: "login", auth: false, allUser: true },
