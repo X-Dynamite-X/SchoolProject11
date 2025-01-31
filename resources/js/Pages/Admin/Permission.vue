@@ -1,29 +1,34 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, onMounted } from "vue";
 import TabelTh from "@/components/Tabel/TabelTh.vue";
 import DataTable from "@/components/Tabel/DataTable.vue";
 import DynamicRow from "@/components/Tabel/DynamicRow.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
 import LodengSpiner from "@/components/AllApp/LodengSpiner.vue";
-
+import { usePermssionRoleStore } from "@/Stores/permissionRoles";
+const permissionRoleStore = usePermssionRoleStore();
 const newPermission = ref("");
 const loading = ref(false);
+const permissions = ref([]);
 
-const permissions = ref([
-    { id: 1, name: "User Management" },
-    { id: 2, name: "Delete" },
-    { id: 3, name: "Read" },
-    { id: 4, name: "Write" },
-    { id: 5, name: "Subject Management" },
-]);
-
+const fetchData = async () => {
+    loading.value = true;
+    try {
+        await permissionRoleStore.getPermission();
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    } finally {
+        loading.value = false;
+        permissions.value = permissionRoleStore.permissions;
+    }
+};
+onMounted(() => {
+    fetchData();
+});
 const createPermission = () => {
     if (!newPermission.value.trim()) return;
+    permissionRoleStore.createPermission(newPermission.value);
 
-    permissions.value.push({
-        id: permissions.value.length + 1,
-        name: newPermission.value,
-    });
     newPermission.value = "";
 };
 
@@ -64,10 +69,10 @@ const columnsPermissions = [
 
                 <button
                     @click="createPermission"
-                    :disabled="isLoading"
+                    :disabled="loading"
                     class="bg-blue-600 dark:bg-blue-700 text-white px-4 py-2 rounded hover:bg-blue-700 dark:hover:bg-blue-800"
                 >
-                    {{ isLoading ? "Saving..." : "Add Permission" }}
+                    {{ loading ? "Saving..." : "Add Permission" }}
                 </button>
             </div>
 

@@ -10,6 +10,8 @@ use App\Http\Controllers\api\v1\MessageController;
 use App\Http\Controllers\api\v1\SubjectController;
 use App\Http\Controllers\api\v1\ConversationController;
 use App\Http\Controllers\api\v1\SubjectUsersController;
+use App\Http\Controllers\api\PermissionRole\RoleController;
+use App\Http\Controllers\api\PermissionRole\PermissionController;
 
 
 
@@ -31,6 +33,8 @@ Route::middleware([  "auth:sanctum", "auth"])->group(  function () {
 Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefix("admin")->group(function () {
     Route::resource('/subject', SubjectController::class);
     Route::resource('/user', UserController::class);
+    Route::resource('/role', RoleController::class);
+    Route::resource('/permission', PermissionController::class);
     Route::prefix('subjectUsers/{subject}/')->controller(SubjectUsersController::class)-> group(function () {
         Route::post('/',"store")->name('subjectUsers.store');
         Route::put('/{user}',"update")->name("subjectUsers.update");
