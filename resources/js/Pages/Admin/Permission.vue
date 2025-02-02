@@ -5,6 +5,12 @@ import DataTable from "@/components/Tabel/DataTable.vue";
 import DynamicRow from "@/components/Tabel/DynamicRow.vue";
 import Alerts from "@/components/AllApp/Alerts.vue";
 import LodengSpiner from "@/components/AllApp/LodengSpiner.vue";
+import InputForm from "@/components/FieldRequst/InputForm.vue";
+import DynamicDelete from "@/components/Model/DynamicDelete.vue";
+import DynamicEdit from "@/components/Model/DynamicEdit.vue";
+import EditIcon from "@/components/Icon/EditIcon.vue";
+import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
+
 import { usePermssionRoleStore } from "@/Stores/permissionRoles";
 const permissionRoleStore = usePermssionRoleStore();
 const newPermission = ref("");
@@ -27,19 +33,61 @@ onMounted(() => {
 });
 const createPermission = () => {
     if (!newPermission.value.trim()) return;
+    permissionRoleStore.clearErrors();
     permissionRoleStore.createPermission(newPermission.value);
-
     newPermission.value = "";
 };
-
-const thNamePermissionsFields = ["ID", "Name"];
+const thNamePermissionsFields = ["ID", "Name", "Actions"];
 const columnsPermissions = [
+    { key: "actions" },
     { key: "id", label: "ID", showInTabel: true },
-    { key: "name", label: "Name", showInTabel: true },
+    {
+        key: "name",
+        label: "Name",
+        name: "name",
+        type: "text",
+        showInCreate: true,
+        showInEdit: true,
+        required: true,
+        showInTabel: true,
+        disabled: false,
+        placeholder: "Enter Name",
+    },
 ];
+const showEditModel = ref(false);
+const showDeleteModel = ref(false);
+const oldPermissionData = ref(null);
+const modelData = ref({});
+
+const openEditModel = (data) => {
+    showEditModel.value = true;
+    modelData.value = { ...data };
+    oldPermissionData.value = data.name || null;
+};
+
+const openDeleteModel = (data) => {
+    showDeleteModel.value = true;
+    modelData.value = { ...data };
+};
+
+const closeModal = (isEdit = false, saveChanges = false) => {
+    if (!isEdit && !saveChanges) {
+        if (oldPermissionData.value !== null) {
+            modelData.value.name = oldPermissionData.value;
+        }
+    }
+    showEditModel.value = false;
+    showDeleteModel.value = false;
+
+    permissionRoleStore.clearErrors();
+};
 </script>
 
 <template>
+    <template v-if="showAlert">
+        <Alerts :title="alertTitle" :message="alertMessage" />
+    </template>
+
     <template v-if="loading">
         <LodengSpiner />
     </template>
@@ -56,14 +104,16 @@ const columnsPermissions = [
 
                 <!-- نموذج إضافة صلاحية جديدة -->
                 <div class="mb-6">
-                    <label class="block text-gray-700 dark:text-gray-300">
-                        Permission Name:
-                    </label>
-                    <input
+                    <InputForm
                         type="text"
+                        name="permission"
+                        id="permission"
+                        autocomplete="permission"
+                        :required="true"
+                        placeholder="Permission Name"
+                        label="Permission Name"
                         v-model="newPermission"
-                        placeholder="Enter permission name"
-                        class="w-full p-2 border rounded mt-2 bg-gray-50 dark:bg-gray-700 dark:text-white border-gray-300 dark:border-gray-600"
+                        :errorMessage="permissionRoleStore.errors.name || null"
                     />
                 </div>
 
@@ -98,12 +148,48 @@ const columnsPermissions = [
                         />
                     </template>
                     <template #row="{ item }">
-                        <DynamicRow
-                            :item="item"
-                            :columns="columnsPermissions"
-                        />
+                        <DynamicRow :item="item" :columns="columnsPermissions">
+                            <template #column-actions="{ item }">
+                                <button
+                                    :id="item.id"
+                                    @click="openEditModel(item)"
+                                    class="px-3 py-1 mx-1 text-xs bg-stone-300 dark:bg-gray-800 text-yellow-400 hover:text-yellow-600 rounded"
+                                >
+                                    <EditIcon />
+                                </button>
+                                <button
+                                    @click="openDeleteModel(item)"
+                                    :id="item.id"
+                                    class="px-3 py-1 mx-1 bg-stone-300 dark:bg-gray-800 text-red-400 hover:text-red-600 rounded"
+                                >
+                                    <DeleteIcon />
+                                </button>
+                            </template>
+                        </DynamicRow>
                     </template>
                 </DataTable>
+                <DynamicEdit
+                    :data="modelData"
+                    :columns="columnsPermissions"
+                    :show="showEditModel"
+                    @close="closeModal"
+                    title="Edit Subject"
+                    @update="updateData"
+                >
+                </DynamicEdit>
+                <DynamicDelete
+                    :data="modelData"
+                    :columns="columns"
+                    :show="showDeleteModel"
+                    @close="closeModal"
+                    @delete="deleteData"
+                    title="Delete User"
+                >
+                    <template #message="{ data }">
+                        Are you sure you want to delete this Permission?
+                        <strong class="text-red-600">{{ data.name }}</strong>
+                    </template>
+                </DynamicDelete>
             </div>
         </div>
     </template>

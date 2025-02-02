@@ -40,7 +40,6 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                             url: "/api/admin/permission ",
                             dataType: "json",
                             success: (response) => {
-
                                 this.AllPermission = response.permissions;
                                 resolve(response);
                             },
@@ -72,21 +71,26 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                         dataType: "json",
                         success: (response) => {
                             this.AllPermission.push(response.data);
-
+                            this.Errors = [];
                             resolve(response);
                         },
                         error: (error) => {
                             const errors =
-                            error.responseJSON?.message ||
-                            "An error occurred";
+                                error.responseJSON?.message ||
+                                "An error occurred";
+                            this.Errors = error.responseJSON.errors;
                             reject(errors);
-                            },
+                        },
                     });
                 });
             } catch (error) {
-                console.error("User Fetch Error:", error);
+                console.error("User Fetch Error:", error.responseJSON?.errors);
                 throw error;
             }
         },
+        clearErrors() {
+            this.Errors = [];
+        },
     },
+
 });
