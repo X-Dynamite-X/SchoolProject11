@@ -76,7 +76,7 @@ export const useAdminStore = defineStore("admin", {
                     $.ajax({
                         type: "DELETE",
                         url: `/api/admin/user/${data.id}`,
-                        success: async (response) => {
+                        success:  (response) => {
                             this.AllUsers = this.AllUsers.filter(
                                 (user) => user.id !== data.id
                             );

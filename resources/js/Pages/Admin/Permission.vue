@@ -64,12 +64,38 @@ const openEditModel = (data) => {
     modelData.value = { ...data };
     oldPermissionData.value = data.name || null;
 };
-
+const updateData = async (updatedData) => {
+    try {
+        const response = await permissionRoleStore.updatePermission(updatedData); // تنفيذ التحديث عبر المتجر
+        const index = subjects.value.findIndex(
+            (subject) => subject.id === updatedData.id
+        );
+        if (index !== -1) {
+            subjects.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
+        }
+        closeModal(true, true);
+        viewAlert("success", response.message);
+    } catch (error) {
+        console.error("Error updating data:", error);
+        viewAlert("error", "Failed to update subject.");
+    }
+};
 const openDeleteModel = (data) => {
     showDeleteModel.value = true;
     modelData.value = { ...data };
 };
-
+const deleteData = async (data) => {
+    console.log("Deleting Subject:", data);
+    closeModal();
+    try {
+        const response = await permissionRoleStore.deletePermission(data);
+        viewAlert("success", response.message);
+    } catch (error) {
+        console.error("Error deleting Permission :", error);
+        // عرض إشعار الخطأ
+        viewAlert("error", "Failed to delete Permission .");
+    }
+};
 const closeModal = (isEdit = false, saveChanges = false) => {
     if (!isEdit && !saveChanges) {
         if (oldPermissionData.value !== null) {

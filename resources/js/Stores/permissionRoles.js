@@ -58,8 +58,6 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
             }
         },
         async createPermission(data) {
-            console.log(data);
-
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -88,9 +86,64 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 throw error;
             }
         },
+        async deletePermission(data) {
+            await csrf();
+
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "DELETE",
+                        url: `${data.id}`,
+                        dataType: "json",
+                        success: (response) => {
+                            console.log("Response:", response);
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            const errorMessage =
+                                error.responseJSON?.message ||
+                                "An error occurred";
+                            console.error("Error:", errorMessage);
+                            reject(errorMessage);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("Delete Permission Error:", error.message);
+                throw error;
+            }
+        },
+        async updatePermission(id, data) {
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "POST",
+                        url: `/api/admin/permission/${id}`,
+                        data: {
+                            name: data,
+                        },
+                        dataType: "json",
+                        success: (response) => {
+                            this.AllPermission.push(response.data);
+                            this.Errors = [];
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            const errors =
+                                error.responseJSON?.message ||
+                                "An error occurred";
+                            this.Errors = error.responseJSON.errors;
+                            reject(errors);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("User Fetch Error:", error.responseJSON?.errors);
+                throw error;
+            }
+        },
         clearErrors() {
             this.Errors = [];
         },
     },
-
 });

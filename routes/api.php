@@ -34,6 +34,7 @@ Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefi
     Route::resource('/subject', SubjectController::class);
     Route::resource('/user', UserController::class);
     Route::resource('/role', RoleController::class);
+    Route::delete('/permission2/{permission}', [PermissionController::class, 'destroy2']);
     Route::resource('/permission', PermissionController::class);
     Route::prefix('subjectUsers/{subject}/')->controller(SubjectUsersController::class)-> group(function () {
         Route::post('/',"store")->name('subjectUsers.store');
