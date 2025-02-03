@@ -93,7 +93,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "DELETE",
-                        url: `${data.id}`,
+                        url: `/api/admin/permission/${data.id}`,
                         dataType: "json",
                         success: (response) => {
                             console.log("Response:", response);

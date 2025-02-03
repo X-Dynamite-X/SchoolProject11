@@ -66,7 +66,9 @@ const openEditModel = (data) => {
 };
 const updateData = async (updatedData) => {
     try {
-        const response = await permissionRoleStore.updatePermission(updatedData); // تنفيذ التحديث عبر المتجر
+        const response = await permissionRoleStore.updatePermission(
+            updatedData
+        ); // تنفيذ التحديث عبر المتجر
         const index = subjects.value.findIndex(
             (subject) => subject.id === updatedData.id
         );
@@ -84,11 +86,15 @@ const openDeleteModel = (data) => {
     showDeleteModel.value = true;
     modelData.value = { ...data };
 };
+
 const deleteData = async (data) => {
     console.log("Deleting Subject:", data);
     closeModal();
     try {
         const response = await permissionRoleStore.deletePermission(data);
+        permissions.value = permissions.value.filter(
+            (permission) => permission.id !== data.id
+        );
         viewAlert("success", response.message);
     } catch (error) {
         console.error("Error deleting Permission :", error);
@@ -106,6 +112,20 @@ const closeModal = (isEdit = false, saveChanges = false) => {
     showDeleteModel.value = false;
 
     permissionRoleStore.clearErrors();
+};
+const showAlert = ref(false);
+const alertTitle = ref("");
+const alertMessage = ref("");
+
+const viewAlert = (title, message) => {
+    alertTitle.value = title;
+    alertMessage.value = message;
+    showAlert.value = true;
+
+    // إخفاء الإشعار تلقائيًا بعد 3 ثوانٍ
+    setTimeout(() => {
+        showAlert.value = false;
+    }, 3000);
 };
 </script>
 

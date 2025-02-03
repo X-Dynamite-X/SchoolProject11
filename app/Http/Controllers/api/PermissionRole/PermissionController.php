@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\api\PermissionRole;
 
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+
 use Spatie\Permission\Models\Permission;
-use App\Http\Requests\Admin\PermissionRole\StoreNewPermission;
 use App\Http\Requests\Admin\PermissionRole\UpdatePermission;
+use App\Http\Requests\Admin\PermissionRole\StoreNewPermission;
 
 class PermissionController extends Controller
 {
@@ -41,29 +42,38 @@ class PermissionController extends Controller
         return response()->json(["permission" => $permission, "message" => "updated is Success"]);
     }
 
-    public function destroy2(Permission $permission)
+    public function destroy(Permission $permission)
     {
-        // التحقق مما إذا تم العثور على الأذن
-        if (!$permission) {
-            return response()->json(["message" => "Permission not found"], 404);
+        $deleted = Permission::where("id", $permission->id)->delete();
+        if ($deleted) {
+            return response()->json([
+                "messages" => "success",
+                "message" => "Permission deleted successfully"
+            ]);
+        } else {
+            return response()->json([
+                "messages" => "error",
+                "message" => "Permission not found"
+            ], 404);
         }
-
-        // التحقق مما إذا كان الأذن مرتبطًا بأي دور
-        $roles = $permission->roles;
-        if ($roles->isNotEmpty()) {
-            return response()->json(["message" => "Cannot delete permission because it is assigned to roles."], 400);
-        }
-
-        // التحقق مما إذا كان الأذن مرتبطًا بأي مستخدم
-        $users = $permission->users;
-        if ($users->isNotEmpty()) {
-            return response()->json(["message" => "Cannot delete permission because it is assigned to users."], 400);
-        }
-
-        // حذف الأذن
-        $permission->delete();
-
-        // إعادة استجابة JSON بنجاح
-        return response()->json(["message" => "Permission deleted successfully"]);
     }
+
+
+    // public function destroy(Permission $permission)
+    // {
+    //     // حذف السجل باستخدام Query Builder
+    //     $deleted = DB::table('permissions')->where('id', $permission->id)->delete();
+
+    //     if ($deleted) {
+    //         return response()->json([
+    //             "messages" => "success",
+    //             "message" => "Permission deleted successfully"
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             "messages" => "error",
+    //             "message" => "Permission not found"
+    //         ], 404);
+    //     }
+    // }
 }
