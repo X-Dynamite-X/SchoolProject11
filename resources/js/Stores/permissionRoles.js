@@ -113,18 +113,19 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 throw error;
             }
         },
-        async updatePermission(id, data) {
+        async updatePermission(data) {
+            console.log(data.name);
+            
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
-                        type: "POST",
-                        url: `/api/admin/permission/${id}`,
+                        type: "Put",
+                        url:`/api/admin/permission/${data.id}`,
                         data: {
-                            name: data,
+                            name: data.name,
                         },
                         dataType: "json",
                         success: (response) => {
-                            this.AllPermission.push(response.data);
                             this.Errors = [];
                             resolve(response);
                         },

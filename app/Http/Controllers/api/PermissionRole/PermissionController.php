@@ -37,7 +37,7 @@ class PermissionController extends Controller
 
     public function update(UpdatePermission $request, Permission $permission)
     {
-        $permission->merge($request->validated());
+        $permission->update($request->validated());
         $permission->save();
         return response()->json(["permission" => $permission, "message" => "updated is Success"]);
     }

@@ -22,7 +22,17 @@ class UpdatePermission extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "name" => "required|string|min:2|unique:permissions,name",
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            "name.required" => "The permission name is required.",
+            "name.string" => "The permission name must be a string.",
+            "name.min" => "The permission name must be at least 2 characters.",
+            "name.unique" => "The permission name already exists.",
         ];
     }
 }

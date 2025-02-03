@@ -65,15 +65,15 @@ const openEditModel = (data) => {
     oldPermissionData.value = data.name || null;
 };
 const updateData = async (updatedData) => {
+    // console.log(updatedData);
+    
     try {
-        const response = await permissionRoleStore.updatePermission(
-            updatedData
-        ); // تنفيذ التحديث عبر المتجر
-        const index = subjects.value.findIndex(
-            (subject) => subject.id === updatedData.id
+        const response = await permissionRoleStore.updatePermission(updatedData); // تنفيذ التحديث عبر المتجر
+        const index = permissions.value.findIndex(
+            (permission) => permission.id === updatedData.id
         );
         if (index !== -1) {
-            subjects.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
+            permissions.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
         }
         closeModal(true, true);
         viewAlert("success", response.message);
