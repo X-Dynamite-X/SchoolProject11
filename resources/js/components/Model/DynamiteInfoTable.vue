@@ -408,6 +408,8 @@ const viewAlert = (title, message) => {
                 title="Edit Subject"
                 @update="updateData"
                 :data2="modelData.pivot"
+                :errors="adminStore"
+
             >
             </DynamicEdit>
             <DynamicDelete

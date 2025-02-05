@@ -11,7 +11,7 @@ class UpdatePermission extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->hasRole("admin");
+        return auth()->check() && auth()->user()->hasRole("admin");
     }
 
     /**
@@ -35,4 +35,10 @@ class UpdatePermission extends FormRequest
             "name.unique" => "The permission name already exists.",
         ];
     }
+    public function attributes(): array
+{
+    return [
+        "name" => "updateName",
+    ];
+}
 }

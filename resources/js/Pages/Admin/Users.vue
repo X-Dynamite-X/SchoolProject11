@@ -405,6 +405,8 @@ const viewAlert = (title, message) => {
                 @close="closeModal"
                 title="Edit User"
                 @update="updateData"
+                :errors="adminStore"
+
             >
                 <template #column-roles="{ data, column }">
                     <InputRadio
@@ -419,6 +421,7 @@ const viewAlert = (title, message) => {
                         :errorMessage="adminStore.errors[column.key]||null"
                         :autocomplete="column.autocomplete"
                         v-model="data[column.key][0].name"
+                        
                     />
                 </template>
             </DynamicEdit>

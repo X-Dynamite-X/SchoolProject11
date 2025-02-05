@@ -366,6 +366,8 @@ const viewAlert = (title, message) => {
                 @close="closeModal"
                 title="Edit Subject"
                 @update="updateData"
+                :errors="adminStore"
+
             >
             </DynamicEdit>
             <DynamicDelete

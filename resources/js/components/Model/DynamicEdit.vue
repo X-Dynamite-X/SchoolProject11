@@ -24,6 +24,10 @@ const prpos =defineProps({
     data2:{
         type:Object,
         default:null
+    },
+    errors:{
+        type:Object,
+        default:null
     }
 });
 
@@ -86,6 +90,7 @@ const updateModal = () => {
                                             :data="data"
                                             :column="column"
                                         >
+                                        {{ prpos.errors.errors[column.name] }}
                                             <!-- العرض الافتراضي إذا لم يكن هناك slot -->
                                             <InputForm
                                                 v-if="column.key !== 'id' && column.showInEdit"
@@ -96,7 +101,7 @@ const updateModal = () => {
                                                 :modelValue="prpos.data[column.key] ? prpos.data[column.key]:data2[column.name]"
                                                 :placeholder="column.placeholder"
                                                 :required="column.required"
-                                                :errorMessage="adminStore.errors[column.name] || null"
+                                                :errorMessage="prpos.errors.errors[column.name] || null"
                                                 :autocomplete="column.autocomplete"
                                                 :disabled="column.disabled"
                                                 @update:modelValue="value => prpos.data[column.key] = value"
