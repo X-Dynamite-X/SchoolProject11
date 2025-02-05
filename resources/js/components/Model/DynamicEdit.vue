@@ -90,7 +90,6 @@ const updateModal = () => {
                                             :data="data"
                                             :column="column"
                                         >
-                                        {{ prpos.errors.errors[column.name] }}
                                             <!-- العرض الافتراضي إذا لم يكن هناك slot -->
                                             <InputForm
                                                 v-if="column.key !== 'id' && column.showInEdit"

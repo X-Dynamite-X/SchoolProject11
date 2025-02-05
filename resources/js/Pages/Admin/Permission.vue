@@ -62,9 +62,17 @@ const modelData = ref({});
 const openEditModel = (data) => {
     showEditModel.value = true;
     modelData.value = { ...data };
-    columnsPermissions[2].name = "updateName"
+    
+    // البحث عن العنصر الذي يحتوي على key: "name"
+    const nameColumn = columnsPermissions.find(col => col.key === "name");
+    
+    if (nameColumn) {
+        nameColumn.name = "updateName"; // تغيير الاسم
+    }
+
     oldPermissionData.value = data.name || null;
 };
+
 const updateData = async (updatedData) => {
     // console.log(updatedData);
 
