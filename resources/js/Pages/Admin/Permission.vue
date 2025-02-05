@@ -62,13 +62,16 @@ const modelData = ref({});
 const openEditModel = (data) => {
     showEditModel.value = true;
     modelData.value = { ...data };
+    columnsPermissions[2].name = "updateName"
     oldPermissionData.value = data.name || null;
 };
 const updateData = async (updatedData) => {
     // console.log(updatedData);
-    
+
     try {
-        const response = await permissionRoleStore.updatePermission(updatedData); // تنفيذ التحديث عبر المتجر
+        const response = await permissionRoleStore.updatePermission(
+            updatedData
+        ); // تنفيذ التحديث عبر المتجر
         const index = permissions.value.findIndex(
             (permission) => permission.id === updatedData.id
         );
@@ -226,7 +229,6 @@ const viewAlert = (title, message) => {
                 </DynamicEdit>
                 <DynamicDelete
                     :data="modelData"
-                    :columns="columns"
                     :show="showDeleteModel"
                     @close="closeModal"
                     @delete="deleteData"

@@ -3,12 +3,16 @@
 namespace App\Http\Requests\Admin\PermissionRole;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdatePermission extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
+
+
     public function authorize(): bool
     {
         return auth()->check() && auth()->user()->hasRole("admin");
@@ -35,10 +39,18 @@ class UpdatePermission extends FormRequest
             "name.unique" => "The permission name already exists.",
         ];
     }
-    public function attributes(): array
-{
-    return [
-        "name" => "updateName",
-    ];
-}
+    public function failedValidation(Validator $validator)
+    {
+        $errors = $validator->errors()->getMessages();
+
+        // تغيير مفتاح الخطأ من "name" إلى "updateName"
+        if (isset($errors["name"])) {
+            $errors["updateName"] = $errors["name"];
+            unset($errors["name"]);
+        }
+
+        throw new HttpResponseException(response()->json([
+            "errors" => $errors
+        ], 422));
+    }
 }
