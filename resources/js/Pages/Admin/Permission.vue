@@ -41,8 +41,8 @@ const createPermission = async () => {
         permissions.value.push(response.data);
         viewAlert("success", response.message);
     } catch (error) {
-        console.error("Error updating data:", error);
-        viewAlert("error", "Failed to update subject.");
+        console.error("Error create data:", error);
+        viewAlert("error", "Failed to Create Permission.");
     }
     newPermission.value = "";
 };
@@ -99,7 +99,7 @@ const updateData = async (updatedData) => {
         viewAlert("success", response.message);
     } catch (error) {
         console.error("Error updating data:", error);
-        viewAlert("error", "Failed to update subject.");
+        viewAlert("error", "Failed to update Permission.");
     }
 };
 const openDeleteModel = (data) => {
@@ -108,7 +108,7 @@ const openDeleteModel = (data) => {
 };
 
 const deleteData = async (data) => {
-    console.log("Deleting Subject:", data);
+    console.log("Deleting Permission:", data);
     closeModal();
     try {
         const response = await permissionRoleStore.deletePermission(data);
@@ -239,7 +239,7 @@ const viewAlert = (title, message) => {
                     :columns="columnsPermissions"
                     :show="showEditModel"
                     @close="closeModal"
-                    title="Edit Subject"
+                    title="Edit Permission"
                     @update="updateData"
                     :errors="permissionRoleStore"
                 >
@@ -249,7 +249,7 @@ const viewAlert = (title, message) => {
                     :show="showDeleteModel"
                     @close="closeModal"
                     @delete="deleteData"
-                    title="Delete User"
+                    title="Delete Permission"
                 >
                     <template #message="{ data }">
                         Are you sure you want to delete this Permission?

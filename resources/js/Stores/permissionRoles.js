@@ -97,6 +97,9 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                         dataType: "json",
                         success: (response) => {
                             console.log("Response:", response);
+                            this.AllPermission =   this.AllPermission.filter(
+                                (permission) => permission.id !== data.id
+                            );
                             resolve(response);
                         },
                         error: (error) => {
