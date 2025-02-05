@@ -31,10 +31,19 @@ const fetchData = async () => {
 onMounted(() => {
     fetchData();
 });
-const createPermission = () => {
+const createPermission = async () => {
     if (!newPermission.value.trim()) return;
     permissionRoleStore.clearErrors();
-    permissionRoleStore.createPermission(newPermission.value);
+    try {
+        const response = await permissionRoleStore.createPermission(
+            newPermission.value
+        );
+        permissions.value.push(response.data);
+        viewAlert("success", response.message);
+    } catch (error) {
+        console.error("Error updating data:", error);
+        viewAlert("error", "Failed to update subject.");
+    }
     newPermission.value = "";
 };
 const thNamePermissionsFields = ["ID", "Name", "Actions"];
@@ -62,10 +71,10 @@ const modelData = ref({});
 const openEditModel = (data) => {
     showEditModel.value = true;
     modelData.value = { ...data };
-    
+
     // البحث عن العنصر الذي يحتوي على key: "name"
-    const nameColumn = columnsPermissions.find(col => col.key === "name");
-    
+    const nameColumn = columnsPermissions.find((col) => col.key === "name");
+
     if (nameColumn) {
         nameColumn.name = "updateName"; // تغيير الاسم
     }

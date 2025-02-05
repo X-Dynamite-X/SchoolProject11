@@ -68,7 +68,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                         },
                         dataType: "json",
                         success: (response) => {
-                            this.AllPermission.push(response.data);
+                            // this.AllPermission.push(response.data);
                             this.Errors = [];
                             resolve(response);
                         },
