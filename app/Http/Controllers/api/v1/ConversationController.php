@@ -39,29 +39,20 @@ class ConversationController extends Controller
         // إرجاع البيانات باستخدام Resource
         return ConversationResource::collection($conversations);
     }
-
-
-
     public function show(Request $request)
     {
         $userId = Auth::id(); // استبدل بـ Auth::id() للحصول على ID المستخدم المُسجل دخوله
         $serch = $request->input('serch');
 
-        // البحث مع استبعاد المستخدم الحالي
-        $conversations = User::where(function ($query) use ($serch) {
-            $query->where('name', 'LIKE', "%" . $serch . "%")
-                ->orWhere('email', 'LIKE', "%" . $serch . "%");
-        })
+        $conversations = User::whereAny(["name", "email"], 'LIKE', "%$serch%")
             ->where('id', '!=', $userId) // استبعاد المستخدم الحالي
             ->limit(15)
-            ->get(['id', 'name']); // إرجاع الحقول المطلوبة فقط
-
+            ->get(['id', 'name', "email"]);
         return response()->json([
             'conversations' => $conversations,
             'message' => "Conversations fetched successfully."
         ]);
     }
-
     public function store(ConversationRequest $request)
     {
 
