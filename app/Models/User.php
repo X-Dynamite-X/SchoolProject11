@@ -12,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens , HasFactory, Notifiable ,HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -47,6 +47,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function guardName()
+    {
+        return 'sanctum';
+    }
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'subject_users')->withPivot('mark');
@@ -55,7 +59,4 @@ class User extends Authenticatable
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
-
-
-
 }

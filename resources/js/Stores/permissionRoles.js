@@ -25,7 +25,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
     }),
     getters: {
         permissions: (state) => state.AllPermission,
-        role: (state) => state.AllRole,
+        roles: (state) => state.AllRole,
         errors: (state) => state.Errors,
     },
     actions: {
@@ -68,7 +68,6 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                         },
                         dataType: "json",
                         success: (response) => {
-                            // this.AllPermission.push(response.data);
                             this.Errors = [];
                             resolve(response);
                         },
@@ -96,8 +95,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                         url: `/api/admin/permission/${data.id}`,
                         dataType: "json",
                         success: (response) => {
-                            console.log("Response:", response);
-                            this.AllPermission =   this.AllPermission.filter(
+                            this.AllPermission = this.AllPermission.filter(
                                 (permission) => permission.id !== data.id
                             );
                             resolve(response);
@@ -117,13 +115,11 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
             }
         },
         async updatePermission(data) {
-            console.log(data.name);
-            
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "Put",
-                        url:`/api/admin/permission/${data.id}`,
+                        url: `/api/admin/permission/${data.id}`,
                         data: {
                             name: data.name,
                         },
@@ -146,6 +142,68 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 throw error;
             }
         },
+        async getRole(){
+            if (this.AllPermission.length > 0) {
+                return this.AllPermission;
+            } else {
+                try {
+                    return new Promise((resolve, reject) => {
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/admin/role ",
+                            dataType: "json",
+                            success: (response) => {
+                                this.AllRole = response.roles;
+
+                                resolve(response);
+                            },
+                            error: (error) => {
+                                const errors =
+                                    error.responseJSON?.message ||
+                                    "An error occurred";
+                                reject(errors);
+                            },
+                        });
+                    });
+                } catch (error) {
+                    console.error("User Fetch Error:", error);
+                    throw error;
+                }
+            }
+        },
+        async createRole(data){
+            console.log(data);
+            
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/admin/role ",
+                        data: {
+                            name: data.name,
+                            permissions: data.permissions,
+                        },
+                        dataType: "json",
+                        success: (response) => {
+                            this.Errors = [];
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            const errors =
+                                error.responseJSON?.message ||
+                                "An error occurred";
+                            this.Errors = error.responseJSON.errors;
+                            reject(errors);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("User Fetch Error:", error.responseJSON?.errors);
+                throw error;
+            }
+        },
+        async deleteRole(data){},
+        async updateRole(data){},
         clearErrors() {
             this.Errors = [];
         },

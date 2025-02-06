@@ -5,6 +5,9 @@ namespace App\Http\Controllers\api\PermissionRole;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
+use App\Http\Requests\Admin\PermissionRole\UpdateRole;
+use App\Http\Requests\Admin\PermissionRole\StoreNewRole;
+use App\Http\Resources\RoleResource;
 
 class RoleController extends Controller
 {
@@ -13,15 +16,30 @@ class RoleController extends Controller
      */
     public function index()
     {
-        //
+        $roles = Role::with("permissions")->get(["id", "name"]);
+        return response()->json(["roles" => RoleResource::collection($roles)]);
     }
+
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreNewRole $request)
     {
         //
+        $role = Role::create([
+            "name" => $request->name,
+        ]);
+        $role->givePermissionTo($request->permissions);
+        $role->save();
+        $role->load("permissions");
+        $permissionsNames = $role->permissions->pluck('name');
+
+        return response()->json([
+            "role" => $role->only(["id", "name"]),
+            "permissions" => $permissionsNames,
+            "message" => "created is Success"
+        ]);
     }
 
     /**

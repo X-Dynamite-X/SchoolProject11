@@ -41,4 +41,4 @@ Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefi
         Route::delete('/{user}', "destroy")->name("subjectUsers.destroy");
     });
 });
-// Route::resource('/permission', PermissionController::class);
+Route::resource('/role', RoleController::class);

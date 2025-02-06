@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class RoleSeeder extends Seeder
 {
@@ -13,15 +13,21 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        //
-        $role = [
+        $roles = [
             "admin",
             "user"
         ];
-        foreach ($role as $key => $value) {
-            Role::create([
-                'name' => $value
+
+        foreach ($roles as $roleName) {
+            $newRole = Role::firstOrCreate([
+                'name' => $roleName,
             ]);
+
+            if ($newRole->name === "admin") {
+                $newRole->givePermissionTo("allPermission");
+            } elseif ($newRole->name === "user") {
+                $newRole->givePermissionTo(["Read", "Write", "Update", "Delete"]);
+            }
         }
     }
 }

@@ -14,14 +14,14 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         //
-            //    User::factory(10)->create();
+               User::factory(10)->create();
 
-        // for ($count = 2; $count <= 11; $count++) {
-        //     $user = User::find($count);
-        //     $user->assignRole("user");
-        //     $user->save();
-        // }
-        for($count =0 ;$count <= 150 ;$count++){
+        for ($count = 2; $count <= 11; $count++) {
+            $user = User::find($count);
+            $user->assignRole("user");
+            $user->save();
+        }
+        for($count =0 ;$count <= 30 ;$count++){
             User::create([
                 "name"=>"dynamite_".$count,
                 "email"=>"dynamite_".$count."@gmail.com",
