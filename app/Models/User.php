@@ -47,10 +47,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-    public function guardName()
-    {
-        return 'sanctum';
-    }
+    
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'subject_users')->withPivot('mark');

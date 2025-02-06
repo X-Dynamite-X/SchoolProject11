@@ -54,7 +54,7 @@ const createRole = async () => {
             id: response.role.id,
             name: response.role.name,
             permissions: permissions
-        });read
+        });
 
         viewAlert("success", response.message);
     } catch (error) {
@@ -66,15 +66,7 @@ const createRole = async () => {
     selectedPermissions.value = [];
 };
 
-/**
- * Read
- * write
- * update
- * delete
- * 
-
- * 
- */
+ 
 const thNameUsersFields = ["ID", "Name", "Permissions"];
 const columnsUsers = [
     { key: "id", label: "ID", showInTabel: true },
