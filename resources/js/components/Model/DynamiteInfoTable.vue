@@ -456,7 +456,7 @@ const viewAlert = (title, message) => {
                         class="mt-3 mx-1 inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-100 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-green-700 sm:mt-0 sm:w-auto"
                         @click="createData(formData.value)"
                     >
-                        Create2
+                        Create
                     </button>
                 </template>
             </DynamicCreate>
