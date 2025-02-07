@@ -95,7 +95,6 @@ router.beforeEach(async (to, from, next) => {
     const isAuthenticated = authStore.user;
     const userRole = isAuthenticated?.user?.roles?.[0].name || null;
 
-
     const publicPages = [
         "login",
         "register",
