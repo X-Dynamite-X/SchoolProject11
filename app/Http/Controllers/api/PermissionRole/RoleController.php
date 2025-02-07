@@ -16,7 +16,8 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::with("permissions")->get(["id", "name"]);
+
+        $roles = Role::with("permissions")->where("guard_name","sanctum")->get(["id", "name","guard_name"]);
         return response()->json(["roles" => RoleResource::collection($roles)]);
     }
 

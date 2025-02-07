@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import TabelTh from "@/components/Tabel/TabelTh.vue";
 import DataTable from "@/components/Tabel/DataTable.vue";
 import DynamicRow from "@/components/Tabel/DynamicRow.vue";
@@ -10,13 +10,23 @@ import DynamicDelete from "@/components/Model/DynamicDelete.vue";
 import DynamicEdit from "@/components/Model/DynamicEdit.vue";
 import EditIcon from "@/components/Icon/EditIcon.vue";
 import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
-
+import SearchInput from "@/components/FieldRequst/SearchInput.vue";
+import SearchIcon from "@/components/Icon/SearchIcon.vue";
+import Pagination from "@/components/Tabel/Pagination.vue";
+import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
 import { usePermssionRoleStore } from "@/Stores/permissionRoles";
 const permissionRoleStore = usePermssionRoleStore();
 const newPermission = ref("");
 const loading = ref(false);
-const permissions = ref([]);
+const permissions = computed(() => permissionRoleStore.permissions);
+const searchKeyword = ref("");
+const limitPermission = ref(10);
+const totalItems = ref(0);
+const currentPage = ref(1);
+const sortColumn = ref("id");
+const sortDirection = ref("asc");
 
+// جلب البيانات من المتجر
 const fetchData = async () => {
     loading.value = true;
     try {
@@ -25,9 +35,76 @@ const fetchData = async () => {
         console.error("Error fetching data:", error);
     } finally {
         loading.value = false;
-        permissions.value = permissionRoleStore.permissions;
     }
 };
+watch(searchKeyword, () => {
+    currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
+});
+
+// مراقبة التغييرات في عدد العناصر لكل صفحة
+watch(limitPermission, () => {
+    currentPage.value = 1; // إعادة تعيين الصفحة الحالية إلى 1
+});
+
+// تصفيح البيانات بناءً على كلمة البحث
+const filteredPermissions = computed(() => {
+    const keyword = searchKeyword.value.toLowerCase().trim();
+    return permissions.value.filter((permission) =>
+        permission.name.toLowerCase().includes(keyword)
+    );
+});
+
+// حساب العناصر المعروضة بعد التصفية والفرز
+const paginatedPermissions = computed(() => {
+    const startIndex = (currentPage.value - 1) * limitPermission.value;
+    const endIndex = startIndex + limitPermission.value;
+    return sortedPermissions.value.slice(startIndex, endIndex);
+});
+
+// حساب إجمالي عدد الصفحات
+const totalPages = computed(() =>
+    Math.ceil(filteredPermissions.value.length / limitPermission.value)
+);
+
+// تغيير الصفحة
+const changePage = (page) => {
+    if (page >= 1 && page <= totalPages.value) {
+        currentPage.value = page;
+    }
+};
+
+// تحديث عدد العناصر في الصفحة
+const updateItemsPerPage = (newLimit) => {
+    limitPermission.value = newLimit;
+    currentPage.value = 1; // إعادة ضبط الصفحة إلى الأولى
+};
+
+// تغيير العمود المستخدم للفرز
+const sort = (columnKey) => {
+    if (!columnKey) return;
+
+    if (sortColumn.value === columnKey) {
+        sortDirection.value = sortDirection.value === "asc" ? "desc" : "asc";
+    } else {
+        sortColumn.value = columnKey;
+        sortDirection.value = "asc";
+    }
+};
+
+// فرز البيانات بناءً على العمود والاتجاه
+const sortedPermissions = computed(() => {
+    if (!sortColumn.value) return filteredPermissions.value;
+
+    return [...filteredPermissions.value].sort((a, b) => {
+        const valA = a[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
+        const valB = b[sortColumn.value] ?? ""; // معالجة القيم غير المعرفة أو null
+
+        if (valA < valB) return sortDirection.value === "asc" ? -1 : 1;
+        if (valA > valB) return sortDirection.value === "asc" ? 1 : -1;
+        return 0;
+    });
+});
+
 onMounted(() => {
     fetchData();
 });
@@ -46,7 +123,8 @@ const createPermission = async () => {
     }
     newPermission.value = "";
 };
-const thNamePermissionsFields = ["ID", "Name", "Actions"];
+
+const thNamePermissionsFields = ["ID", "Name", "Guard Name", "Actions"];
 const columnsPermissions = [
     { key: "actions" },
     { key: "id", label: "ID", showInTabel: true },
@@ -62,6 +140,7 @@ const columnsPermissions = [
         disabled: false,
         placeholder: "Enter Name",
     },
+    { key: "guard_name", label: "guard_name", showInTabel: true },
 ];
 const showEditModel = ref(false);
 const showDeleteModel = ref(false);
@@ -201,8 +280,30 @@ const viewAlert = (title, message) => {
                 >
                     Permissions List
                 </h3>
+                <div
+                    class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between space-x-4 pb-4"
+                >
+                    <div class="relative">
+                        <SearchInput
+                            v-model="searchKeyword"
+                            placeholder="Search Permissions..."
+                            class="w-full"
+                        >
+                            <template #icon>
+                                <SearchIcon />
+                            </template>
+                        </SearchInput>
+                    </div>
+                    <div>
+                        <ItemsPerPage
+                            :modelValue="limitPermission"
+                            v-model="limitPermission"
+                            @update:modelValue="updateItemsPerPage"
+                        />
+                    </div>
+                </div>
                 <DataTable
-                    :data="permissions"
+                    :data="paginatedPermissions"
                     :availableData="false"
                     :loading="false"
                 >
@@ -214,7 +315,7 @@ const viewAlert = (title, message) => {
                         />
                     </template>
                     <template #row="{ item }">
-                        <DynamicRow :item="item" :columns="columnsPermissions">
+                        <DynamicRow :item="item"  :columns="columnsPermissions">
                             <template #column-actions="{ item }">
                                 <button
                                     :id="item.id"
@@ -234,6 +335,11 @@ const viewAlert = (title, message) => {
                         </DynamicRow>
                     </template>
                 </DataTable>
+                <Pagination
+                    :currentPage="currentPage"
+                    :totalPages="totalPages"
+                    @change-page="changePage"
+                />
                 <DynamicEdit
                     :data="modelData"
                     :columns="columnsPermissions"

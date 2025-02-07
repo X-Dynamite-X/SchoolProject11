@@ -18,7 +18,7 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $permissions = Permission::all();
+        $permissions = Permission::where("guard_name","sanctum")->get(["id","name","guard_name"]);
         return response()->json(["permissions" => $permissions]);
     }
     public function store(StoreNewPermission $request)
@@ -59,21 +59,5 @@ class PermissionController extends Controller
     }
 
 
-    // public function destroy(Permission $permission)
-    // {
-    //     // حذف السجل باستخدام Query Builder
-    //     $deleted = DB::table('permissions')->where('id', $permission->id)->delete();
 
-    //     if ($deleted) {
-    //         return response()->json([
-    //             "messages" => "success",
-    //             "message" => "Permission deleted successfully"
-    //         ]);
-    //     } else {
-    //         return response()->json([
-    //             "messages" => "error",
-    //             "message" => "Permission not found"
-    //         ], 404);
-    //     }
-    // }
 }

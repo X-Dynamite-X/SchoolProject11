@@ -22,7 +22,15 @@ class RoleSeeder extends Seeder
             $newRole = Role::firstOrCreate([
                 'name' => $roleName,
             ]);
-
+            if ($newRole->name === "admin") {
+                $newRole->givePermissionTo("allPermission");
+            } elseif ($newRole->name === "user") {
+                $newRole->givePermissionTo(["Read", "Write", "Update", "Delete"]);
+            }
+            $newRole = Role::firstOrCreate([
+                'name' => $roleName,
+                "guard_name" => "sanctum"
+            ]);
             if ($newRole->name === "admin") {
                 $newRole->givePermissionTo("allPermission");
             } elseif ($newRole->name === "user") {
