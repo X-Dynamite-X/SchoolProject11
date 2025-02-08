@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\api\PermissionRole;
 
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 use Spatie\Permission\Models\Permission;

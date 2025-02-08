@@ -421,7 +421,7 @@ const viewAlert = (title, message) => {
                         :errorMessage="adminStore.errors[column.key]||null"
                         :autocomplete="column.autocomplete"
                         v-model="data[column.key][0].name"
-                        
+
                     />
                 </template>
             </DynamicEdit>

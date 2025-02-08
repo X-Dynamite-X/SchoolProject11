@@ -26,7 +26,7 @@ class UpdatePermission extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => "required|string|min:2|unique:permissions,name",
+            "name" => "required|string|min:2|unique:permissions,name," . $this->permission->id,
         ];
     }
 

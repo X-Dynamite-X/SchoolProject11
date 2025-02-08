@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 // استقبال البيانات كـ props
-defineProps({
+const props = defineProps({
     options: {
         type: Array,
         required: true,
@@ -10,6 +10,10 @@ defineProps({
     name: {
         type: String,
         required: true,
+    },
+    trueValueOptions: {
+        type: Array, // trueValueOptions هي مصفوفة تحتوي على كائنات
+        default: () => [], // القيمة الافتراضية هي مصفوفة فارغة
     },
     id: {
         type: String,
@@ -20,8 +24,8 @@ defineProps({
         default: false,
     },
     errorMessage: {
-        type: Array,
-        default: () => [],
+        type: Object,
+        default: () => ({}),
     },
     disabled: {
         type: Boolean,
@@ -35,6 +39,14 @@ defineProps({
         type: String,
         default: "",
     },
+    WhatValueNeed: {
+        type: String,
+        default: "id",
+    },
+    nameError: {
+        type: String,
+        required: true,
+    },
 });
 
 // تعريف event للتواصل مع المكون الرئيسي
@@ -44,18 +56,34 @@ const emit = defineEmits(["create"]);
 const selectedOptions = ref([]);
 
 // وظيفة لإضافة أو إزالة القيم
-function toggleOption(optionId) {
-    const index = selectedOptions.value.indexOf(optionId);
+function toggleOption(optionValue) {
+    const index = selectedOptions.value.indexOf(optionValue);
+
     if (index === -1) {
-        selectedOptions.value.push(optionId);
+        // إذا لم يكن الخيار موجودًا، أضفه
+        selectedOptions.value.push(optionValue);
     } else {
+        // إذا كان الخيار موجودًا، أزله
         selectedOptions.value.splice(index, 1);
     }
-    emit("create", selectedOptions.value); // إرسال الخيارات المحددة
+
+    // إرسال الخيارات المحددة إلى المكون الرئيسي
+    emit("create", selectedOptions.value);
     console.log("Selected options:", selectedOptions.value);
 }
-</script>
 
+// مراقبة التغييرات في trueValueOptions لتحديث selectedOptions
+watch(
+    () => props.trueValueOptions,
+    (newTrueValueOptions) => {
+        // تحديث الخيارات المحددة بناءً على القيم الموجودة في trueValueOptions
+        selectedOptions.value = newTrueValueOptions.map(
+            (option) => option[props.WhatValueNeed]
+        );
+    },
+    { immediate: true }
+);
+</script>
 <template>
     <form class="max-w-md mx-auto space-y-4">
         <!-- Label for the select -->
@@ -65,7 +93,6 @@ function toggleOption(optionId) {
         >
             {{ label }}
         </label>
-
         <!-- Custom-styled container for checkboxes -->
         <div
             class="max-h-[25rem] overflow-scroll scroll-container-inner bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-sm p-4 space-y-3"
@@ -80,9 +107,16 @@ function toggleOption(optionId) {
                 <input
                     type="checkbox"
                     :id="`checkbox-${option.id}`"
-                    :value="option.id"
+                    :value="option[WhatValueNeed]"
                     :disabled="disabled"
-                    @change="toggleOption(option.id)"
+                    :checked="
+                        trueValueOptions.some(
+                            (trueOption) =>
+                                trueOption[WhatValueNeed] ===
+                                option[WhatValueNeed]
+                        )
+                    "
+                    @change="toggleOption(option[WhatValueNeed])"
                     class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <!-- Label for checkbox -->
@@ -94,14 +128,19 @@ function toggleOption(optionId) {
                 </label>
             </div>
         </div>
-
         <!-- Display error message if provided -->
-        <div  v-for="option in options"
-        :key="option.id" >
-
-        <p v-if="errorMessage['user_ids.'+option.id]" class="text-sm text-red-500">
-            {{ errorMessage['user_ids.'+option.id][0] }}
-        </p>
+        <div v-for="option in options" :key="option.id">
+            <p
+                v-if="errorMessage[`${nameError}.` + option.id]"
+                class="text-sm text-red-500"
+            >
+                {{ errorMessage[`${nameError}.` + option.id][0] }}
+            </p>
+        </div>
+        <div>
+            <p v-if="errorMessage.errors" class="text-sm text-red-500">
+                {{ errorMessage.errors[nameError] }}
+            </p>
         </div>
     </form>
 </template>

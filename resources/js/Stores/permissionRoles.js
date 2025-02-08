@@ -173,7 +173,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
         },
         async createRole(data){
             console.log(data);
-            
+
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -202,8 +202,70 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 throw error;
             }
         },
-        async deleteRole(data){},
-        async updateRole(data){},
+        async deleteRole(data){
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "DELETE",
+                        url: `/api/admin/role/${data.id}`,
+                        dataType: "json",
+                        success: (response) => {
+                            this.AllRole = this.AllRole.filter(
+                                (role) => role.id !== data.id
+                            );
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            const errorMessage =
+                                error.responseJSON?.message ||
+                                "An error occurred";
+                            console.error("Error:", errorMessage);
+                            reject(errorMessage);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("Delete Permission Error:", error.message);
+                throw error;
+            }
+        },
+        async updateRole(data){
+            const roleData =data.role;
+            const permissionData =data.permissions;
+
+            try {
+                return new Promise((resolve, reject) => {
+                    $.ajax({
+                        type: "Put",
+                        url: `/api/admin/role/${roleData.id}`,
+                        data: {
+                            name: roleData.name,
+                            permissions:permissionData
+                        },
+                        dataType: "json",
+                        success: (response) => {
+                            this.Errors = [];
+                            console.log("333333333333333333333333333333333");
+
+                            console.log(response);
+                            console.log("333333333333333333333333333333333");
+
+                            resolve(response);
+                        },
+                        error: (error) => {
+                            const errors =
+                                error.responseJSON?.message ||
+                                "An error occurred";
+                            this.Errors = error.responseJSON.errors;
+                            reject(errors);
+                        },
+                    });
+                });
+            } catch (error) {
+                console.error("User Fetch Error:", error.responseJSON?.errors);
+                throw error;
+            }
+        },
         clearErrors() {
             this.Errors = [];
         },

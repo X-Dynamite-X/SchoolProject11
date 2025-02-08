@@ -11,6 +11,12 @@ import SearchInput from "@/components/FieldRequst/SearchInput.vue";
 import SearchIcon from "@/components/Icon/SearchIcon.vue";
 import Pagination from "@/components/Tabel/Pagination.vue";
 import ItemsPerPage from "@/components/FieldRequst/ItemsPerPage.vue";
+import EditIcon from "@/components/Icon/EditIcon.vue";
+import DeleteIcon from "@/components/Icon/DeleteIcon.vue";
+import DynamicDelete from "@/components/Model/DynamicDelete.vue";
+import DynamicEdit from "@/components/Model/DynamicEdit.vue";
+import InputCheckBox from "@/components/FieldRequst/InputCheckBox.vue";
+
 const permissionRoleStore = usePermssionRoleStore();
 
 const newRole = ref("");
@@ -106,7 +112,6 @@ const sort = (columnKey) => {
     }
 };
 
-
 onMounted(() => {
     fetchData();
 });
@@ -132,6 +137,7 @@ const createRole = async () => {
         roles.value.push({
             id: response.role.id,
             name: response.role.name,
+            guard_name: response.role.guard_name,
             permissions: permissions,
         });
 
@@ -145,13 +151,115 @@ const createRole = async () => {
     selectedPermissions.value = [];
 };
 
-const thNameUsersFields = ["ID", "Name", "Permissions", "Guard Name"];
-const columnsUsers = [
-    { key: "id", label: "ID", showInTabel: true },
-    { key: "name", label: "Name", showInTabel: true },
-    { key: "permission", label: "Permissions", showInTabel: true },
-    { key: "guard_name", label: "guard_name", showInTabel: true },
+const thNameUsersFields = [
+    "ID",
+    "Name",
+    "Permissions",
+    "Guard Name",
+    "Actions",
 ];
+const columnsRoles = [
+    { key: "id", label: "ID", showInTabel: true },
+    {
+        key: "name",
+        label: "Name",
+        showInTabel: true,
+        showInEdit: true,
+        required: true,
+    },
+    {
+        key: "permission",
+        label: "Permissions",
+        name:"permissions",
+        showInTabel: true,
+        showInEdit: true,
+    },
+    { key: "guard_name", label: "guard_name", showInTabel: true },
+    { key: "actions" },
+];
+
+const showEditModel = ref(false);
+const showDeleteModel = ref(false);
+const oldRoleData = ref(null);
+const modelData = ref({});
+
+const openEditModel = (data) => {
+    showEditModel.value = true;
+    modelData.value = { ...data };
+
+    // البحث عن العنصر الذي يحتوي على key: "name"
+    const nameColumn = columnsRoles.find((col) => col.key === "name");
+
+    if (nameColumn) {
+        nameColumn.name = "updateName"; // تغيير الاسم
+    }
+
+    oldRoleData.value = data.name || null;
+};
+const permission_name = ref([]);
+
+const handleSelectedOption = (options) => {
+    // تحديث قائمة الأذونات المحددة
+    permission_name.value = options;
+};
+
+const updateData = async (updatedData) => {
+    const data = {
+        role: updatedData,
+        permissions: permission_name.value, // الصلاحيات المحددة
+    };
+
+    try {
+        // تنفيذ التحديث عبر المتجر
+        const response = await permissionRoleStore.updateRole(data);
+
+        // تحديث بيانات الدور في الجدول
+        const index = roles.value.findIndex((role) => role.id === updatedData.id);
+        if (index !== -1) {
+            roles.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
+            roles.value[index].permissions =response.role.permissions;
+        }
+
+        closeModal(true, true);
+        viewAlert("success", response.message || "The role has been updated successfully.");
+    } catch (error) {
+        // معالجة الأخطاء وإظهار الإشعار الفاشل
+        console.error("Error updating data:", error.message);
+        viewAlert("error", error.message || "Failed to update the role.");
+    }
+};
+const openDeleteModel = (data) => {
+    console.log(data);
+
+    showDeleteModel.value = true;
+    modelData.value = { ...data };
+};
+
+const deleteData = async (data) => {
+    console.log("Deleting Permission:", data);
+    closeModal();
+    try {
+        const response = await permissionRoleStore.deleteRole(data);
+        roles.value = roles.value.filter((role) => role.id !== data.id);
+        viewAlert("success", response.message);
+    } catch (error) {
+        console.error("Error deleting Role :", error);
+        // عرض إشعار الخطأ
+        viewAlert("error", "Failed to delete Role .");
+    }
+};
+const closeModal = (isEdit = false, saveChanges = false) => {
+    if (!isEdit && !saveChanges) {
+        if (oldRoleData.value !== null) {
+            modelData.value.name = oldRoleData.value;
+        }
+    }
+    showEditModel.value = false;
+    showDeleteModel.value = false;
+
+    permissionRoleStore.clearErrors();
+};
+
 const showAlert = ref(false);
 const alertTitle = ref("");
 const alertMessage = ref("");
@@ -247,7 +355,7 @@ const viewAlert = (title, message) => {
                 >
                     Roles List
                 </h3>
-                  <div
+                <div
                     class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between space-x-4 pb-4"
                 >
                     <div class="relative">
@@ -282,7 +390,7 @@ const viewAlert = (title, message) => {
                         />
                     </template>
                     <template #row="{ item }">
-                        <DynamicRow :item="item" :columns="columnsUsers">
+                        <DynamicRow :item="item" :columns="columnsRoles">
                             <template #column-permission="{ item }">
                                 <span
                                     v-for="permission in item.permissions"
@@ -292,14 +400,69 @@ const viewAlert = (title, message) => {
                                     {{ permission.name }}
                                 </span>
                             </template>
+                            <template #column-actions="{ item }">
+                                <button
+                                    :id="item.id"
+                                    @click="openEditModel(item)"
+                                    class="px-3 py-1 mx-1 text-xs bg-stone-300 dark:bg-gray-800 text-yellow-400 hover:text-yellow-600 rounded"
+                                >
+                                    <EditIcon />
+                                </button>
+                                <button
+                                    @click="openDeleteModel(item)"
+                                    :id="item.id"
+                                    class="px-3 py-1 mx-1 bg-stone-300 dark:bg-gray-800 text-red-400 hover:text-red-600 rounded"
+                                >
+                                    <DeleteIcon />
+                                </button>
+                            </template>
                         </DynamicRow>
                     </template>
                 </DataTable>
-                 <Pagination
+                <Pagination
                     :currentPage="currentPage"
                     :totalPages="totalPages"
                     @change-page="changePage"
                 />
+                <DynamicEdit
+                    :data="modelData"
+                    :columns="columnsRoles"
+                    :show="showEditModel"
+                    @close="closeModal"
+                    title="Edit Role"
+                    @update="updateData"
+                    :errors="permissionRoleStore"
+                >
+                    <template #column-permission="{ data ,column }">
+                        <InputCheckBox
+                            :multiple="column.multiple"
+                            :trueValueOptions="data.permissions"
+                            :options="permissions"
+                            :errorMessage="permissionRoleStore"
+                            :id="column.id"
+                            :name="column.name"
+                            :disabled="column.disabled"
+                            :required="column.required"
+                            :label="column.label"
+                            @create="handleSelectedOption"
+                            WhatValueNeed="name"
+                            nameError="permissions"
+                        >
+                        </InputCheckBox>
+                    </template>
+                </DynamicEdit>
+                <DynamicDelete
+                    :data="modelData"
+                    :show="showDeleteModel"
+                    @close="closeModal"
+                    @delete="deleteData"
+                    title="Delete Role"
+                >
+                    <template #message="{ data }">
+                        Are you sure you want to delete this Role?
+                        <strong class="text-red-600">{{ data.name }}</strong>
+                    </template>
+                </DynamicDelete>
             </div>
         </div>
     </template>
