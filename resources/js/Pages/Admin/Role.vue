@@ -170,7 +170,7 @@ const columnsRoles = [
     {
         key: "permission",
         label: "Permissions",
-        name:"permissions",
+        name: "permissions",
         showInTabel: true,
         showInEdit: true,
     },
@@ -214,14 +214,19 @@ const updateData = async (updatedData) => {
         const response = await permissionRoleStore.updateRole(data);
 
         // تحديث بيانات الدور في الجدول
-        const index = roles.value.findIndex((role) => role.id === updatedData.id);
+        const index = roles.value.findIndex(
+            (role) => role.id === updatedData.id
+        );
         if (index !== -1) {
             roles.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
-            roles.value[index].permissions =response.role.permissions;
+            roles.value[index].permissions = response.role.permissions;
         }
 
         closeModal(true, true);
-        viewAlert("success", response.message || "The role has been updated successfully.");
+        viewAlert(
+            "success",
+            response.message || "The role has been updated successfully."
+        );
     } catch (error) {
         // معالجة الأخطاء وإظهار الإشعار الفاشل
         console.error("Error updating data:", error.message);
@@ -284,7 +289,9 @@ const viewAlert = (title, message) => {
     </template>
 
     <template v-else>
-        <div class="p-6 bg-gray-100 dark:bg-gray-900 min-h-[92vh]">
+        <div
+            class="p-6 bg-gray-100 dark:bg-gray-900 min-h-full max-h-[92vh] overflow-y-scroll touch-scroll h-full"
+        >
             <div
                 class="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
             >
@@ -433,7 +440,7 @@ const viewAlert = (title, message) => {
                     @update="updateData"
                     :errors="permissionRoleStore"
                 >
-                    <template #column-permission="{ data ,column }">
+                    <template #column-permission="{ data, column }">
                         <InputCheckBox
                             :multiple="column.multiple"
                             :trueValueOptions="data.permissions"

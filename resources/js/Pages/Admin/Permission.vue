@@ -237,7 +237,7 @@ const viewAlert = (title, message) => {
         <LodengSpiner />
     </template>
     <template v-else>
-        <div class="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+        <div class="p-6 bg-gray-100 dark:bg-gray-900 min-h-full max-h-[92vh] overflow-y-scroll touch-scroll  h-full  ">
             <div
                 class="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"
             >
