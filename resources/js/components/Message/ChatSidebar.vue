@@ -40,6 +40,7 @@ const updateSearchQuery = (event) => {
 const createChat = (userId) => {
     emit("createChat", userId);
 };
+
 </script>
 
 <template>

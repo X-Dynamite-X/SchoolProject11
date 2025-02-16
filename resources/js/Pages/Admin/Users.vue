@@ -43,7 +43,7 @@ const columns = [
     { key: "id", label: "ID", showInTabel: true },
     {
         key: "actions",
-     },
+    },
     {
         key: "name",
         label: "Name",
@@ -218,7 +218,7 @@ const openEditModel = (data) => {
 };
 const updateData = async (updatedData) => {
     try {
-        const response =await adminStore.updateUser(updatedData); // انتظار تحديث المستخدم
+        const response = await adminStore.updateUser(updatedData); // انتظار تحديث المستخدم
         closeModal(true, true);
         viewAlert("success", response.message);
         modelData.value = { ...updatedData };
@@ -235,7 +235,7 @@ const deleteData = async (data) => {
     console.log("Deleting User:", data);
     closeModal();
     try {
-        const response =await adminStore.deleteUser(data);
+        const response = await adminStore.deleteUser(data);
         viewAlert("success", response.message);
     } catch (error) {
         console.error("Error deleting user:", error);
@@ -253,7 +253,6 @@ const closeModal = (isEdit = false, saveChanges = false) => {
     showEditModel.value = false;
     showDeleteModel.value = false;
     showCreateModel.value = false;
-
 
     adminStore.clearErrors();
 };
@@ -279,10 +278,10 @@ const viewAlert = (title, message) => {
         <Alerts :title="alertTitle" :message="alertMessage" />
     </div>
     <div
-        class="flex-grow p-4 overflow-scroll touch-scroll bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 max-h-[92vh] h-[92vh] min-h-[92vh]"
+        class="max-w-7xl w-11/12 mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md overflow-scroll touch-scroll max-h-[90vh] h-[90vh] min-h-[90vh]"
     >
         <!--  -->
-        <div class="container w-10/12 mx-auto">
+        <div class="container w-full mx-auto">
             <div
                 class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between space-x-4 pb-4"
             >
@@ -406,7 +405,6 @@ const viewAlert = (title, message) => {
                 title="Edit User"
                 @update="updateData"
                 :errors="adminStore"
-
             >
                 <template #column-roles="{ data, column }">
                     <InputRadio
@@ -418,10 +416,9 @@ const viewAlert = (title, message) => {
                         :placeholder="column.placeholder"
                         :required="column.required"
                         :options="column.options"
-                        :errorMessage="adminStore.errors[column.key]||null"
+                        :errorMessage="adminStore.errors[column.key] || null"
                         :autocomplete="column.autocomplete"
                         v-model="data[column.key][0].name"
-
                     />
                 </template>
             </DynamicEdit>

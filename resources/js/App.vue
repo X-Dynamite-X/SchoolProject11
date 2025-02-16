@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "vue"; // تأكد من أنك استوردت ref
 import Navigation from "@/Layouts/Navigation.vue";
+import AdminLayout from "@/Layouts/AdminLayout.vue";
 
 const menuItems = [
     {
@@ -37,24 +38,30 @@ const menuItems = [
     { name: "Login", to: "login", auth: false, allUser: true },
     { name: "Register", to: "register", auth: false, allUser: true },
 ];
-
+const adminRouteNames = [
+    "adminUsers",
+    "adminRole",
+    "adminPermission",
+    "adminSubjects",
+];
 // تعريف toggleMobileMenu
 const toggleMobileMenu = ref(false);
 </script>
 
 <template>
-    <div>
+    <!-- <div>
         <Navigation @toggle="toggleMobileMenu" :menuItems="menuItems" />
-    </div>
-
-    <router-view v-slot="{ Component, route }">
-        <div
-            :key="route.name"
-            class="dark:bg-gray-900 text-gray-900 dark:text-white min-h-[100vh] max-h-[100vh] pt-16"
-        >
-            <Component :is="Component" />
-        </div>
-    </router-view>
+    </div> -->
+    <AdminLayout :menuItems="menuItems"  @toggle="toggleMobileMenu" :adminRouteNames="adminRouteNames">
+        <router-view v-slot="{ Component, route }">
+            <div
+                :key="route.name"
+                class="dark:bg-gray-900 text-gray-900 dark:text-white min-h-[100vh] max-h-[100vh] pt-16"
+            >
+                <Component :is="Component" />
+            </div>
+        </router-view>
+    </AdminLayout>
 </template>
 
 <style>

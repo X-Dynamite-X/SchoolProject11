@@ -48,7 +48,8 @@ const moveConversationsInLastMessage = (currentIndex) => {
 // التمرير إلى أسفل
 const scrollToBottom = () => {
     if (messagesContainer.value) {
-        messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+        messagesContainer.value.scrollTop =
+            messagesContainer.value.scrollHeight;
     }
 };
 
@@ -104,7 +105,7 @@ const responseNewMessage = () => {
 
                         if (activeChatId.value === data.conversation_id) {
                             setTimeout(scrollToBottom, 100);
-                       
+
                             cheakMessageIsRead(data.conversation_id);
                         }
 
@@ -118,7 +119,48 @@ const responseNewMessage = () => {
         }
     });
 };
+const addConversationChannel = window.Echo.private(
+    `user_${authStore.user.user.id}`
+);
+addConversationChannel.listen(".add-conversation", function (data) {
+    const newConversation = {
+        id: data.conversation.id,
+        messages: data.conversation.messages,
+        other_user: data.conversation.other_user,
+    };
+    conversations.value.push(newConversation);
+    addChanelNewConversation(newConversation.id);
+});
+function addChanelNewConversation(conversationId) {
+    const addMessageChannel = window.Echo.private(
+        `conversation_${conversationId}`
+    );
+    addMessageChannel.listen(".new-message", function (data) {
+        if (data.sender_id != authStore.user.user.id) {
+            const newMessage = {
+                id: data.message_id ?? null,
+                sender_id: data.sender_id,
+                text: data.text,
+                created_at: data.created_at,
+            };
+            const existingConversation = conversations.value.find(
+                (conv) => conv.id === data.conversation_id
+            );
+            if (existingConversation) {
+                existingConversation.messages.push(newMessage);
+                if (activeChatId.value === data.conversation_id) {
+                    setTimeout(scrollToBottom, 100);
+                    cheakMessageIsRead(data.conversation_id);
 
+                }
+                let index = conversations.value.findIndex(
+                    (conversation) => conversation.id === data.conversation_id
+                );
+                moveConversationsInLastMessage(index);
+            }
+        }
+    });
+}
 // تحديد المحادثة النشطة
 const selectChat = (chatId) => {
     activeChatId.value = chatId;
@@ -126,8 +168,11 @@ const selectChat = (chatId) => {
     isSidebarVisible.value = false;
 
     if (oldConversationId.value !== chatId) {
+        console.log("is work");
+
         cheakMessageIsRead(chatId);
     }
+    console.log("is not work");
 
     checkInAuntherUserIsReadMessageOrNot();
 };
@@ -144,7 +189,8 @@ const cheakMessageIsRead = (conversationId) => {
     }
 
     const hasUnreadMessages = conversation.messages.some(
-        (message) => message.sender_id !== authStore.user.user.id && !message.is_read
+        (message) =>
+            message.sender_id !== authStore.user.user.id && !message.is_read
     );
 
     if (hasUnreadMessages) {
@@ -205,7 +251,9 @@ const createChat = async (userId) => {
         if (response.conversation) {
             conversations.value.push(response.conversation);
             searchQuery.value = "";
-            selectChat(response.conversation.id);
+
+            addChanelNewConversation(response.conversation.id);
+            setTimeout(selectChat(response.conversation.id), 300);
         }
     } catch (error) {
         console.error("Failed to create conversation:", error);
@@ -265,9 +313,7 @@ onMounted(() => {
 
 // تحديد المحادثة النشطة
 const activeChat = computed(() => {
-    return conversations.value.find(
-        (conv) => conv.id === activeChatId.value
-    );
+    return conversations.value.find((conv) => conv.id === activeChatId.value);
 });
 
 // مراقبة استعلام البحث
@@ -280,7 +326,9 @@ watch(searchQuery, (newQuery) => {
     debounceTimer = setTimeout(async () => {
         if (newQuery.length > 0) {
             try {
-                const response = await messageStore.searchConversations(newQuery);
+                const response = await messageStore.searchConversations(
+                    newQuery
+                );
                 if (response.conversations) {
                     conversationQuery.value = response.conversations;
                 }
