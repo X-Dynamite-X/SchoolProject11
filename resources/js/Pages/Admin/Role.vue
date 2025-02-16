@@ -218,7 +218,7 @@ const updateData = async (updatedData) => {
             (role) => role.id === updatedData.id
         );
         if (index !== -1) {
-            roles.value[index] = { ...updatedData }; // استبدال العنصر بالكامل
+            roles.value[index] = { ...updatedData }; // استبدال العنصر بالكامل   #LCUPUQRR
             roles.value[index].permissions = response.role.permissions;
         }
 

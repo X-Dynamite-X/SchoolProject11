@@ -255,7 +255,7 @@ const viewAlert = (title, message) => {
         <Alerts :title="alertTitle" :message="alertMessage" />
     </div>
     <div
-        class="max-w-4xl  w-11/12 mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md overflow-scroll touch-scroll  max-h-[90vh] h-[90vh] min-h-[90vh]"
+        class="max-w-4xl  w-11/12 mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md overflow-scroll touch-scroll  max-h-[90vh]   min-h-auto"
     >
         <!--  -->
         <div class="container w-full mx-auto">
