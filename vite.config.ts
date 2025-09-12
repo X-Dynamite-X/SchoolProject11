@@ -11,9 +11,6 @@ export default defineConfig({
         vue(),
     ],
 
-    server: {
-        host: '192.168.100.10',
-    },
-
+ 
 
 });

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useAuthStore } from "@/Stores/Auth";
+import { useAuthStore } from "@/Stores/auth";
 import CheckDouble from "@/components/Icon/CheckDouble.vue";
 import Check from "@/components/Icon/Check.vue";
 import ChatFooter from "@/components/Message/ChatFooter.vue";

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch, provide } from "vue";
 import { useMessageStore } from "@/Stores/message";
-import { useAuthStore } from "@/Stores/Auth";
+import { useAuthStore } from "@/Stores/auth";
 import CloseIcon from "@/components/Icon/CloseIcon.vue";
 import MenuIcon from "@/components/Icon/MenuIcon.vue";
 import ChatSidebar from "@/components/Message/ChatSidebar.vue";

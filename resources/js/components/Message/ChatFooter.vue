@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { useAuthStore } from "@/Stores/Auth";
+import { useAuthStore } from "@/Stores/auth";
 
 const authStore = useAuthStore();
 const newMessage = ref("");

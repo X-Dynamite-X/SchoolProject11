@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, defineEmits, computed, watch } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { useAdminStore } from "@/Stores/admin";
 import TabelTh from "@/components/Tabel/TabelTh.vue";
 import InputCheckBox from "@/components/FieldRequst/InputCheckBox.vue";

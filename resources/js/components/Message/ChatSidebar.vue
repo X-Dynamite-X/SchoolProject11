@@ -1,5 +1,5 @@
 <script setup>
-import { inject, nextTick, defineEmits } from "vue";
+import { inject, nextTick } from "vue";
 
 // الخصائص التي يتلقاها المكون
 const props = defineProps({

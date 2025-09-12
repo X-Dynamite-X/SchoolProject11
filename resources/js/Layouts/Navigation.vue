@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineProps,  } from "vue";
+import { ref,  } from "vue";
 import { useAuthStore } from "@/Stores/auth";
 import UserMenu from "@/components/NavBar/UserMenu.vue";
 import SmollLogo from "@/components/AllApp/SmollLogo.vue";
