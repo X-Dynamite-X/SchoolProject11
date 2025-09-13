@@ -15,7 +15,7 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
     'frontend_url' => env('FRONTEND_URL', 'https://localhost:8000'),
-
+    'assrt_url'   => env('ASSET_URL'),
     /*
     |--------------------------------------------------------------------------
     | Application Environment

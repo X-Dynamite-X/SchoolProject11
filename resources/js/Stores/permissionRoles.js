@@ -6,7 +6,7 @@ const csrf = async () => {
     if (csrfV === null) {
         try {
             // جلب الـ CSRF token إذا لم يكن موجودًا
-            csrfV = await $.get("/sanctum/csrf-cookie");
+            csrfV = await $.get("/SchoolProject11/sanctum/csrf-cookie");
             return csrfV;
         } catch (error) {
             console.error("Failed to fetch CSRF token:", error);
@@ -37,7 +37,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                     return new Promise((resolve, reject) => {
                         $.ajax({
                             type: "GET",
-                            url: "/api/admin/permission ",
+                            url: "/SchoolProject11/api/admin/permission ",
                             dataType: "json",
                             success: (response) => {
                                 this.AllPermission = response.permissions;
@@ -62,7 +62,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "POST",
-                        url: "/api/admin/permission ",
+                        url: "/SchoolProject11/api/admin/permission ",
                         data: {
                             name: data,
                         },
@@ -92,7 +92,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "DELETE",
-                        url: `/api/admin/permission/${data.id}`,
+                        url: `/SchoolProject11/api/admin/permission/${data.id}`,
                         dataType: "json",
                         success: (response) => {
                             this.AllPermission = this.AllPermission.filter(
@@ -119,7 +119,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "Put",
-                        url: `/api/admin/permission/${data.id}`,
+                        url: `/SchoolProject11/api/admin/permission/${data.id}`,
                         data: {
                             name: data.name,
                         },
@@ -150,7 +150,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                     return new Promise((resolve, reject) => {
                         $.ajax({
                             type: "GET",
-                            url: "/api/admin/role ",
+                            url: "/SchoolProject11/api/admin/role ",
                             dataType: "json",
                             success: (response) => {
                                 this.AllRole = response.roles;
@@ -178,7 +178,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "POST",
-                        url: "/api/admin/role ",
+                        url: "/SchoolProject11/api/admin/role ",
                         data: {
                             name: data.name,
                             permissions: data.permissions,
@@ -207,7 +207,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "DELETE",
-                        url: `/api/admin/role/${data.id}`,
+                        url: `/SchoolProject11/api/admin/role/${data.id}`,
                         dataType: "json",
                         success: (response) => {
                             this.AllRole = this.AllRole.filter(
@@ -237,7 +237,7 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "Put",
-                        url: `/api/admin/role/${roleData.id}`,
+                        url: `/SchoolProject11/api/admin/role/${roleData.id}`,
                         data: {
                             name: roleData.name,
                             permissions:permissionData

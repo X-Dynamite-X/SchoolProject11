@@ -17,57 +17,57 @@ import SubjectsAdmin from "@/Pages/Admin/Subjects.vue";
 const routes = [
     // المسارات المسجلة
     {
-        path: "/",
+        path: "/SchoolProject11/",
         component: Home,
         name: "home",
     },
     {
-        path: "/login",
+        path: "/SchoolProject11/login",
         component: Login,
         name: "login",
     },
     {
-        path: "/register",
+        path: "/SchoolProject11/register",
         component: Register,
         name: "register",
     },
     {
-        path: "/forgot-psasword",
+        path: "/SchoolProject11/forgot-psasword",
         component: ForgotPsasword,
         name: "ForgotPsasword",
     },
     {
-        path: "/password-reset/:token",
+        path: "/SchoolProject11/password-reset/:token",
         component: ResetPassword,
         name: "ResetPassword",
     },
     {
-        path: "/admin/users",
+        path: "/SchoolProject11/admin/users",
         component: UsersAdmin,
         name: "adminUsers",
     },
     {
-        path: "/admin/Role",
+        path: "/SchoolProject11/admin/Role",
         component: Role,
         name: "adminRole",
     },
     {
-        path: "/admin/permission",
+        path: "/SchoolProject11/admin/permission",
         component: Permission,
         name: "adminPermission",
     },
     {
-        path: "/admin/Subject",
+        path: "/SchoolProject11/admin/Subject",
         component: SubjectsAdmin,
         name: "adminSubjects",
     },
     {
-        path: "/message",
+        path: "/SchoolProject11/message",
         component: Message,
         name: "message",
     },
     {
-        path: "/:catchAll(.*)",
+        path: "/SchoolProject11/:catchAll(.*)",
         component: NotFound,
         name: "NotFound",
     },

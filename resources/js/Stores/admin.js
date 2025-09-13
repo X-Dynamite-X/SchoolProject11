@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import $, { error, get } from "jquery";
 
-const csrf = () => $.get("/sanctum/csrf-cookie");
+const csrf = () => $.get("/SchoolProject11/sanctum/csrf-cookie");
 
 export const useAdminStore = defineStore("admin", {
     state: () => ({
@@ -24,7 +24,7 @@ export const useAdminStore = defineStore("admin", {
                     return new Promise((resolve, reject) => {
                         $.ajax({
                             type: "get",
-                            url: "/api/admin/user ",
+                            url: "/SchoolProject11/api/admin/user ",
                             dataType: "json",
                             success: (data) => {
                                 this.AllUsers = data.users;
@@ -50,7 +50,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "post",
-                        url: `/api/admin/user`,
+                        url: `/SchoolProject11/api/admin/user`,
                         data: data,
                         success: (response) => {
                             this.AllUsers.push(response.user);
@@ -75,7 +75,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "DELETE",
-                        url: `/api/admin/user/${data.id}`,
+                        url: `/SchoolProject11/api/admin/user/${data.id}`,
                         success:  (response) => {
                             this.AllUsers = this.AllUsers.filter(
                                 (user) => user.id !== data.id
@@ -99,7 +99,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "put",
-                        url: `/api/admin/user/${data.id}`,
+                        url: `/SchoolProject11/api/admin/user/${data.id}`,
                         data: {
                             roles: data.roles[0].name,
                         },
@@ -126,7 +126,7 @@ export const useAdminStore = defineStore("admin", {
                     return new Promise((resolve, reject) => {
                         $.ajax({
                             type: "get",
-                            url: "/api/admin/subject ",
+                            url: "/SchoolProject11/api/admin/subject ",
                             dataType: "json",
                             success: (data) => {
                                 this.AllSubjects = data.subjects;
@@ -152,7 +152,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "post",
-                        url: `/api/admin/subject`,
+                        url: `/SchoolProject11/api/admin/subject`,
                         data: data,
                         success: (response) => {
                             this.AllSubjects.push(response.subject);
@@ -176,7 +176,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "put",
-                        url: `/api/admin/subject/${data.id}`,
+                        url: `/SchoolProject11/api/admin/subject/${data.id}`,
                         data: {
                             name: data.name,
                             success_mark: data.success_mark,
@@ -204,7 +204,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "DELETE",
-                        url: `/api/admin/subject/${data.id}`,
+                        url: `/SchoolProject11/api/admin/subject/${data.id}`,
                         success: async (response) => {
                             this.AllSubjects = this.AllSubjects.filter(
                                 (subject) => subject.id !== data.id
@@ -232,7 +232,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "post",
-                        url: `/api/admin/subjectUsers/${subject_id}`,
+                        url: `/SchoolProject11/api/admin/subjectUsers/${subject_id}`,
                         data: {
                             user_ids: data[0],
                             subject_id: subject_id,
@@ -260,7 +260,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "put",
-                        url: `/api/admin/subjectUsers/${data.subject_id}/${data.user_id}`,
+                        url: `/SchoolProject11/api/admin/subjectUsers/${data.subject_id}/${data.user_id}`,
                         data: data,
                         success: (response) => {
                             // this.AllSubjects[response.subject.id]["users"].push(response.subject);
@@ -286,7 +286,7 @@ export const useAdminStore = defineStore("admin", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "delete",
-                        url: `/api/admin/subjectUsers/${data.subject_id}/${data.user_id}`,
+                        url: `/SchoolProject11/api/admin/subjectUsers/${data.subject_id}/${data.user_id}`,
                         data: data,
                         success: (response) => {
                             resolve(response);

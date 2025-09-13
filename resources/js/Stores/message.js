@@ -6,7 +6,7 @@ const csrf = async () => {
     if (csrfV === null) {
         try {
             // جلب الـ CSRF token إذا لم يكن موجودًا
-            csrfV = await $.get("/sanctum/csrf-cookie");
+            csrfV = await $.get("/SchoolProject11/sanctum/csrf-cookie");
             return csrfV;
         } catch (error) {
             console.error("Failed to fetch CSRF token:", error);
@@ -36,7 +36,7 @@ export const useMessageStore = defineStore("message", {
                     return new Promise((resolve, reject) => {
                         $.ajax({
                             type: "GET",
-                            url: "/api/conversation",
+                            url: "/SchoolProject11/api/conversation",
                             dataType: "json",
                             success: (response) => {
                                 this.AllConversations = response.data;
@@ -61,7 +61,7 @@ export const useMessageStore = defineStore("message", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "GET",
-                        url: "/api/conversation/search",
+                        url: "/SchoolProject11/api/conversation/search",
                         dataType: "json",
                         data: {
                             serch: serch,
@@ -82,7 +82,7 @@ export const useMessageStore = defineStore("message", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "POST",
-                        url: "/api/conversation",
+                        url: "/SchoolProject11/api/conversation",
                         data: {
                             user_two_id: userId,
                         },
@@ -107,7 +107,7 @@ export const useMessageStore = defineStore("message", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "POST",
-                        url: "/api/message",
+                        url: "/SchoolProject11/api/message",
                         data: {
                             conversation_id: data["conversationId"],
                             text: data["text"],
@@ -131,7 +131,7 @@ export const useMessageStore = defineStore("message", {
                 return new Promise((resolve, reject) => {
                     $.ajax({
                         type: "put",
-                        url: `/api/conversation/${conversationId}/isRead`,
+                        url: `/SchoolProject11/api/conversation/${conversationId}/isRead`,
                         dataType: "json",
                         success: (response) => {
                             resolve(response);

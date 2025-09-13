@@ -21,8 +21,15 @@ Route::get('/user', function (Request $request) {
     ]);
 })->middleware('auth:sanctum')->name("api.user");
 
+
+
+Route::post('/tokens/create', function (Request $request) {
+    $token = $request->user()->createToken(name: $request->token_name);
+    return ['token' => $token->plainTextToken];
+});
+
 // Route::resource('/conversation', ConversationController::class);
-// Route::resource('/message', MessageController::class);
+Route::resource('/message', MessageController::class);
 
 Route::middleware(["auth:sanctum", "auth"])->group(function () {
     Route::resource('/conversation', ConversationController::class);
@@ -34,7 +41,6 @@ Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefi
     Route::resource('/user', UserController::class);
     Route::resource('/role', RoleController::class);
     Route::resource('/permission', PermissionController::class);
-
     Route::prefix('subjectUsers/{subject}/')->controller(SubjectUsersController::class)->group(function () {
         Route::post('/', "store")->name('subjectUsers.store');
         Route::put('/{user}', "update")->name("subjectUsers.update");

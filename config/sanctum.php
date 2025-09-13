@@ -21,7 +21,9 @@ return [
     //     Sanctum::currentApplicationUrlWithPort(),
     //     env('FRONTEND_URL') ? ','.parse_url(env('FRONTEND_URL'), PHP_URL_HOST) : ''
     // ))),
-'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', '192.168.100.10:8000,localhost')),
+// 'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'localhost')),
+'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', 'reptile-pumped-bear.ngrok-free.app')),
+
 
 'cookie' => env('SESSION_COOKIE', 'laravel_session'),
 

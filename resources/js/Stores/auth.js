@@ -5,6 +5,11 @@ const csrf = () => {
     return $.ajax({
         url: "/sanctum/csrf-cookie",
         method: "GET",
+        xhrFields: { withCredentials: true },
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     });
 };
 
@@ -24,6 +29,8 @@ export const useAuthStore = defineStore("auth", {
     actions: {
         async getUser() {
             if (this.authUser) {
+                console.log(this.authUser);
+
                 return this.authUser;
             } else {
                 await csrf();
@@ -31,7 +38,10 @@ export const useAuthStore = defineStore("auth", {
                     const response = await $.ajax({
                         url: "/api/user",
                         method: "GET",
+                        xhrFields: { withCredentials: true },
                     });
+                    console.log(response);
+
                     this.authUser = response;
                     this.authRole = response.user.roles[0];
                 } catch (error) {
@@ -50,6 +60,8 @@ export const useAuthStore = defineStore("auth", {
                         email: data.email,
                         password: data.password,
                     },
+                    xhrFields: { withCredentials: true }
+
                 });
                 this.router.push("/");
                 return true;

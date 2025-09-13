@@ -4,7 +4,7 @@ namespace App\Http\Requests\Auth;
 
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\{Auth,Log};
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -26,6 +26,9 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+        Log::info('i rules');
+        Log::info($this->all());
+
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
@@ -43,6 +46,7 @@ class LoginRequest extends FormRequest
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
+            Log::info(message: 'i authenticate');
 
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
@@ -59,6 +63,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
+        Log::info('i ensureIsNotRateLimited');
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
@@ -80,6 +85,8 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
+        Log::info('i throttleKey');
+
         return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
     }
 }

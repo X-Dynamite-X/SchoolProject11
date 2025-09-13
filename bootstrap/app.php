@@ -37,8 +37,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
-        $middleware->validateCsrfTokens([
-            "/*"
+        $middleware->validateCsrfTokens(except: [
+            // Add any routes that should be excluded from CSRF validation
         ]);
 
         //

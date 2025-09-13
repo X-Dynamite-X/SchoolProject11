@@ -10,7 +10,5 @@ export default defineConfig({
         }),
         vue(),
     ],
-
  
-
 });
