@@ -1,22 +1,8 @@
 import { defineStore } from "pinia";
 import $, { error, get } from "jquery";
-let csrfV = null;
 
-const csrf = async () => {
-    if (csrfV === null) {
-        try {
-            // جلب الـ CSRF token إذا لم يكن موجودًا
-            csrfV = await $.get("/SchoolProject11/sanctum/csrf-cookie");
-            return csrfV;
-        } catch (error) {
-            console.error("Failed to fetch CSRF token:", error);
-            throw error; // إعادة رمي الخطأ للتعامل معه في مكان آخر
-        }
-    } else {
-        // إعادة الـ CSRF token المحفوظ إذا كان موجودًا
-        return csrfV;
-    }
-};
+
+
 export const usePermssionRoleStore = defineStore("permissionRole", {
     state: () => ({
         AllPermission: [],
@@ -86,8 +72,6 @@ export const usePermssionRoleStore = defineStore("permissionRole", {
             }
         },
         async deletePermission(data) {
-            await csrf();
-
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({

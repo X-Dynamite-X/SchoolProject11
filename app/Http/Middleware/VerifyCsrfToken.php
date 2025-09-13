@@ -12,8 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        // Add any routes that should be excluded from CSRF validation
-        // For example: 'api/*' if you want to exclude all API routes
+        'api/*', // Exclude all API routes from CSRF validation since they use Sanctum
     ];
 
     /**
@@ -48,9 +47,18 @@ class VerifyCsrfToken extends Middleware
      */
     public function handle($request, \Closure $next)
     {
-        // For API routes using Sanctum, skip CSRF validation
+        // For API routes using Sanctum with bearer token, skip CSRF validation
         if ($request->is('api/*') && $request->bearerToken()) {
             return $next($request);
+        }
+
+        // For API routes using session-based auth (SPA), validate CSRF
+        if ($request->is('api/*') && !$request->bearerToken()) {
+            // Check if user is authenticated via session
+            if (\Illuminate\Support\Facades\Auth::check()) {
+                // Validate CSRF token for session-based API requests
+                return parent::handle($request, $next);
+            }
         }
 
         return parent::handle($request, $next);

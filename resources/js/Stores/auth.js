@@ -5,11 +5,7 @@ const csrf = () => {
     return $.ajax({
         url: "/SchoolProject11/sanctum/csrf-cookie",
         method: "GET",
-        xhrFields: { withCredentials: true },
-        headers: {
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+        xhrFields: { withCredentials: true }
     });
 };
 
@@ -33,7 +29,6 @@ export const useAuthStore = defineStore("auth", {
 
                 return this.authUser;
             } else {
-                await csrf();
                 try {
                     const response = await $.ajax({
                         url: "/api/user",
@@ -61,12 +56,33 @@ export const useAuthStore = defineStore("auth", {
                         password: data.password,
                     },
                     xhrFields: { withCredentials: true }
-
                 });
                 this.router.push("/");
                 return true;
             } catch (error) {
-                if (error.status === 422) {
+                // إذا كان خطأ CSRF، جرب مرة أخرى
+                if (error.status === 419) {
+                    console.warn('CSRF token expired during login, retrying...');
+                    await csrf();
+                    try {
+                        await $.ajax({
+                            url: "/login",
+                            method: "POST",
+                            data: {
+                                email: data.email,
+                                password: data.password,
+                            },
+                            xhrFields: { withCredentials: true }
+                        });
+                        this.router.push("/");
+                        return true;
+                    } catch (retryError) {
+                        if (retryError.status === 422) {
+                            this.authErrors = retryError.responseJSON.errors;
+                        }
+                        return false;
+                    }
+                } else if (error.status === 422) {
                     this.authErrors = error.responseJSON.errors;
                 }
                 return false;

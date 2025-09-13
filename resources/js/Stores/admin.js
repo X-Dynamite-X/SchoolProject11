@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import $, { error, get } from "jquery";
 
-const csrf = () => $.get("/SchoolProject11/sanctum/csrf-cookie");
+
 
 export const useAdminStore = defineStore("admin", {
     state: () => ({
@@ -19,7 +19,6 @@ export const useAdminStore = defineStore("admin", {
             if (this.AllUsers.length > 0) {
                 return this.AllUsers;
             } else {
-                await csrf();
                 try {
                     return new Promise((resolve, reject) => {
                         $.ajax({
@@ -45,7 +44,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async createUser(data) {
-            await csrf();
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -70,7 +68,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async deleteUser(data) {
-            await csrf();
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -94,7 +91,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async updateUser(data) {
-            await csrf();
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -103,13 +99,18 @@ export const useAdminStore = defineStore("admin", {
                         data: {
                             roles: data.roles[0].name,
                         },
+                        xhrFields: { withCredentials: true },
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
                         success: (response) => {
                             resolve(response);
                         },
                         error: (error) => {
                             console.error("User Update Error:", error);
                             reject(error);
-                        },
+                        }
                     });
                 });
             } catch (error) {
@@ -121,7 +122,6 @@ export const useAdminStore = defineStore("admin", {
             if (this.AllSubjects.length > 0) {
                 return this.AllSubjects;
             } else {
-                await csrf();
                 try {
                     return new Promise((resolve, reject) => {
                         $.ajax({
@@ -147,7 +147,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async createSubject(data) {
-            await csrf();
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -171,7 +170,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async updateSubject(data) {
-            await csrf();
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -199,7 +197,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async deleteSubject(data) {
-            await csrf();
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -226,8 +223,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async createSubjectUsers(subject_id, data) {
-            await csrf();
-
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({
@@ -254,7 +249,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async updateSubjectUsers(data) {
-            await csrf();
             try {
 
                 return new Promise((resolve, reject) => {
@@ -280,8 +274,6 @@ export const useAdminStore = defineStore("admin", {
             }
         },
         async deleteSubjectUsers(data) {
-            await csrf();
-
             try {
                 return new Promise((resolve, reject) => {
                     $.ajax({

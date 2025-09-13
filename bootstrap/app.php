@@ -38,7 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->validateCsrfTokens(except: [
-            // Add any routes that should be excluded from CSRF validation
+            'api/*', // Exclude all API routes from CSRF validation
         ]);
 
         //

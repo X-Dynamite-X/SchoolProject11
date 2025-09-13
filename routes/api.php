@@ -31,13 +31,13 @@ Route::post('/tokens/create', function (Request $request) {
 // Route::resource('/conversation', ConversationController::class);
 Route::resource('/message', MessageController::class);
 
-Route::middleware(["auth:sanctum", "auth"])->group(function () {
+Route::middleware(["auth:sanctum"])->group(function () {
     Route::resource('/conversation', ConversationController::class);
     Route::get('/conversation/search', [ConversationController::class, 'show']);
     Route::put('/conversation/{conversationId}/isRead', [ConversationController::class, 'isOpenConversation']);
     Route::resource('/message', MessageController::class);
 });
-Route::middleware(["role:admin", "auth:sanctum", "auth"])->name("admin.")->prefix("admin")->group(function () {
+Route::middleware(["role:admin", "auth:sanctum"])->name("admin.")->prefix("admin")->group(function () {
     Route::resource('/subject', SubjectController::class);
     Route::resource('/user', UserController::class);
     Route::resource('/role', RoleController::class);
