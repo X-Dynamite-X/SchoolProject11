@@ -33,6 +33,7 @@ Route::resource('/message', MessageController::class);
 
 Route::middleware(["auth:sanctum", "auth"])->group(function () {
     Route::resource('/conversation', ConversationController::class);
+    Route::get('/conversation/search', [ConversationController::class, 'show']);
     Route::put('/conversation/{conversationId}/isRead', [ConversationController::class, 'isOpenConversation']);
     Route::resource('/message', MessageController::class);
 });

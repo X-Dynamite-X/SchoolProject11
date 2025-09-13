@@ -3,7 +3,7 @@ import router from "@/router/router";
 
 const csrf = () => {
     return $.ajax({
-        url: "/sanctum/csrf-cookie",
+        url: "/SchoolProject11/sanctum/csrf-cookie",
         method: "GET",
         xhrFields: { withCredentials: true },
         headers: {
@@ -140,7 +140,7 @@ export const useAuthStore = defineStore("auth", {
         async updateProfile(data) {
             try {
                 const response = await $.ajax({
-                    url: `/api/v1/user/update`,
+                    url: `/api/user/update`,
                     method: "PUT",
                     data: data,
                 });
