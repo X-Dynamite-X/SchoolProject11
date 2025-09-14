@@ -26,13 +26,21 @@ let checkReadMessageChannel = null;
 // استرجاع المحادثات
 const fetchDataConversation = async () => {
     try {
+        // التأكد من تحميل بيانات المستخدم أولاً
+        if (!authStore.user) {
+            await authStore.getUser();
+        }
+
         await messageStore.getConversations();
         conversations.value = messageStore.conversations;
     } catch (error) {
         console.error("Failed to fetch conversations:", error);
     } finally {
         loading.value = false;
-        responseNewMessage();
+        // التأكد من وجود بيانات المستخدم قبل تشغيل Echo channels
+        if (authStore.user?.user?.id && window.Echo) {
+            responseNewMessage();
+        }
     }
 };
 
@@ -67,7 +75,7 @@ const isReadMessageInConversation = (conversationId) => {
     }
 
     conversation.messages.forEach((message) => {
-        if (message.sender_id === authStore.user.user.id && !message.is_read) {
+        if (message.sender_id === authStore.user?.user?.id && !message.is_read) {
             message.is_read = true;
         }
     });
@@ -75,6 +83,17 @@ const isReadMessageInConversation = (conversationId) => {
 
 // الاستجابة للرسائل الجديدة
 const responseNewMessage = () => {
+    // التأكد من وجود بيانات المستخدم و Echo
+    if (!authStore.user?.user?.id) {
+        console.warn("User data not available for Echo channels");
+        return;
+    }
+
+    if (!window.Echo) {
+        console.warn("Echo is not available");
+        return;
+    }
+
     const connectedChannels = new Set();
     const conversationMap = new Map(
         conversations.value.map((conv) => [conv.id, conv])
@@ -88,7 +107,7 @@ const responseNewMessage = () => {
             connectedChannels.add(conversation.id);
 
             addMessageChannel.listen(".new-message", (data) => {
-                if (data.sender_id !== authStore.user.user.id) {
+                if (data.sender_id !== authStore.user?.user?.id) {
                     const newMessage = {
                         id: data.message_id ?? null,
                         sender_id: data.sender_id,
@@ -118,25 +137,33 @@ const responseNewMessage = () => {
             });
         }
     });
+
+    // إنشاء channel للمحادثات الجديدة
+    const addConversationChannel = window.Echo.private(
+        `user_${authStore.user.user.id}`
+    );
+    addConversationChannel.listen(".add-conversation", function (data) {
+        const newConversation = {
+            id: data.conversation.id,
+            messages: data.conversation.messages,
+            other_user: data.conversation.other_user,
+        };
+        conversations.value.push(newConversation);
+        addChanelNewConversation(newConversation.id);
+    });
 };
-const addConversationChannel = window.Echo.private(
-    `user_${authStore.user.user.id}`
-);
-addConversationChannel.listen(".add-conversation", function (data) {
-    const newConversation = {
-        id: data.conversation.id,
-        messages: data.conversation.messages,
-        other_user: data.conversation.other_user,
-    };
-    conversations.value.push(newConversation);
-    addChanelNewConversation(newConversation.id);
-});
 function addChanelNewConversation(conversationId) {
+    // التأكد من وجود بيانات المستخدم
+    if (!authStore.user?.user?.id) {
+        console.warn("User data not available for new conversation channel");
+        return;
+    }
+
     const addMessageChannel = window.Echo.private(
         `conversation_${conversationId}`
     );
     addMessageChannel.listen(".new-message", function (data) {
-        if (data.sender_id != authStore.user.user.id) {
+        if (data.sender_id != authStore.user?.user?.id) {
             const newMessage = {
                 id: data.message_id ?? null,
                 sender_id: data.sender_id,
@@ -174,7 +201,10 @@ const selectChat = (chatId) => {
     }
     console.log("is not work");
 
-    checkInAuntherUserIsReadMessageOrNot();
+    // التحقق من وجود Echo قبل تشغيل channel
+    if (window.Echo && authStore.user?.user?.id) {
+        checkInAuntherUserIsReadMessageOrNot();
+    }
 };
 
 // التحقق من الرسائل غير المقروءة
@@ -190,7 +220,7 @@ const cheakMessageIsRead = (conversationId) => {
 
     const hasUnreadMessages = conversation.messages.some(
         (message) =>
-            message.sender_id !== authStore.user.user.id && !message.is_read
+            message.sender_id !== authStore.user?.user?.id && !message.is_read
     );
 
     if (hasUnreadMessages) {
@@ -204,6 +234,11 @@ const cheakMessageIsRead = (conversationId) => {
 const checkInAuntherUserIsReadMessageOrNot = () => {
     if (!activeChatId.value) {
         console.warn("Invalid conversation ID.");
+        return;
+    }
+
+    if (!authStore.user?.user?.id) {
+        console.warn("User data not available for read message channel");
         return;
     }
 
@@ -221,7 +256,7 @@ const checkInAuntherUserIsReadMessageOrNot = () => {
 
     oldConversationId.value = activeChatId.value;
 
-    checkReadMessageChannel = Echo.private(
+    checkReadMessageChannel = window.Echo.private(
         `message_in_conversation_${activeChatId.value}_isRead`
     );
 

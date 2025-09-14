@@ -17,9 +17,9 @@ export const useAuthStore = defineStore("auth", {
         authStatus: null,
     }),
     getters: {
-        user: (satae) => satae.authUser,
-        errors: (satae) => satae.authErrors,
-        status: (satae) => satae.authStatus,
+        user: (state) => state.authUser,
+        errors: (state) => state.authErrors,
+        status: (state) => state.authStatus,
         roles: (state) => state.authRole,
     },
     actions: {

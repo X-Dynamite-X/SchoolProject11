@@ -17,7 +17,7 @@ defineProps({
         v-for="(message, index) in activeChat?.messages || []"
         :key="index"
         :class="[
-            message.sender_id == authStore.user.user.id
+            message.sender_id == authStore.user?.user?.id
                 ? 'ml-auto bg-blue-500 text-white text-end'
                 : 'mr-auto bg-gray-200 dark:bg-gray-700 dark:text-white',
         ]"
@@ -30,7 +30,7 @@ defineProps({
             {{ message.created_at }}
         </div>
         <div
-            v-if="message.sender_id == authStore.user.user.id"
+            v-if="message.sender_id == authStore.user?.user?.id"
             class="text-xs mt-1 flex items-center space-x-1 justify-end"
         >
             <span v-if="message.is_read == true">

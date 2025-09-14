@@ -8,7 +8,7 @@ const newMessage = ref("");
 const emit = defineEmits(["sendMessage"]);
 
 const sendMessage = () => {
-    if (newMessage.value.trim()) {
+    if (newMessage.value.trim() && authStore.user?.user?.id) {
         emit("sendMessage", authStore.user.user.id, newMessage.value); // Pass userId and newMessage
         newMessage.value = ""; // Clear the input after sending
     }
