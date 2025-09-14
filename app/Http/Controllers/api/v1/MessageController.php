@@ -21,11 +21,17 @@ class MessageController extends Controller
                 'conversation_id' => $request->input('conversation_id'),
                 'text' => $request->input('text'),
                 "is_read"=>false,
-                'created_at' => $request->input('created_at'),
-                "updated_at" => null,
+                // Let Laravel handle created_at automatically
             ]
         );
+
+        // Log the message creation and event firing
+        \Log::info('Message created:', ['message_id' => $message->id, 'conversation_id' => $message->conversation_id]);
+
         event(new NewMessageEvent($message));
+
+        \Log::info('NewMessageEvent fired for message:', ['message_id' => $message->id]);
+
         return response()->json([
             'newMessage' => $message,
             'message' => 'Message Create Successfully',

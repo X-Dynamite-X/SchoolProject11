@@ -94,6 +94,8 @@ const responseNewMessage = () => {
         return;
     }
 
+    console.log("Setting up Echo channels for user:", authStore.user.user.id);
+
     const connectedChannels = new Set();
     const conversationMap = new Map(
         conversations.value.map((conv) => [conv.id, conv])
@@ -107,12 +109,14 @@ const responseNewMessage = () => {
             connectedChannels.add(conversation.id);
 
             addMessageChannel.listen(".new-message", (data) => {
+                console.log("Received new message:", data);
                 if (data.sender_id !== authStore.user?.user?.id) {
                     const newMessage = {
-                        id: data.message_id ?? null,
+                        id: data.id ?? null,
                         sender_id: data.sender_id,
                         text: data.text,
                         created_at: data.created_at,
+                        is_read: false,
                     };
 
                     const existingConversation = conversationMap.get(
@@ -165,10 +169,11 @@ function addChanelNewConversation(conversationId) {
     addMessageChannel.listen(".new-message", function (data) {
         if (data.sender_id != authStore.user?.user?.id) {
             const newMessage = {
-                id: data.message_id ?? null,
+                id: data.id ?? null,
                 sender_id: data.sender_id,
                 text: data.text,
                 created_at: data.created_at,
+                is_read: false,
             };
             const existingConversation = conversations.value.find(
                 (conv) => conv.id === data.conversation_id
